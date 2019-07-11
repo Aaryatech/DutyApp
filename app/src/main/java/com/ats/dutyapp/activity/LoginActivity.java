@@ -2,7 +2,9 @@ package com.ats.dutyapp.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,9 +18,14 @@ import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.fcm.SharedPrefManager;
 import com.ats.dutyapp.model.Info;
 import com.ats.dutyapp.model.Login;
+import com.ats.dutyapp.model.Sync;
 import com.ats.dutyapp.utils.CommonDialog;
 import com.ats.dutyapp.utils.CustomSharedPreference;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,8 +35,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText edDSCCode;
     private Button btnSubmit,btnSync;
     public String strIntent,strIntentSplash;
-   // ArrayList<Sync> syncArray = new ArrayList<>();
-   // Sync syncData;
+    ArrayList<Sync> syncArray = new ArrayList<>();
+    Sync syncData;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +60,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             e.printStackTrace();
         }
 
+        try {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            Gson gson = new Gson();
+            String json = prefs.getString("Sync", null);
+            Type type = new TypeToken<ArrayList<Sync>>() {}.getType();
+            syncArray= gson.fromJson(json, type);
+            Log.e("SYNCH ONCR : ", "------------" + syncArray);
+            if(syncArray==null)
+            {
+                getSynch();
+            }
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
     }
 
@@ -207,7 +229,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             if (data.getError()) {
                                 commonDialog.dismiss();
 
-                                Intent intent=new Intent(LoginActivity.this, MainActivity.class);
+                                Intent intent=new Intent(LoginActivity.this, HomeActivity.class);
                                 intent.putExtra("model", strIntent);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(intent);
@@ -215,7 +237,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             } else {
 
                                 commonDialog.dismiss();
-                                Intent intent=new Intent(LoginActivity.this, MainActivity.class);
+                                Intent intent=new Intent(LoginActivity.this, HomeActivity.class);
                                 intent.putExtra("model", strIntent);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(intent);
@@ -225,7 +247,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             commonDialog.dismiss();
                             Log.e("Data Null : ", "-----------");
 
-                            Intent intent=new Intent(LoginActivity.this, MainActivity.class);
+                            Intent intent=new Intent(LoginActivity.this, HomeActivity.class);
                             intent.putExtra("model", strIntent);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intent);
@@ -237,7 +259,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         Log.e("Exception : ", "-----------" + e.getMessage());
                         e.printStackTrace();
 
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                         finish();
                     }
                 }
@@ -249,7 +271,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Log.e("onFailure : ", "-----------" + t.getMessage());
                     t.printStackTrace();
 
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                     finish();
                 }
             });
@@ -257,4 +279,117 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             Toast.makeText(this, "No Internet Connection !", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void getSynch() {
+
+        if (Constants.isOnline(this)) {
+            final CommonDialog commonDialog = new CommonDialog(this, "Loading", "Please Wait...");
+            commonDialog.show();
+
+            Call<ArrayList<Sync>> listCall = Constants.myInterface.allSettings();
+            listCall.enqueue(new Callback<ArrayList<Sync>>() {
+                @Override
+                public void onResponse(Call<ArrayList<Sync>> call, Response<ArrayList<Sync>> response) {
+                    try {
+                        if (response.body() != null) {
+
+                            Log.e("SYNCH DATA : ", "------------" + response.body());
+
+                            Sync data;
+                            syncArray=response.body();
+                            if (syncArray!=null) {
+                                commonDialog.dismiss();
+//                                Gson gson = new Gson();
+//                                String json = gson.toJson(syncArray);
+//                                Log.e("JSON","-------------------------------"+json);
+
+                                if(syncData==null) {
+
+                                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
+                                    SharedPreferences.Editor editor = prefs.edit();
+                                    Gson gson = new Gson();
+                                    String json = gson.toJson(syncArray);
+                                    editor.putString("Sync", json);
+                                    editor.apply();     // This line is IMPORTANT !!!
+
+                                }
+
+                            } else {
+                                commonDialog.dismiss();
+
+                                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this, R.style.AlertDialogTheme);
+                                builder.setTitle(getResources().getString(R.string.app_name));
+                                builder.setMessage("Oops something went wrong! please check username & password.");
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+
+                            }
+                        } else {
+                            commonDialog.dismiss();
+
+                            Log.e("Data Null1 : ", "-----------");
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this, R.style.AlertDialogTheme);
+                            builder.setTitle(getResources().getString(R.string.app_name));
+                            builder.setMessage("Oops something went wrong! please check username & password.");
+                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
+                    } catch (Exception e) {
+                        commonDialog.dismiss();
+                        //Toast.makeText(LoginActivity.this, "Unable to login", Toast.LENGTH_SHORT).show();
+                        Log.e("Exception : ", "-----------" + e.getMessage());
+                        e.printStackTrace();
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this, R.style.AlertDialogTheme);
+                        builder.setTitle(getResources().getString(R.string.app_name));
+                        builder.setMessage("Oops something went wrong! please check username & password.");
+                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ArrayList<Sync>> call, Throwable t) {
+                    commonDialog.dismiss();
+                    Log.e("onFailure : ", "-----------" + t.getMessage());
+                    t.printStackTrace();
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this, R.style.AlertDialogTheme);
+                    builder.setTitle(getResources().getString(R.string.app_name));
+                    builder.setMessage("Oops something went wrong! please check username & password.");
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            });
+        } else {
+            Toast.makeText(this, "No Internet Connection !", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }

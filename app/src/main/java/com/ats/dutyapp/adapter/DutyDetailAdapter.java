@@ -2,6 +2,7 @@ package com.ats.dutyapp.adapter;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
@@ -17,7 +18,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -26,10 +26,13 @@ import android.widget.Toast;
 
 import com.ats.dutyapp.R;
 import com.ats.dutyapp.activity.MainActivity;
+import com.ats.dutyapp.activity.RemarkActivity;
 import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.model.DutyDetail;
 import com.ats.dutyapp.model.Info;
 import com.ats.dutyapp.utils.CommonDialog;
+import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -66,37 +69,64 @@ public class DutyDetailAdapter extends RecyclerView.Adapter<DutyDetailAdapter.My
 
         myViewHolder.tvTaskName.setText(""+model.getTaskName());
         myViewHolder.tvWeight.setText(""+model.getTaskWeight());
+        myViewHolder.tvRemark.setText("Remark : "+model.getRemark());
+        myViewHolder.tvTaskDesc.setText("Task Description : "+model.getTaskDesc());
 
-//        if(model.isChecked())
-//        {
-//            myViewHolder.checkBox.setChecked(true);
-//        }else{
-//            myViewHolder.checkBox.setChecked(false);
-//        }
+        String imageUri = String.valueOf(model.getPhoto1());
+        try {
+            Picasso.with(context).load(Constants.IMAGE_URL+imageUri).placeholder(context.getResources().getDrawable(R.drawable.ic_photo)).into(myViewHolder.ivPhoto1);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String imageUri1 = String.valueOf(model.getPhoto2());
+        try {
+            Picasso.with(context).load(Constants.IMAGE_URL+imageUri1).placeholder(context.getResources().getDrawable(R.drawable.ic_photo)).into(myViewHolder.ivPhoto2);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if(model.getTaskStatus()==0)
         {
-            myViewHolder.checkBox.setChecked(false);
+            myViewHolder.btnDone.setVisibility(View.VISIBLE);
         }else if(model.getTaskStatus()==1)
         {
-            myViewHolder.checkBox.setChecked(true);
+            myViewHolder.btnDone.setVisibility(View.GONE);
         }
 
-        myViewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        if(model.getPhotoReq()==0 && model.getRemarkReq()==1) {
+            myViewHolder.linearLayoutPhoto.setVisibility(View.GONE);
+            myViewHolder.tvRemark.setVisibility(View.VISIBLE);
+        }else if(model.getPhotoReq()==1 && model.getRemarkReq()==0) {
+            myViewHolder.linearLayoutPhoto.setVisibility(View.VISIBLE);
+            myViewHolder.tvRemark.setVisibility(View.GONE);
+        }else if(model.getPhotoReq()==1 && model.getRemarkReq()==1)
+        {
+            myViewHolder.linearLayoutPhoto.setVisibility(View.VISIBLE);
+            myViewHolder.tvRemark.setVisibility(View.VISIBLE);
+        }
+
+        myViewHolder.btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    model.setChecked(true);
-                    if(model.getRemarkReq()==1 || model.getPhotoReq()==1) {
-                        new AddApproveDialog(context, model).show();
-                    }else {
-                        getTaskDone(model.getTaskDoneDetailId(),model.getTaskDoneHeaderId(),model.getPhotoReq(),model.getRemarkReq(),"","","","","","",1);
-                    }
-                } else {
-                    model.setChecked(false);
+            public void onClick(View v) {
+                if(model.getRemarkReq()==1 || model.getPhotoReq()==1) {
+                   // new AddApproveDialog(context, model).show();
 
+                    Gson gson = new Gson();
+                    String json = gson.toJson(model);
+
+                    Intent intent = new Intent(context, RemarkActivity.class);
+                    Bundle args = new Bundle();
+                    args.putString("model", json);
+                    intent.putExtra("model", json);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    context.startActivity(intent);
+
+                }else {
+                    getTaskDone(model.getTaskDoneDetailId(),model.getTaskDoneHeaderId(),model.getPhotoReq(),model.getRemarkReq(),"","","","","","",1);
                 }
-
             }
         });
     }
@@ -107,14 +137,23 @@ public class DutyDetailAdapter extends RecyclerView.Adapter<DutyDetailAdapter.My
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvTaskName,tvWeight;
+        private TextView tvTaskName,tvWeight,tvRemark,tvTaskDesc;
+        private ImageView ivPhoto1,ivPhoto2;
+        private LinearLayout linearLayoutPhoto;
+        private Button btnDone;
         private CheckBox checkBox;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
             tvTaskName=itemView.findViewById(R.id.tvTaskName);
             tvWeight=itemView.findViewById(R.id.tvWeight);
+            tvRemark=itemView.findViewById(R.id.tvRemark);
+            tvTaskDesc=itemView.findViewById(R.id.tvTaskDesc);
+            ivPhoto1=itemView.findViewById(R.id.ivPhoto1);
+            ivPhoto2=itemView.findViewById(R.id.ivPhoto2);
+            btnDone=itemView.findViewById(R.id.btnDone);
             checkBox=itemView.findViewById(R.id.checkbox);
+            linearLayoutPhoto=itemView.findViewById(R.id.linearLayoutPhoto);
 
         }
     }

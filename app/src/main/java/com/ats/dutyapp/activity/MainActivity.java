@@ -9,11 +9,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.ats.dutyapp.R;
+import com.ats.dutyapp.fragment.DashboardFragment;
 import com.ats.dutyapp.fragment.DutyDetailBySuperwiserFragment;
 import com.ats.dutyapp.fragment.DutyDetailFragment;
 import com.ats.dutyapp.fragment.DutyListSuperwiser;
 import com.ats.dutyapp.fragment.DutyListFragment;
-import com.ats.dutyapp.fragment.MainFragment;
+import com.ats.dutyapp.fragment.EmployeeListFragment;
 import com.ats.dutyapp.model.Login;
 import com.ats.dutyapp.utils.CustomSharedPreference;
 import com.google.gson.Gson;
@@ -43,7 +44,7 @@ Login loginUser;
         }else if(loginUser.getEmpCatId()==3) {
 
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame, new MainFragment(), "Exit");
+            ft.replace(R.id.content_frame, new EmployeeListFragment(), "Exit");
             ft.commit();
         }
 
@@ -56,7 +57,7 @@ Login loginUser;
         Fragment mainFragment = getSupportFragmentManager().findFragmentByTag("MainFragment");
         Fragment dutyFragment = getSupportFragmentManager().findFragmentByTag("DutyFragment");
         Fragment dutyListSupFragment = getSupportFragmentManager().findFragmentByTag("DutyListSupFragment");
-        if (exit instanceof MainFragment && exit.isVisible()) {
+        if (exit instanceof EmployeeListFragment && exit.isVisible()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogTheme);
             builder.setMessage("Exit Application ?");
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -74,11 +75,18 @@ Login loginUser;
             AlertDialog dialog = builder.create();
             dialog.show();
 
-        } else if (mainFragment instanceof DutyListFragment && mainFragment.isVisible() ||
+        }else if (mainFragment instanceof EmployeeListFragment && mainFragment.isVisible()) {
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, new DashboardFragment(), "Exit");
+            ft.commit();
+
+        }
+        else if (mainFragment instanceof DutyListFragment && mainFragment.isVisible() ||
                 mainFragment instanceof DutyDetailFragment && mainFragment.isVisible()) {
 
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame, new MainFragment(), "Exit");
+            ft.replace(R.id.content_frame, new EmployeeListFragment(), "Exit");
             ft.commit();
 
         }else if (dutyFragment instanceof DutyDetailFragment && dutyFragment.isVisible()) {
@@ -92,7 +100,6 @@ Login loginUser;
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, new DutyListSuperwiser(), "Exit");
             ft.commit();
-
         }
         else {
 

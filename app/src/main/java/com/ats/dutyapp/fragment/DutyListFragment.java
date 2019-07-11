@@ -1,7 +1,9 @@
 package com.ats.dutyapp.fragment;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,9 +19,14 @@ import com.ats.dutyapp.adapter.DutyListAdapter;
 import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.model.DutyHeader;
 import com.ats.dutyapp.model.Employee;
+import com.ats.dutyapp.model.Login;
+import com.ats.dutyapp.model.Sync;
 import com.ats.dutyapp.utils.CommonDialog;
+import com.ats.dutyapp.utils.CustomSharedPreference;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -31,11 +38,12 @@ import retrofit2.Response;
  * A simple {@link Fragment} subclass.
  */
 public class DutyListFragment extends Fragment {
-Employee model;
+  public static Employee model;
     private RecyclerView recyclerView;
     DutyListAdapter adapter;
     ArrayList<DutyHeader> dutyList =new ArrayList<>();
-
+    public static Login loginUserMain;
+    ArrayList<Sync> syncArray = new ArrayList<>();
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -45,18 +53,69 @@ Employee model;
         recyclerView = view.findViewById(R.id.recyclerView);
 
         try {
-            String quoteStr = getArguments().getString("model");
+            String employeeStr = getArguments().getString("model");
             Gson gson = new Gson();
-            model = gson.fromJson(quoteStr, Employee.class);
+            model = gson.fromJson(employeeStr, Employee.class);
             Log.e("MODEL EMPLOYEE INFO", "-----------------------------------" + model);
         }catch (Exception e)
         {
             e.printStackTrace();
         }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        if(model!=null) {
-            getDutyList(model.getEmpId(), sdf.format(System.currentTimeMillis()));
+
+        try {
+            String userStr = CustomSharedPreference.getString(getActivity(), CustomSharedPreference.MAIN_KEY_USER);
+            Gson gson = new Gson();
+            loginUserMain = gson.fromJson(userStr, Login.class);
+            Log.e("LOGIN USER MAIN : ", "--------USER-------" + loginUserMain);
+        }catch (Exception e)
+        {
+            e.printStackTrace();
         }
+
+        try {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            Gson gson = new Gson();
+            String json = prefs.getString("Sync", null);
+            Type type = new TypeToken<ArrayList<Sync>>() {}.getType();
+            syncArray= gson.fromJson(json, type);
+
+            Log.e("SYNC MAIN : ", "--------USER-------" + syncArray);
+
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        if(syncArray!=null) {
+            for (int j = 0; j < syncArray.size(); j++) {
+                if (syncArray.get(j).getSettingKey().equals("Employee")) {
+                    if (syncArray.get(j).getSettingValue().equals(String.valueOf(loginUserMain.getEmpCatId()))) {
+
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        getDutyList(loginUserMain.getEmpId(), sdf.format(System.currentTimeMillis()));
+
+                    }
+                } else if(syncArray.get(j).getSettingKey().equals("Supervisor")){
+                    if (syncArray.get(j).getSettingValue().equals(String.valueOf(loginUserMain.getEmpCatId()))) {
+
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        if(model!=null) {
+                            getDutyList(model.getEmpId(), sdf.format(System.currentTimeMillis()));
+                        }
+
+                    }
+                }else if(syncArray.get(j).getSettingKey().equals("Admin")){
+                    if (syncArray.get(j).getSettingValue().equals(String.valueOf(loginUserMain.getEmpCatId()))) {
+                        if(model!=null) {
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            getDutyList(model.getEmpId(), sdf.format(System.currentTimeMillis()));
+                        }
+
+                    }
+                }
+            }
+        }
+
         return view;
     }
 

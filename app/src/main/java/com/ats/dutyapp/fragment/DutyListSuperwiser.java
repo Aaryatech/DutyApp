@@ -1,7 +1,9 @@
 package com.ats.dutyapp.fragment;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,10 +20,13 @@ import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.model.DutyHeaderDetail;
 import com.ats.dutyapp.model.Employee;
 import com.ats.dutyapp.model.Login;
+import com.ats.dutyapp.model.Sync;
 import com.ats.dutyapp.utils.CommonDialog;
 import com.ats.dutyapp.utils.CustomSharedPreference;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -37,12 +42,14 @@ public class DutyListSuperwiser extends Fragment {
     DutyHeaderDetailListAdapter adapter;
     ArrayList<DutyHeaderDetail> dutyList =new ArrayList<>();
     Login loginUser;
+    ArrayList<Sync> syncArray = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_duty_list_by_dept, container, false);
+        getActivity().setTitle("Duty List");
         recyclerView = view.findViewById(R.id.recyclerView);
 
         try {
@@ -55,9 +62,42 @@ public class DutyListSuperwiser extends Fragment {
             e.printStackTrace();
         }
 
-        ArrayList<Integer> deptList = new ArrayList<>();
-        deptList.add(loginUser.getEmpDeptId());
-        getDutyListByDept(deptList);
+        try {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            Gson gson = new Gson();
+            String json = prefs.getString("Sync", null);
+            Type type = new TypeToken<ArrayList<Sync>>() {}.getType();
+            syncArray= gson.fromJson(json, type);
+
+            Log.e("SYNC MAIN : ", "--------USER-------" + syncArray);
+
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        if(syncArray!=null) {
+            for (int j = 0; j < syncArray.size(); j++) {
+              if(syncArray.get(j).getSettingKey().equals("Supervisor")){
+                    if (syncArray.get(j).getSettingValue().equals(String.valueOf(loginUser.getEmpCatId()))) {
+
+                        ArrayList<Integer> deptList = new ArrayList<>();
+                        deptList.add(loginUser.getEmpDeptId());
+                        getDutyListByDept(deptList);
+
+
+                    }
+                }else if(syncArray.get(j).getSettingKey().equals("Admin")){
+                    if (syncArray.get(j).getSettingValue().equals(String.valueOf(loginUser.getEmpCatId()))) {
+                        ArrayList<Integer> deptList = new ArrayList<>();
+                        deptList.add(-1);
+                        getDutyListByDept(deptList);
+
+                    }
+                }
+            }
+        }
+
         return view;
     }
 

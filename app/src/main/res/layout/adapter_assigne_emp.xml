@@ -18,13 +18,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:padding="5dp">
+                    android:padding="10dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
                         android:layout_weight="1"
+                        android:padding="10dp"
                         android:orientation="vertical">
 
                         <TextView
@@ -41,17 +41,6 @@
                             android:textColor="@color/colorPrimaryDark"
                             android:textSize="16sp" />
 
-                        <TextView
-                            android:id="@+id/tvEmpDesig"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:fontFamily="@font/sf_ui_regular"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:text="My Leave Pending"
-                            android:textColor="@color/colorBlack"
-                            android:textSize="14sp" />
 
                     </LinearLayout>
 

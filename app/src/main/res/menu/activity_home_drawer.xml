@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home"
+            android:title="Dashboard" />
+
+        <item
+            android:id="@+id/nav_emp_list"
+            android:icon="@drawable/ic_employee"
+            android:title="Employee Task Done" />
+
+        <item
+            android:id="@+id/nav_assigne_emp"
+            android:icon="@drawable/ic_list"
+            android:title="Assign Duty List" />
+
+        <item
+            android:id="@+id/nav_duty_list_emp"
+            android:icon="@drawable/ic_list"
+            android:title="Duty List" />
+
+    </group>
+
+
+
+</menu>

@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.ats.dutyapp.R;
-import com.ats.dutyapp.activity.MainActivity;
+import com.ats.dutyapp.activity.HomeActivity;
 import com.ats.dutyapp.fragment.DutyDetailBySuperwiserFragment;
 import com.ats.dutyapp.model.DutyHeaderDetail;
 import com.google.gson.Gson;
@@ -51,12 +51,20 @@ public class DutyHeaderDetailListAdapter extends RecyclerView.Adapter<DutyHeader
                 Gson gson = new Gson();
                 String json = gson.toJson(model);
 
-                MainActivity activity = (MainActivity) context;
+                HomeActivity activity = (HomeActivity) context;
                 DutyDetailBySuperwiserFragment adf = new DutyDetailBySuperwiserFragment();
                 Bundle args = new Bundle();
                 args.putString("model",json);
                 adf.setArguments(args);
                 activity.getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf, "DutyListSupFragment").commit();
+
+//                    MainActivity activity = (MainActivity) context;
+//                    DutyDetailFragment adf = new DutyDetailFragment();
+//                    Bundle args = new Bundle();
+//                    args.putString("model",json);
+//                    adf.setArguments(args);
+//                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf, "DutyFragment").commit();
+
 
             }
         });

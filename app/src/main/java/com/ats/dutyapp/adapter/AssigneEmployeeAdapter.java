@@ -11,15 +11,15 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.ats.dutyapp.R;
-import com.ats.dutyapp.model.Employee;
+import com.ats.dutyapp.model.EmpList;
 
 import java.util.ArrayList;
 
 public class AssigneEmployeeAdapter extends RecyclerView.Adapter<AssigneEmployeeAdapter.MyViewHolder> {
-    private ArrayList<Employee> empList;
+    private ArrayList<EmpList> empList;
     private Context context;
 
-    public AssigneEmployeeAdapter(ArrayList<Employee> empList, Context context) {
+    public AssigneEmployeeAdapter(ArrayList<EmpList> empList, Context context) {
         this.empList = empList;
         this.context = context;
     }
@@ -35,20 +35,10 @@ public class AssigneEmployeeAdapter extends RecyclerView.Adapter<AssigneEmployee
 
     @Override
     public void onBindViewHolder(@NonNull AssigneEmployeeAdapter.MyViewHolder myViewHolder, int i) {
-        final Employee model=empList.get(i);
-        myViewHolder.tvEmpName.setText(model.getEmpFname()+" "+model.getEmpMname()+" "+model.getEmpSname());
+        final EmpList model=empList.get(i);
+        myViewHolder.tvEmpName.setText(model.getEmpName());
 
-        if(model.getEmpCatId()==1) {
-            myViewHolder.tvEmpDesig.setText("Superwiser");
-        }else  if(model.getEmpCatId()==2) {
-            myViewHolder.tvEmpDesig.setText("Admin");
-        }else  if(model.getEmpCatId()==3) {
-            myViewHolder.tvEmpDesig.setText("Employee");
-        }else  if(model.getEmpCatId()==4) {
-            myViewHolder.tvEmpDesig.setText("Security");
-        }
-
-        if(model.isChecked())
+        if(model.getAssigned())
         {
             myViewHolder.checkBox.setChecked(true);
         }else{
@@ -59,9 +49,9 @@ public class AssigneEmployeeAdapter extends RecyclerView.Adapter<AssigneEmployee
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    model.setChecked(true);
+                    model.setAssigned(true);
                 } else {
-                    model.setChecked(false);
+                    model.setAssigned(false);
 
                 }
 

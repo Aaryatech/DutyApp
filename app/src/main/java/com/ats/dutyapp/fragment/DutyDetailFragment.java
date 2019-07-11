@@ -49,10 +49,10 @@ import static android.app.Activity.RESULT_OK;
  * A simple {@link Fragment} subclass.
  */
 public class DutyDetailFragment extends Fragment {
-    DutyHeader model;
+    public static DutyHeader model;
     private TextView tvDutyName,tvTimeOff,tvTimeOn,tvDate;
     private RecyclerView recyclerView;
-    DutyDetailAdapter adapter;
+    public static DutyDetailAdapter adapter;
     ArrayList<DutyDetail> dutyDetailList =new ArrayList<>();
 
     File folder = new File(Environment.getExternalStorageDirectory() + File.separator, "gfpl_security");
@@ -93,9 +93,9 @@ public class DutyDetailFragment extends Fragment {
         if(model!=null)
         {
             tvDutyName.setText(model.getDutyName());
-            tvTimeOff.setText(model.getShiftToTime());
-            tvTimeOn.setText(model.getShiftFromTime());
-            tvDate.setText(model.getTaskDate());
+            tvTimeOff.setText("To Time : "+model.getShiftToTime());
+            tvTimeOn.setText("From Time : "+model.getShiftFromTime());
+            tvDate.setText("Date : "+model.getTaskDate());
 
             getDutyDetail(model.getTaskDoneHeaderId());
         }

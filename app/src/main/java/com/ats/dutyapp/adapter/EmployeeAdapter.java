@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.ats.dutyapp.R;
-import com.ats.dutyapp.activity.MainActivity;
+import com.ats.dutyapp.activity.HomeActivity;
 import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.fragment.DutyListFragment;
 import com.ats.dutyapp.model.Employee;
@@ -71,12 +71,12 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.MyView
                 Gson gson = new Gson();
                 String json = gson.toJson(model);
 
-                MainActivity activity = (MainActivity) context;
+                HomeActivity activity = (HomeActivity) context;
                 DutyListFragment adf = new DutyListFragment();
                 Bundle args = new Bundle();
                 args.putString("model",json);
                 adf.setArguments(args);
-                activity.getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf, "MainFragment").commit();
+                activity.getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf, "EmployeeFragment").commit();
 
             }
         });

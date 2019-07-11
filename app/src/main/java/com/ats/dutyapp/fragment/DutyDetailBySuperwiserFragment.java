@@ -21,16 +21,15 @@ import com.ats.dutyapp.R;
 import com.ats.dutyapp.adapter.AssigneEmployeeAdapter;
 import com.ats.dutyapp.adapter.DutyDetailBySuperwiser;
 import com.ats.dutyapp.constant.Constants;
-import com.ats.dutyapp.model.AssignDuty;
+import com.ats.dutyapp.model.AssignDetail;
 import com.ats.dutyapp.model.DutyHeaderDetail;
-import com.ats.dutyapp.model.Employee;
+import com.ats.dutyapp.model.EmpList;
+import com.ats.dutyapp.model.Info;
 import com.ats.dutyapp.model.Login;
-import com.ats.dutyapp.model.TaskDetailDisplay;
 import com.ats.dutyapp.utils.CommonDialog;
 import com.ats.dutyapp.utils.CustomSharedPreference;
 import com.google.gson.Gson;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -42,16 +41,18 @@ import retrofit2.Response;
  */
 public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnClickListener {
 
-    public TextView tvTaskStartTime,tvTaskEndTime,tvDate,tvTaskName;
+    public TextView tvTaskStartTime,tvTaskEndTime,tvDate,tvTaskName,tvAssignName;
     public RecyclerView recyclerView,recyclerViewEmp;
     public Button btnSubmit;
     DutyHeaderDetail model;
     Login loginUser;
     AssigneEmployeeAdapter adapterEmp;
-    ArrayList<Employee> empList = new ArrayList<>();
+    AssignDetail assignDetail;
     DutyDetailBySuperwiser adapter;
+    ArrayList<AssignDetail> detailList = new ArrayList<>();
+    ArrayList<EmpList> empList = new ArrayList<>();
 
-    public static ArrayList<Employee> assignEmpStaticList = new ArrayList<>();
+    public static ArrayList<EmpList> assignEmpStaticList = new ArrayList<>();
     String stringId;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,8 +64,8 @@ public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnC
         tvTaskEndTime=(TextView)view.findViewById(R.id.tvTaskEndTime);
         tvDate=(TextView)view.findViewById(R.id.tvDate);
         tvTaskName=(TextView)view.findViewById(R.id.tvTaskName);
+        tvAssignName=(TextView)view.findViewById(R.id.tvAssignName);
         recyclerView=(RecyclerView)view.findViewById(R.id.recyclerView);
-        recyclerViewEmp=(RecyclerView)view.findViewById(R.id.recyclerViewEmp);
         btnSubmit=(Button)view.findViewById(R.id.btnSubmit);
 
         try {
@@ -73,28 +74,24 @@ public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnC
             model = gson.fromJson(quoteStr, DutyHeaderDetail.class);
             Log.e("MODEL DUTY INFO", "-----------------------------------" + model);
 
-            tvTaskStartTime.setText("From Time : "+model.getShiftFromTime());
-            tvTaskEndTime.setText("To Time : "+model.getShiftToTime());
-            tvDate.setText(""+model.getCreatedDate());
-            tvTaskName.setText(""+model.getDutyName());
 
         }catch (Exception e)
         {
             e.printStackTrace();
         }
 
-        if (model.getTaskDetailDisplay() != null) {
-            ArrayList<TaskDetailDisplay> detailList = new ArrayList<>();
-            for (int i = 0; i < model.getTaskDetailDisplay().size(); i++) {
-                detailList.add(model.getTaskDetailDisplay().get(i));
-            }
-
-            adapter = new DutyDetailBySuperwiser(detailList, getContext());
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
-            recyclerView.setLayoutManager(mLayoutManager);
-            recyclerView.setItemAnimator(new DefaultItemAnimator());
-            recyclerView.setAdapter(adapter);
-        }
+//        if (model.getTaskDetailDisplay() != null) {
+//            ArrayList<TaskDetailDisplay> detailList = new ArrayList<>();
+//            for (int i = 0; i < model.getTaskDetailDisplay().size(); i++) {
+//                detailList.add(model.getTaskDetailDisplay().get(i));
+//            }
+//
+//            adapter = new DutyDetailBySuperwiser(detailList, getContext());
+//            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+//            recyclerView.setLayoutManager(mLayoutManager);
+//            recyclerView.setItemAnimator(new DefaultItemAnimator());
+//            recyclerView.setAdapter(adapter);
+//        }
 
         try {
             String userStr = CustomSharedPreference.getString(getActivity(), CustomSharedPreference.MAIN_KEY_USER);
@@ -106,48 +103,59 @@ public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnC
             e.printStackTrace();
         }
 
-        ArrayList<Integer> deptIdList = new ArrayList<>();
-        deptIdList.add(loginUser.getEmpDeptId());
-
-        getEmployee(deptIdList);
+        getAssignEmp(model.getDutyId());
 
         btnSubmit.setOnClickListener(this);
 
         return view;
     }
 
-    private void getEmployee(ArrayList<Integer> deptIdList) {
-        Log.e("PARAMETER","            DEPT ID       "+deptIdList);
+    private void getAssignEmp(Integer dutyId) {
+
+        Log.e("PARAMETER","            DUTY ID       "+dutyId);
 
         if (Constants.isOnline(getContext())) {
             final CommonDialog commonDialog = new CommonDialog(getContext(), "Loading", "Please Wait...");
             commonDialog.show();
 
-            Call<ArrayList<Employee>> listCall = Constants.myInterface.allEmployeesByDept(deptIdList);
-            listCall.enqueue(new Callback<ArrayList<Employee>>() {
+            Call<AssignDetail> listCall = Constants.myInterface.getAssignDutyByDutyId(dutyId);
+            listCall.enqueue(new Callback<AssignDetail>() {
                 @Override
-                public void onResponse(Call<ArrayList<Employee>> call, Response<ArrayList<Employee>> response) {
+                public void onResponse(Call<AssignDetail> call, Response<AssignDetail> response) {
                     try {
                         if (response.body() != null) {
 
-                            Log.e("ASSIGN EMPLOYEE LIST : ", " - " + response.body());
-                            empList.clear();
-                            empList = response.body();
+                            Log.e("DUTY DETAIL LIST : ", " - " + response.body());
+                             assignDetail=response.body();
+
+                            detailList.add(assignDetail);
+
+                            if (assignDetail.getEmpList() != null) {
+
+                            for (int j = 0; j < assignDetail.getEmpList().size(); j++) {
+                                empList.add(assignDetail.getEmpList().get(j));
+                            }
+
+                         }
 
                             assignEmpStaticList.clear();
                             assignEmpStaticList = empList;
 
-                            for (int i = 0; i < assignEmpStaticList.size(); i++) {
-                                assignEmpStaticList.get(i).setChecked(false);
-                            }
+//                            for (int i = 0; i < assignEmpStaticList.size(); i++) {
+//                                assignEmpStaticList.get(i).setChecked(false);
+//                            }
 
-                           // AssignUser();
+                            tvTaskStartTime.setText("From Time : "+assignDetail.getShiftFromTime());
+                            tvTaskEndTime.setText("To Time : "+assignDetail.getShiftToTime());
+                            tvDate.setText(""+assignDetail.getAssignDate());
+                            tvTaskName.setText(""+assignDetail.getDutyName());
+                            tvAssignName.setText(""+assignDetail.getTaskAssignUserName());
 
-                            adapterEmp = new AssigneEmployeeAdapter(empList, getContext());
-                            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
-                            recyclerViewEmp.setLayoutManager(mLayoutManager);
-                            recyclerViewEmp.setItemAnimator(new DefaultItemAnimator());
-                            recyclerViewEmp.setAdapter(adapterEmp);
+                            adapterEmp = new AssigneEmployeeAdapter(empList, getActivity());
+                            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+                            recyclerView.setLayoutManager(mLayoutManager);
+                            recyclerView.setItemAnimator(new DefaultItemAnimator());
+                            recyclerView.setAdapter(adapterEmp);
 
                             commonDialog.dismiss();
 
@@ -163,7 +171,7 @@ public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnC
                 }
 
                 @Override
-                public void onFailure(Call<ArrayList<Employee>> call, Throwable t) {
+                public void onFailure(Call<AssignDetail> call, Throwable t) {
                     commonDialog.dismiss();
                     Log.e("onFailure : ", "-----------" + t.getMessage());
                     t.printStackTrace();
@@ -173,6 +181,7 @@ public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnC
             Toast.makeText(getContext(), "No Internet Connection !", Toast.LENGTH_SHORT).show();
         }
     }
+
 
 
     @Override
@@ -185,23 +194,18 @@ public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnC
 
     private void AssignUser() {
 
-        ArrayList<Employee> assignedEmpArray = new ArrayList<>();
         ArrayList<Integer> assignedEmpIdArray = new ArrayList<>();
         ArrayList<String> assignedEmpNameArray = new ArrayList<>();
 
         if (assignEmpStaticList != null) {
             if (assignEmpStaticList.size() > 0) {
-                assignedEmpArray.clear();
                 for (int i = 0; i < assignEmpStaticList.size(); i++) {
-                    if (assignEmpStaticList.get(i).isChecked()) {
-                        assignedEmpArray.add(assignEmpStaticList.get(i));
+                    if (assignEmpStaticList.get(i).getAssigned()) {
                         assignedEmpIdArray.add(assignEmpStaticList.get(i).getEmpId());
-                        assignedEmpNameArray.add(assignEmpStaticList.get(i).getEmpFname() + " " + assignEmpStaticList.get(i).getEmpMname() + " " + assignEmpStaticList.get(i).getEmpSname());
+                        assignedEmpNameArray.add(assignEmpStaticList.get(i).getEmpName());
                     }
                 }
             }
-            Log.e("ASSIGN EMP", "---------------------------------" + assignedEmpArray);
-            Log.e("ASSIGN EMP SIZE", "---------------------------------" + assignedEmpArray.size());
 
             String empIds = assignedEmpIdArray.toString().trim();
             Log.e("ASSIGN EMP ID", "---------------------------------" + empIds);
@@ -212,28 +216,44 @@ public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnC
             Log.e("ASSIGN EMP ID STRING", "---------------------------------" + stringId);
             Log.e("ASSIGN EMP ID STRING1", "---------------------------------" + a1);
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            AssignDuty assignDuty= new AssignDuty(0,sdf.format(System.currentTimeMillis()),model.getDutyId(),stringId,"",loginUser.getEmpId(),"",0,1,1,0,0,"","","");
-            saveAssigneDuty(assignDuty);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
+            builder.setTitle("Confirmation");
+            builder.setMessage("Do you want to submit ?");
+            builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    saveAssigneDuty(assignDetail.getDutyId(),assignDetail.getNotifyTime(),stringId);
+
+                }
+            });
+            builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
 
         }
     }
 
-    private void saveAssigneDuty(AssignDuty assignDuty) {
-        Log.e("PARAMETER","---------------------------------------ASSIGHN VISITOR--------------------------"+assignDuty);
+    private void saveAssigneDuty(Integer dutyId, String notifyTime, String empId) {
+        Log.e("PARAMETER","---------------------------------------DUTY ID--------------------------"+dutyId+"---------------------------NOTIFY TIME------------------"+notifyTime+"--------------------------EMP ID-----------------------------"+empId);
 
         if (Constants.isOnline(getContext())) {
             final CommonDialog commonDialog = new CommonDialog(getContext(), "Loading", "Please Wait...");
             commonDialog.show();
 
-            Call<AssignDuty> listCall = Constants.myInterface.saveAssignDuty(assignDuty);
-            listCall.enqueue(new Callback<AssignDuty>() {
+            Call<Info> listCall = Constants.myInterface.updateAssignDutyTimeAndEmpIds(dutyId,notifyTime,empId);
+            listCall.enqueue(new Callback<Info>() {
                 @Override
-                public void onResponse(Call<AssignDuty> call, Response<AssignDuty> response) {
+                public void onResponse(Call<Info> call, Response<Info> response) {
                     try {
                         if (response.body() != null) {
 
-                            Log.e("ASSIGHN VISITOR : ", " ------------------------------ASSIGHN VISITOR------------------------- " + response.body());
+                            Log.e("SAVE ASSIGN EMP : ", " ------------------------------SAVE ASSIGN EMP------------------------- " + response.body());
                             Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
                             FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                             ft.replace(R.id.content_frame, new DutyListSuperwiser(), "MainFragment");
@@ -281,7 +301,7 @@ public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnC
                 }
 
                 @Override
-                public void onFailure(Call<AssignDuty> call, Throwable t) {
+                public void onFailure(Call<Info> call, Throwable t) {
                     commonDialog.dismiss();
                     Log.e("onFailure : ", "-----------" + t.getMessage());
                     t.printStackTrace();
