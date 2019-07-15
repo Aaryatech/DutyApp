@@ -68,4 +68,15 @@ public class DeptCount {
         this.total = total;
         this.completed = completed;
     }
+
+    @Override
+    public String toString() {
+        return "DeptCount{" +
+                "id='" + id + '\'' +
+                ", deptId=" + deptId +
+                ", deptName='" + deptName + '\'' +
+                ", total=" + total +
+                ", completed=" + completed +
+                '}';
+    }
 }

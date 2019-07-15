@@ -100,8 +100,6 @@ public class DutyDetailFragment extends Fragment {
             getDutyDetail(model.getTaskDoneHeaderId());
         }
 
-
-
         return view;
     }
 

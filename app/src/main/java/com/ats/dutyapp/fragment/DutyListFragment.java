@@ -85,7 +85,6 @@ public class DutyListFragment extends Fragment {
         {
             e.printStackTrace();
         }
-
         if(syncArray!=null) {
             for (int j = 0; j < syncArray.size(); j++) {
                 if (syncArray.get(j).getSettingKey().equals("Employee")) {

@@ -118,7 +118,6 @@ Login loginUser;
                 Log.e("MY TAG1","-----Employee-------");
                 if(syncArray.get(i).getSettingValue().equals(String.valueOf(loginUser.getEmpCatId())))
                 {
-
                     navigationView.getMenu().findItem(R.id.nav_home).setVisible(true);
                     navigationView.getMenu().findItem(R.id.nav_emp_list).setVisible(false);
                     navigationView.getMenu().findItem(R.id.nav_assigne_emp).setVisible(false);

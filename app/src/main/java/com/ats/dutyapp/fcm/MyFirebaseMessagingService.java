@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.ats.dutyapp.activity.LoginActivity;
+import com.ats.dutyapp.activity.HomeActivity;
 import com.ats.dutyapp.sqlite.DatabaseHandler;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -64,7 +64,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
                 db.addNotification(title, message, "" + sdf.format(Calendar.getInstance().getTimeInMillis()));
 
-                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
                     intent.putExtra("model", type);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
@@ -74,7 +74,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             } else {
 
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
                 intent.putExtra("model", type);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 //intent.putExtra("Feedback","fcm");
