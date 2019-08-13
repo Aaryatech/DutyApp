@@ -181,9 +181,7 @@ public class RemarkActivity extends AppCompatActivity implements View.OnClickLis
                     });
                     AlertDialog dialog = builder.create();
                     dialog.show();
-
                 }
-
 
             }else if(dutyDetail.getPhotoReq()==1 && dutyDetail.getRemarkReq()==0) {
                 if (imagePath1 != null && imagePath2 != null ) {
@@ -192,7 +190,6 @@ public class RemarkActivity extends AppCompatActivity implements View.OnClickLis
                     final ArrayList<String> fileNameArray = new ArrayList<>();
 
                     String photo1 = "", photo2 = "", photo3 = "";
-
                     //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss");
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     if (imagePath1 != null) {
@@ -564,14 +561,21 @@ public class RemarkActivity extends AppCompatActivity implements View.OnClickLis
 
                             if (!response.body().getError()) {
 
-                                MainActivity activity = (MainActivity) context;
-                                Toast.makeText(activity, "Task Done Successfully", Toast.LENGTH_SHORT).show();
+                                RemarkActivity activity = (RemarkActivity) context;
+                                Toast.makeText(getApplicationContext(), "Task Done Successfully", Toast.LENGTH_SHORT).show();
+//                                activity.finish();
 
+                                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                                //intent.putExtra("model", "Close Meeting");
+                                intent.putExtra("model", "RemarkActivity");
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+
+                                commonDialog.dismiss();
                             } else {
                                 Toast.makeText(RemarkActivity.this, "Unable to process", Toast.LENGTH_SHORT).show();
+                                commonDialog.dismiss();
                             }
-
-                            commonDialog.dismiss();
 
                         } else {
                             commonDialog.dismiss();

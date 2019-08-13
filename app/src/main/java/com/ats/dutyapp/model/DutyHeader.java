@@ -81,6 +81,8 @@ public class DutyHeader {
     @Expose
     private Object taskDoneDetailDisplayList;
 
+    private Boolean isChecked;
+
     public Integer getTaskDoneHeaderId() {
         return taskDoneHeaderId;
     }
@@ -281,6 +283,15 @@ public class DutyHeader {
         this.taskDoneDetailDisplayList = taskDoneDetailDisplayList;
     }
 
+
+    public Boolean getChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(Boolean checked) {
+        isChecked = checked;
+    }
+
     @Override
     public String toString() {
         return "DutyHeader{" +
@@ -309,6 +320,7 @@ public class DutyHeader {
                 ", shiftToTime='" + shiftToTime + '\'' +
                 ", noOfHr='" + noOfHr + '\'' +
                 ", taskDoneDetailDisplayList=" + taskDoneDetailDisplayList +
+                ", isChecked=" + isChecked +
                 '}';
     }
 }

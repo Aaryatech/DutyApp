@@ -18,12 +18,12 @@ public class CustomSharedPreference
 
     public static String LANGUAGE_ENG = "en";
     public static String LANGUAGE_MAR = "ma";
+    public static String LANGUAGE_HIN = "hi";
     public static String LANGUAGE_ENG_ID = "1"; //--- for english
     public static String LANGUAGE_MAR_ID = "2"; //--- for marathi
-    public static String LANGUAGE_SELECTED = "1"; //--- for marathi
-    public static String KEY_USER = "User";
+    public static String LANGUAGE_HIN_ID = "3"; //--- for hindi
+    public static String LANGUAGE_SELECTED = "1";
     public static String MAIN_KEY_USER = "MainUser";
-    public static String SYNC_DATA = "SyncData";
 
     private static String PREFERENCE_NAME = "UserInfo";
     public static String PREFERENCE_TOKEN = "appToken";

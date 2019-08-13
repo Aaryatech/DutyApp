@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.ats.dutyapp.R;
-import com.ats.dutyapp.adapter.DashboardEmployeeAdapter;
+import com.ats.dutyapp.adapter.EmployeeAdapter;
 import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.model.DeptCount;
 import com.ats.dutyapp.model.EmpCount;
@@ -35,7 +35,7 @@ import retrofit2.Response;
 public class EmployeeDashboardFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    DashboardEmployeeAdapter adapter;
+    EmployeeAdapter adapter;
     ArrayList<EmpCount> empList = new ArrayList<>();
     DeptCount model;
     Login loginUserMain;
@@ -98,7 +98,8 @@ public class EmployeeDashboardFragment extends Fragment {
                             empList.clear();
                             empList = response.body();
 
-                            adapter = new DashboardEmployeeAdapter(empList, getContext());
+                            adapter = new EmployeeAdapter(empList, getContext());
+//                            DashboardEmployeeAdapter
                             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
                             recyclerView.setLayoutManager(mLayoutManager);
                             recyclerView.setItemAnimator(new DefaultItemAnimator());

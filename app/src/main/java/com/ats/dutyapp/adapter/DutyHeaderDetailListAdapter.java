@@ -40,7 +40,7 @@ public class DutyHeaderDetailListAdapter extends RecyclerView.Adapter<DutyHeader
     public void onBindViewHolder(@NonNull DutyHeaderDetailListAdapter.MyViewHolder myViewHolder, int i) {
         final DutyHeaderDetail model=dutyList.get(i);
         myViewHolder.tvDutyName.setText(""+model.getDutyName());
-        myViewHolder.tvDutyCount.setText("Count : "+model.getTotalTaskWt());
+        myViewHolder.tvDutyCount.setText("Wgt : "+model.getTotalTaskWt());
         myViewHolder.tvTimeOn.setText("From Time : "+model.getShiftFromTime());
         myViewHolder.tvTimeOff.setText("To Time : "+model.getShiftToTime());
         myViewHolder.tvDate.setText(""+model.getCreatedDate());

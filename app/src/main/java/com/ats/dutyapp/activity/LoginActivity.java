@@ -42,13 +42,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
         edDSCCode = findViewById(R.id.edDSCCode);
 
         btnSubmit = findViewById(R.id.btnSubmit);
         btnSync = findViewById(R.id.btnSync);
         btnSubmit.setOnClickListener(this);
         btnSync.setOnClickListener(this);
+
+     //   CustomSharedPreference.putString(LoginActivity.this, CustomSharedPreference.LANGUAGE_ENG, CustomSharedPreference.LANGUAGE_ENG_ID);
+        CustomSharedPreference.putString(LoginActivity.this, CustomSharedPreference.LANGUAGE_SELECTED, CustomSharedPreference.LANGUAGE_ENG_ID);
 
         try {
             //strIntent = getIntent().getStringExtra("model");
@@ -77,7 +79,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
 
     }
-
 
     @Override
     public void onClick(View v) {
@@ -234,8 +235,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(intent);
                                 finish();
-                            } else {
 
+                            } else {
                                 commonDialog.dismiss();
                                 Intent intent=new Intent(LoginActivity.this, HomeActivity.class);
                                 intent.putExtra("model", strIntent);

@@ -37,6 +37,8 @@
     <color name="colorBlack">#000000</color>
     <color name="colorGray">#f5f5f5</color>
     <color name="colorLight">#e6f6f7</color>
+    <color name="colorLightPink">#FFE5E5</color>
+    <color name="colorLightPink1">#FFD6DC</color>
     <color name="color1">#000000</color>
     <color name="color2">#000000</color>
 

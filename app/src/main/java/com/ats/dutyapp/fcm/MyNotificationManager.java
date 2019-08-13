@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.AudioAttributes;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -76,7 +77,6 @@ public class MyNotificationManager {
                     .setWhen(System.currentTimeMillis());
             notificationManager.notify(1, notificationBuilder.build());
 
-
         } else {
             Log.e("ANDROID","---------------------------------- < O");
 
@@ -97,10 +97,13 @@ public class MyNotificationManager {
             builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS | Notification.DEFAULT_VIBRATE);
         }
 
-
     }
 
     public void showSmallNotification(String title, String message, Intent intent) {
+
+        Uri uri = Uri.parse("mattersofgrey.com/audio/DEX-Gen-MainThemeDing.mp3");
+       // Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
         final PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
                         mCtx,
@@ -115,13 +118,21 @@ public class MyNotificationManager {
             NotificationManager notificationManager = (NotificationManager) mCtx.getSystemService(NOTIFICATION_SERVICE);
             String id = "id_product";
             int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel mChannel = new NotificationChannel(id, title, importance);
+
+            AudioAttributes attributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .build();
+
+            NotificationChannel mChannel = new NotificationChannel(id,
+                    mCtx.getString(R.string.app_name),
+                    NotificationManager.IMPORTANCE_HIGH);
+
             // Configure the notification channel.
-            mChannel.setDescription(message);
+            mChannel.setDescription("");
             mChannel.enableLights(true);
-            // Sets the notification light color for notifications posted to this
-            // channel, if the device supports this feature.
-            mChannel.setLightColor(Color.RED);
+            mChannel.enableVibration(true);
+            mChannel.setSound(uri, attributes); // This is IMPORTANT
+
             notificationManager.createNotificationChannel(mChannel);
 
             PendingIntent pendingIntent = PendingIntent.getActivity(mCtx, 123, intent, PendingIntent.FLAG_UPDATE_CURRENT);

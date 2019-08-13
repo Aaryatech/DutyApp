@@ -53,6 +53,7 @@ public class DutyDetailFragment extends Fragment {
     private TextView tvDutyName,tvTimeOff,tvTimeOn,tvDate;
     private RecyclerView recyclerView;
     public static DutyDetailAdapter adapter;
+    public String language;
     ArrayList<DutyDetail> dutyDetailList =new ArrayList<>();
 
     File folder = new File(Environment.getExternalStorageDirectory() + File.separator, "gfpl_security");
@@ -73,6 +74,9 @@ public class DutyDetailFragment extends Fragment {
         tvTimeOn=view.findViewById(R.id.tvTimeStart);
         tvDate=view.findViewById(R.id.tvDate);
         recyclerView = view.findViewById(R.id.recyclerView);
+
+//        language = CustomSharedPreference.LANGUAGE_SELECTED;
+//        Log.e("LANGUAGE FRAG","----------------------------------------"+language);
 
         if (PermissionsUtil.checkAndRequestPermissions(getActivity())) {
         }
@@ -104,7 +108,7 @@ public class DutyDetailFragment extends Fragment {
     }
 
     private void getDutyDetail(Integer taskDoneHeaderId) {
-        Log.e("PARAMETER","            HEADER ID       ");
+        Log.e("PARAMETER","            HEADER ID       "+taskDoneHeaderId);
 
         if (Constants.isOnline(getContext())) {
             final CommonDialog commonDialog = new CommonDialog(getContext(), "Loading", "Please Wait...");

@@ -1,6 +1,7 @@
 package com.ats.dutyapp.activity;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -22,14 +23,17 @@ import android.widget.TextView;
 import com.ats.dutyapp.R;
 import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.fragment.DashboardFragment;
+import com.ats.dutyapp.fragment.DocumentFragment;
 import com.ats.dutyapp.fragment.DutyDetailBySuperwiserFragment;
 import com.ats.dutyapp.fragment.DutyDetailFragment;
 import com.ats.dutyapp.fragment.DutyListFragment;
 import com.ats.dutyapp.fragment.DutyListSuperwiser;
 import com.ats.dutyapp.fragment.EmployeeDashboardFragment;
 import com.ats.dutyapp.fragment.EmployeeListFragment;
+import com.ats.dutyapp.fragment.TaskFragment;
 import com.ats.dutyapp.model.Login;
 import com.ats.dutyapp.model.Sync;
+import com.ats.dutyapp.utils.Constant;
 import com.ats.dutyapp.utils.CustomSharedPreference;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -44,6 +48,10 @@ public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 ArrayList<Sync> syncArray = new ArrayList<>();
 Login loginUser;
+public String strRemark;
+String language;
+int selectLang;
+CharSequence[] values = {" English "," मराठी "," हिंदी "};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +68,8 @@ Login loginUser;
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
 
+        selectLang= Integer.parseInt(CustomSharedPreference.getString(getApplicationContext(),CustomSharedPreference.LANGUAGE_SELECTED));
+        Log.e("SELECTED LANG : ", "------------------------------" + selectLang);
         try {
             String userStr = CustomSharedPreference.getString(getApplication(), CustomSharedPreference.MAIN_KEY_USER);
             Gson gson = new Gson();
@@ -110,6 +120,30 @@ Login loginUser;
             }
         }
 
+
+        try {
+            Intent intent = getIntent();
+            strRemark = intent.getExtras().getString("model");
+            Log.e("StringMain","--------------------------"+strRemark);
+
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        if(strRemark!=null) {
+            if (strRemark.equalsIgnoreCase("RemarkActivity")) {
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, new DutyDetailFragment(), "MainFragment");
+                ft.commit();
+            }
+        }else {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, new DashboardFragment(), "Exit");
+            ft.commit();
+
+        }
+
         for(int i=0;i<syncArray.size();i++)
         {
             Log.e("MY TAG","-----syncArray-------");
@@ -152,11 +186,6 @@ Login loginUser;
             }
 
         }
-
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.content_frame, new DashboardFragment(), "Exit");
-        ft.commit();
-
     }
 
     @Override
@@ -167,6 +196,7 @@ Login loginUser;
         Fragment employeeFragment = getSupportFragmentManager().findFragmentByTag("EmployeeFragment");
         Fragment dutyFragment = getSupportFragmentManager().findFragmentByTag("DutyFragment");
         Fragment dutyListSupFragment = getSupportFragmentManager().findFragmentByTag("DutyListSupFragment");
+        Fragment dutyDetailFragment = getSupportFragmentManager().findFragmentByTag("DutyDetialFragment");
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -215,6 +245,12 @@ Login loginUser;
 
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, new DutyListSuperwiser(), "MainFragment");
+            ft.commit();
+
+        }else if (dutyDetailFragment instanceof TaskFragment && dutyDetailFragment.isVisible()) {
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, new DutyDetailBySuperwiserFragment(), "DutyListSupFragment");
             ft.commit();
 
         }
@@ -271,10 +307,98 @@ Login loginUser;
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, new DutyListFragment(), "MainFragment");
             ft.commit();
+        }else if (id == R.id.nav_document) {
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, new DocumentFragment(), "MainFragment");
+            ft.commit();
+        }else if (id == R.id.nav_Marathi) {
+
+            language = CustomSharedPreference.LANGUAGE_MAR;
+            CustomSharedPreference.putString(HomeActivity.this, CustomSharedPreference.LANGUAGE_MAR, CustomSharedPreference.LANGUAGE_MAR_ID);
+            Constant.yourLanguage(HomeActivity.this, language);
+
+            Log.e("Marathi Id","----------------------------"+CustomSharedPreference.getString(getApplicationContext(),CustomSharedPreference.LANGUAGE_MAR));
+
+            CustomSharedPreference.putString(HomeActivity.this, CustomSharedPreference.LANGUAGE_SELECTED, CustomSharedPreference.LANGUAGE_MAR_ID);
+
+            Log.e("Marathi selected","----------------------------"+CustomSharedPreference.getString(getApplicationContext(),CustomSharedPreference.LANGUAGE_SELECTED));
+
+            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+            finish();
+            startActivity(intent);
+
+        }else if(id==R.id.nav_hindi)
+        {
+            language = CustomSharedPreference.LANGUAGE_HIN;
+            CustomSharedPreference.putString(HomeActivity.this, CustomSharedPreference.LANGUAGE_HIN, CustomSharedPreference.LANGUAGE_HIN_ID);
+            Constant.yourLanguage(HomeActivity.this, language);
+
+            Log.e("Hindi Id","----------------------------"+CustomSharedPreference.getString(getApplicationContext(),CustomSharedPreference.LANGUAGE_HIN));
+
+            CustomSharedPreference.putString(HomeActivity.this, CustomSharedPreference.LANGUAGE_SELECTED, CustomSharedPreference.LANGUAGE_HIN_ID);
+
+            Log.e("Hindi selected","----------------------------"+CustomSharedPreference.getString(getApplicationContext(),CustomSharedPreference.LANGUAGE_SELECTED));
+
+            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+            finish();
+            startActivity(intent);
+        }else if(id==R.id.nav_Eng)
+        {
+            language = CustomSharedPreference.LANGUAGE_ENG;
+            CustomSharedPreference.putString(HomeActivity.this, CustomSharedPreference.LANGUAGE_ENG, CustomSharedPreference.LANGUAGE_ENG_ID);
+            Constant.yourLanguage(HomeActivity.this, language);
+            Log.e("English Id","----------------------------"+CustomSharedPreference.getString(getApplicationContext(),CustomSharedPreference.LANGUAGE_ENG));
+
+            CustomSharedPreference.putString(HomeActivity.this, CustomSharedPreference.LANGUAGE_SELECTED, CustomSharedPreference.LANGUAGE_ENG_ID);
+
+            Log.e("English selected","----------------------------"+CustomSharedPreference.getString(getApplicationContext(),CustomSharedPreference.LANGUAGE_SELECTED));
+            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+            finish();
+            startActivity(intent);
+
+        }else if(id==R.id.nav_language)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
+            builder.setTitle("Select language")
+                    .setSingleChoiceItems(values,(selectLang-1) ,new DialogInterface.OnClickListener(){
+                   // .setItems(R.array.lauguage, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int pos) {
+                            // The 'which' argument contains the index position
+                            // of the selected item
+                            if (pos == 0) {
+                                Constant.yourLanguage(HomeActivity.this, CustomSharedPreference.LANGUAGE_ENG);
+                                CustomSharedPreference.putString(HomeActivity.this, CustomSharedPreference.LANGUAGE_ENG, CustomSharedPreference.LANGUAGE_ENG_ID);
+                                CustomSharedPreference.putString(HomeActivity.this, CustomSharedPreference.LANGUAGE_SELECTED, CustomSharedPreference.LANGUAGE_ENG_ID);
+
+                                //setLocale("ta");
+                            } else if (pos == 1) {
+                                Constant.yourLanguage(HomeActivity.this, CustomSharedPreference.LANGUAGE_MAR);
+                                CustomSharedPreference.putString(HomeActivity.this, CustomSharedPreference.LANGUAGE_MAR, CustomSharedPreference.LANGUAGE_MAR_ID);
+                                CustomSharedPreference.putString(HomeActivity.this, CustomSharedPreference.LANGUAGE_SELECTED, CustomSharedPreference.LANGUAGE_MAR_ID);
+
+                                //setLocale("hi");
+                            }else if (pos == 2) {
+                                Constant.yourLanguage(HomeActivity.this, CustomSharedPreference.LANGUAGE_HIN);
+                                CustomSharedPreference.putString(HomeActivity.this, CustomSharedPreference.LANGUAGE_HIN, CustomSharedPreference.LANGUAGE_HIN_ID);
+                                CustomSharedPreference.putString(HomeActivity.this, CustomSharedPreference.LANGUAGE_SELECTED, CustomSharedPreference.LANGUAGE_HIN_ID);
+
+                                //setLocale("hi");
+                            }
+                            Intent refresh = new Intent(HomeActivity.this, HomeActivity.class);
+                            startActivity(refresh);
+                            finish();
+                        }
+                    });
+            builder.create();
+            builder.show();
+
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
 }

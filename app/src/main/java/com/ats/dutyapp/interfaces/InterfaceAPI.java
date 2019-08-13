@@ -3,7 +3,9 @@ package com.ats.dutyapp.interfaces;
 import com.ats.dutyapp.model.AssignDetail;
 import com.ats.dutyapp.model.AssignDuty;
 import com.ats.dutyapp.model.DeptCount;
+import com.ats.dutyapp.model.Document;
 import com.ats.dutyapp.model.DutyDetail;
+import com.ats.dutyapp.model.DutyDone;
 import com.ats.dutyapp.model.DutyHeader;
 import com.ats.dutyapp.model.DutyHeaderDetail;
 import com.ats.dutyapp.model.EmpCount;
@@ -70,4 +72,14 @@ public interface InterfaceAPI {
 
     @POST("duty/master/getEmpWiseCount")
     Call<ArrayList<EmpCount>> getEmpWiseCount(@Query("deptId") int deptId,@Query("empId") ArrayList<Integer> empId, @Query("date") String date);
+
+    @POST("duty/master/updateAssignDutySchedule")
+    Call<Info> updateAssignDutySchedule(@Query("assignId") int assignId, @Query("status") int status);
+
+
+    @POST("duty/master/getDutyReportByEmp")
+    Call<ArrayList<Document>> getDutyReportByEmp(@Query("empId") int empId,@Query("langId") int langId);
+
+    @POST("duty/master/saveTaskDoneHeader")
+    Call<DutyDone> saveTaskDoneHeader(@Body DutyDone dutyDone);
 }

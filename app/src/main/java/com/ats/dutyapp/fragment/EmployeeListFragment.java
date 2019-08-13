@@ -17,7 +17,7 @@ import android.widget.Toast;
 import com.ats.dutyapp.R;
 import com.ats.dutyapp.adapter.EmployeeAdapter;
 import com.ats.dutyapp.constant.Constants;
-import com.ats.dutyapp.model.Employee;
+import com.ats.dutyapp.model.EmpCount;
 import com.ats.dutyapp.model.Login;
 import com.ats.dutyapp.model.Sync;
 import com.ats.dutyapp.utils.CommonDialog;
@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -39,7 +40,7 @@ public class EmployeeListFragment extends Fragment {
     private RecyclerView recyclerView;
     EmployeeAdapter adapter;
     Login loginUserMain;
-    ArrayList<Employee> empList = new ArrayList<>();
+    ArrayList<EmpCount> empList = new ArrayList<>();
     ArrayList<Sync> syncArray = new ArrayList<>();
 
     @Override
@@ -81,7 +82,15 @@ public class EmployeeListFragment extends Fragment {
 
                         ArrayList<Integer> deptIdList = new ArrayList<>();
                         deptIdList.add(loginUserMain.getEmpDeptId());
-                        getEmployeeList(deptIdList);
+
+                        ArrayList<Integer> employee = new ArrayList<>();
+                        employee.add(-1);
+
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+                       // getEmployeeList(deptIdList);
+                        getEmployeeList(loginUserMain.getEmpDeptId(),employee,sdf.format(System.currentTimeMillis()));
+                       // getEmployeeList(deptIdList);
 
                         Log.e("Superwiser","--------------------------------");
 
@@ -91,7 +100,13 @@ public class EmployeeListFragment extends Fragment {
 
                         ArrayList<Integer> deptIdList = new ArrayList<>();
                         deptIdList.add(-1);
-                        getEmployeeList(deptIdList);
+
+                        ArrayList<Integer> employee = new ArrayList<>();
+                        employee.add(-1);
+
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        getEmployeeList(-1,employee,sdf.format(System.currentTimeMillis()));
+                       // getEmployeeList(deptIdList);
 
                         Log.e("Admin","--------------------------------");
 
@@ -105,17 +120,68 @@ public class EmployeeListFragment extends Fragment {
         return view;
     }
 
-    private void getEmployeeList(ArrayList<Integer> deptId) {
-        Log.e("PARAMETER","            DEPT ID       "+deptId);
+//    private void getEmployeeList(ArrayList<Integer> deptId) {
+//        Log.e("PARAMETER","            DEPT ID       "+deptId);
+//
+//        if (Constants.isOnline(getContext())) {
+//            final CommonDialog commonDialog = new CommonDialog(getContext(), "Loading", "Please Wait...");
+//            commonDialog.show();
+//
+//            Call<ArrayList<Employee>> listCall = Constants.myInterface.allEmployeesByDept(deptId);
+//            listCall.enqueue(new Callback<ArrayList<Employee>>() {
+//                @Override
+//                public void onResponse(Call<ArrayList<Employee>> call, Response<ArrayList<Employee>> response) {
+//                    try {
+//                        if (response.body() != null) {
+//
+//                            Log.e("EMPLOYEE LIST : ", " - " + response.body());
+//                            empList.clear();
+//                            empList = response.body();
+//
+//                            adapter = new EmployeeAdapter(empList, getContext());
+//                            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+//                            recyclerView.setLayoutManager(mLayoutManager);
+//                            recyclerView.setItemAnimator(new DefaultItemAnimator());
+//                            recyclerView.setAdapter(adapter);
+//
+//                            commonDialog.dismiss();
+//
+//                        } else {
+//                            commonDialog.dismiss();
+//                            Log.e("Data Null : ", "-----------");
+//                        }
+//                    } catch (Exception e) {
+//                        commonDialog.dismiss();
+//                        Log.e("Exception : ", "-----------" + e.getMessage());
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<ArrayList<Employee>> call, Throwable t) {
+//                    commonDialog.dismiss();
+//                    Log.e("onFailure : ", "-----------" + t.getMessage());
+//                    t.printStackTrace();
+//                }
+//            });
+//        } else {
+//            Toast.makeText(getContext(), "No Internet Connection !", Toast.LENGTH_SHORT).show();
+//        }
+//    }
+//
+
+    private void getEmployeeList(int deptId, ArrayList<Integer>  empId, String date) {
+
+        Log.e("PARAMETER","            DEPT ID       "+deptId+"     EMP ID   "+empId+"         Date     "+date);
 
         if (Constants.isOnline(getContext())) {
             final CommonDialog commonDialog = new CommonDialog(getContext(), "Loading", "Please Wait...");
             commonDialog.show();
 
-            Call<ArrayList<Employee>> listCall = Constants.myInterface.allEmployeesByDept(deptId);
-            listCall.enqueue(new Callback<ArrayList<Employee>>() {
+            Call<ArrayList<EmpCount>> listCall = Constants.myInterface.getEmpWiseCount(deptId,empId,date);
+            listCall.enqueue(new Callback<ArrayList<EmpCount>>() {
                 @Override
-                public void onResponse(Call<ArrayList<Employee>> call, Response<ArrayList<Employee>> response) {
+                public void onResponse(Call<ArrayList<EmpCount>> call, Response<ArrayList<EmpCount>> response) {
                     try {
                         if (response.body() != null) {
 
@@ -143,7 +209,7 @@ public class EmployeeListFragment extends Fragment {
                 }
 
                 @Override
-                public void onFailure(Call<ArrayList<Employee>> call, Throwable t) {
+                public void onFailure(Call<ArrayList<EmpCount>> call, Throwable t) {
                     commonDialog.dismiss();
                     Log.e("onFailure : ", "-----------" + t.getMessage());
                     t.printStackTrace();
@@ -153,5 +219,6 @@ public class EmployeeListFragment extends Fragment {
             Toast.makeText(getContext(), "No Internet Connection !", Toast.LENGTH_SHORT).show();
         }
     }
+
 
 }

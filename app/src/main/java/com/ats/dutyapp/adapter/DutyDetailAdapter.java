@@ -1,40 +1,37 @@
 package com.ats.dutyapp.adapter;
 
-import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ats.dutyapp.R;
-import com.ats.dutyapp.activity.MainActivity;
+import com.ats.dutyapp.activity.HomeActivity;
 import com.ats.dutyapp.activity.RemarkActivity;
 import com.ats.dutyapp.constant.Constants;
+import com.ats.dutyapp.fragment.DutyDetailFragment;
 import com.ats.dutyapp.model.DutyDetail;
 import com.ats.dutyapp.model.Info;
 import com.ats.dutyapp.utils.CommonDialog;
+import com.ats.dutyapp.utils.CustomSharedPreference;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -43,6 +40,8 @@ import retrofit2.Response;
 public class DutyDetailAdapter extends RecyclerView.Adapter<DutyDetailAdapter.MyViewHolder> {
     private ArrayList<DutyDetail> dutyDetailList;
     private static Context context;
+    String language;
+    int languageId;
 
 
     public DutyDetailAdapter(ArrayList<DutyDetail> dutyDetailList, Context context) {
@@ -50,8 +49,6 @@ public class DutyDetailAdapter extends RecyclerView.Adapter<DutyDetailAdapter.My
         this.context = context;
 
     }
-
-
 
     @NonNull
     @Override
@@ -67,10 +64,31 @@ public class DutyDetailAdapter extends RecyclerView.Adapter<DutyDetailAdapter.My
         final DutyDetail model=dutyDetailList.get(i);
         Log.e("Model Duty Adapter","------------------"+model);
 
-        myViewHolder.tvTaskName.setText(""+model.getTaskName());
-        myViewHolder.tvWeight.setText(""+model.getTaskWeight());
+        //language = CustomSharedPreference.LANGUAGE_SELECTED;
+        language = CustomSharedPreference.getString(context,CustomSharedPreference.LANGUAGE_SELECTED);
+        Log.e("LANGUAGE","----------------------------------------"+language);
+
+
+        myViewHolder.tvWeight.setText("Wgt "+model.getTaskWeight());
         myViewHolder.tvRemark.setText("Remark : "+model.getRemark());
-        myViewHolder.tvTaskDesc.setText("Task Description : "+model.getTaskDesc());
+
+        if(language.equalsIgnoreCase("0"))
+        {
+            myViewHolder.tvTaskName.setText(""+model.getTaskNameEng());
+            myViewHolder.tvTaskDesc.setText("Task Description : "+model.getTaskDescEng());
+            Log.e("LANGUAGE","------------------------------ENG--------------------------------------");
+        }else if(language.equalsIgnoreCase("1"))
+        {
+            myViewHolder.tvTaskName.setText(""+model.getTaskNameMar());
+            myViewHolder.tvTaskDesc.setText("Task Description : "+model.getTaskDescMar());
+            Log.e("LANGUAGE","------------------------------MAR--------------------------------------");
+        }else if(language.equalsIgnoreCase("2"))
+        {
+            myViewHolder.tvTaskName.setText(""+model.getTaskNameHin());
+            myViewHolder.tvTaskDesc.setText("Task Description : "+model.getTaskDescHin());
+            Log.e("LANGUAGE","------------------------------HIN--------------------------------------");
+        }
+
 
         String imageUri = String.valueOf(model.getPhoto1());
         try {
@@ -94,6 +112,7 @@ public class DutyDetailAdapter extends RecyclerView.Adapter<DutyDetailAdapter.My
         }else if(model.getTaskStatus()==1)
         {
             myViewHolder.btnDone.setVisibility(View.GONE);
+            myViewHolder.cardView.setBackgroundColor(context.getResources().getColor(R.color.colorLightPink));
         }
 
         if(model.getPhotoReq()==0 && model.getRemarkReq()==1) {
@@ -107,6 +126,7 @@ public class DutyDetailAdapter extends RecyclerView.Adapter<DutyDetailAdapter.My
             myViewHolder.linearLayoutPhoto.setVisibility(View.VISIBLE);
             myViewHolder.tvRemark.setVisibility(View.VISIBLE);
         }
+
 
         myViewHolder.btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,8 +144,27 @@ public class DutyDetailAdapter extends RecyclerView.Adapter<DutyDetailAdapter.My
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     context.startActivity(intent);
 
-                }else {
-                    getTaskDone(model.getTaskDoneDetailId(),model.getTaskDoneHeaderId(),model.getPhotoReq(),model.getRemarkReq(),"","","","","","",1);
+                }else if(model.getRemarkReq()==0 && model.getPhotoReq()==0) {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogTheme);
+                    builder.setTitle("Confirmation");
+                    builder.setMessage("Do you want to done task ?");
+                    builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            getTaskDone(model.getTaskDoneDetailId(),model.getTaskDoneHeaderId(),model.getPhotoReq(),model.getRemarkReq(),"","","","","","",1);
+
+                        }
+                    });
+                    builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
             }
         });
@@ -141,6 +180,7 @@ public class DutyDetailAdapter extends RecyclerView.Adapter<DutyDetailAdapter.My
         private ImageView ivPhoto1,ivPhoto2;
         private LinearLayout linearLayoutPhoto;
         private Button btnDone;
+        private CardView cardView;
         private CheckBox checkBox;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -153,210 +193,13 @@ public class DutyDetailAdapter extends RecyclerView.Adapter<DutyDetailAdapter.My
             ivPhoto2=itemView.findViewById(R.id.ivPhoto2);
             btnDone=itemView.findViewById(R.id.btnDone);
             checkBox=itemView.findViewById(R.id.checkbox);
+            cardView=itemView.findViewById(R.id.cardView);
             linearLayoutPhoto=itemView.findViewById(R.id.linearLayoutPhoto);
 
         }
     }
 
-    private static class AddApproveDialog extends Dialog implements View.OnClickListener {
-        public Button btnCancel, btnSubmit;
-        public TextView tvLabPhoto1,tvLabPhoto2;
-        public TextInputLayout textInputLayout;
-        public LinearLayout linearLayoutPhoto1,linearLayoutPhoto2;
-        DutyDetail dutyDetail;
-        public EditText edRemark;
-        private Context context;
 
-
-        private ImageView ivCamera1, ivCamera2, ivPhoto1, ivPhoto2;
-        private TextView tvPhoto1, tvPhoto2;
-        File folder = new File(Environment.getExternalStorageDirectory() + File.separator, "gfpl_security");
-        File f;
-        Bitmap myBitmap1 = null, myBitmap2 = null, myBitmap3 = null;
-        public static String path1, imagePath1 = null, imagePath2 = null, imagePath3 = null;
-
-        public AddApproveDialog(Context context, DutyDetail dutyDetail) {
-            super(context);
-            this.dutyDetail = dutyDetail;
-            this.context = context;
-
-        }
-
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-            setTitle("Filter");
-            setContentView(R.layout.dailog_layout);
-            setCancelable(false);
-
-            Window window = getWindow();
-            WindowManager.LayoutParams wlp = window.getAttributes();
-            //  wlp.gravity = Gravity.TOP | Gravity.RIGHT;
-            wlp.gravity = Gravity.CENTER_VERTICAL;
-            wlp.x = 5;
-            wlp.y = 5;
-            wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
-            wlp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-            window.setAttributes(wlp);
-
-            btnCancel = (Button) findViewById(R.id.btnCancel);
-            btnSubmit = (Button) findViewById(R.id.btnSubmit);
-            edRemark = (EditText) findViewById(R.id.edRemark);
-            ivCamera1 = (ImageView) findViewById(R.id.ivCamera1);
-            ivCamera2 = (ImageView) findViewById(R.id.ivCamera2);
-            ivPhoto1 = (ImageView) findViewById(R.id.ivPhoto1);
-            ivPhoto2 = (ImageView) findViewById(R.id.ivPhoto2);
-            tvPhoto1 = (TextView) findViewById(R.id.tvPhoto1);
-            tvPhoto2 = (TextView) findViewById(R.id.tvPhoto2);
-
-            tvLabPhoto1 = (TextView) findViewById(R.id.tvLabPhoto1);
-            tvLabPhoto2 = (TextView) findViewById(R.id.tvLabPhoto2);
-            textInputLayout = (TextInputLayout) findViewById(R.id.textInputLayout);
-            linearLayoutPhoto1 = (LinearLayout) findViewById(R.id.linearLayoutPhoto1);
-            linearLayoutPhoto2 = (LinearLayout) findViewById(R.id.linearLayoutPhoto2);
-
-            if(dutyDetail.getPhotoReq()==1 && dutyDetail.getRemarkReq()==0)
-            {
-                tvLabPhoto1.setVisibility(View.VISIBLE);
-                tvLabPhoto2.setVisibility(View.VISIBLE);
-                linearLayoutPhoto1.setVisibility(View.VISIBLE);
-                linearLayoutPhoto2.setVisibility(View.VISIBLE);
-                edRemark.setVisibility(View.GONE);
-                textInputLayout.setVisibility(View.GONE);
-            }else if(dutyDetail.getRemarkReq()==1 && dutyDetail.getPhotoReq()==0)
-            {
-                tvLabPhoto1.setVisibility(View.GONE);
-                tvLabPhoto2.setVisibility(View.GONE);
-                linearLayoutPhoto1.setVisibility(View.GONE);
-                linearLayoutPhoto2.setVisibility(View.GONE);
-                edRemark.setVisibility(View.VISIBLE);
-                textInputLayout.setVisibility(View.VISIBLE);
-            }else if(dutyDetail.getRemarkReq()==1 && dutyDetail.getPhotoReq()==1)
-            {
-                tvLabPhoto1.setVisibility(View.VISIBLE);
-                tvLabPhoto2.setVisibility(View.VISIBLE);
-                linearLayoutPhoto1.setVisibility(View.VISIBLE);
-                linearLayoutPhoto2.setVisibility(View.VISIBLE);
-                edRemark.setVisibility(View.VISIBLE);
-                textInputLayout.setVisibility(View.VISIBLE);
-            }
-
-
-            ivCamera1.setOnClickListener(this);
-            ivCamera2.setOnClickListener(this);
-            btnCancel.setOnClickListener(this);
-            btnSubmit.setOnClickListener(this);
-
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (v.getId() == R.id.btnSubmit) {
-
-                if(dutyDetail.getPhotoReq()==0 && dutyDetail.getRemarkReq()==1) {
-                    String strRemark;
-                    strRemark = edRemark.getText().toString();
-                    boolean isValidRemark = false;
-
-                    if (strRemark.isEmpty()) {
-                        edRemark.setError("required");
-                    } else {
-                        edRemark.setError(null);
-                        isValidRemark = true;
-                    }
-
-                    if (isValidRemark) {
-                        getTaskDone(dutyDetail.getTaskDoneDetailId(), dutyDetail.getTaskDoneHeaderId(), dutyDetail.getPhotoReq(), dutyDetail.getRemarkReq(), "", "", "", "", "", strRemark, 1);
-                    }
-
-                    dismiss();
-                }else if(dutyDetail.getPhotoReq()==1 && dutyDetail.getRemarkReq()==0) {
-                    if (imagePath1 != null && imagePath2 != null ) {
-                        getTaskDone(dutyDetail.getTaskDoneDetailId(), dutyDetail.getTaskDoneHeaderId(), dutyDetail.getPhotoReq(), dutyDetail.getRemarkReq(), "", "", "", "", "", "", 1);
-                    }else{
-                        Toast.makeText(context, "Please Attach photo", Toast.LENGTH_SHORT).show();
-                    }
-                }else if(dutyDetail.getPhotoReq()==1 && dutyDetail.getRemarkReq()==1)
-                {
-                    String strRemark;
-                    strRemark = edRemark.getText().toString();
-                    boolean isValidRemark = false;
-
-                    if (strRemark.isEmpty()) {
-                        edRemark.setError("required");
-                    } else {
-                        edRemark.setError(null);
-                        isValidRemark = true;
-                    }
-
-                    if (isValidRemark) {
-                        if (imagePath1 != null && imagePath2 != null ) {
-                            getTaskDone(dutyDetail.getTaskDoneDetailId(), dutyDetail.getTaskDoneHeaderId(), dutyDetail.getPhotoReq(), dutyDetail.getRemarkReq(), "", "", "", "", "", strRemark, 1);
-                        }else{
-                            Toast.makeText(context, "Please Attach photo", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-
-            } else if (v.getId() == R.id.btnCancel) {
-                dismiss();
-
-            } else if (v.getId() == R.id.ivCamera1) {
-               // mCallback.showCameraDialog("Photo1");
-            } else if (v.getId() == R.id.ivCamera2) {
-                //mCallback.showCameraDialog("Photo2");
-            }
-        }
-
-
-
-//        private void showCameraDialog(String type) {
-//            try {
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                    if (type.equalsIgnoreCase("Photo1")) {
-//                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                        f = new File(folder + File.separator, "" + Calendar.getInstance().getTimeInMillis()+ "_p1.jpg");
-//                        String authorities = BuildConfig.APPLICATION_ID + ".provider";
-//                        Uri imageUri = FileProvider.getUriForFile(getContext(), authorities, f);
-//                        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                        ((Activity) context).startActivityForResult(intent, 102);
-//                    } else if (type.equalsIgnoreCase("Photo2")) {
-//                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                        f = new File(folder + File.separator, "" + Calendar.getInstance().getTimeInMillis()+ "_p2.jpg");
-//                        String authorities = BuildConfig.APPLICATION_ID + ".provider";
-//                        Uri imageUri = FileProvider.getUriForFile(getContext(), authorities, f);
-//                        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                        ((Activity) context).startActivityForResult(intent, 202);
-//                    }
-//
-//                } else {
-//
-//                    if (type.equalsIgnoreCase("Photo1")) {
-//                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                        f = new File(folder + File.separator, "" + Calendar.getInstance().getTimeInMillis() + "_p1.jpg");
-//                        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                        ((Activity) context).startActivityForResult(intent, 102);
-//                    } else if (type.equalsIgnoreCase("Photo2")) {
-//                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                        f = new File(folder + File.separator, "" + Calendar.getInstance().getTimeInMillis()+ "_p2.jpg");
-//                        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                        ((Activity) context).startActivityForResult(intent, 202);
-//                    }
-//
-//                }
-//            } catch (Exception e) {
-//                ////Log.e("select camera : ", " Exception : " + e.getMessage());
-//            }
-//        }
-
-
-
-    }
 
     private static void getTaskDone(Integer taskDoneDetailId, Integer taskDoneHeaderId, Integer photoReq, Integer remarkReq, String photo1, String photo2, String photo3, String photo4, String photo5, String strRemark, int status) {
 
@@ -376,20 +219,23 @@ public class DutyDetailAdapter extends RecyclerView.Adapter<DutyDetailAdapter.My
 
                             if (!response.body().getError()) {
 
-                                MainActivity activity = (MainActivity) context;
+                                Toast.makeText(context, "Task Done Successfully", Toast.LENGTH_SHORT).show();
 
-                                Toast.makeText(activity, "Task Done Successfully", Toast.LENGTH_SHORT).show();
+                                HomeActivity activity = (HomeActivity) context;
+
+                                FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+                                ft.replace(R.id.content_frame, new DutyDetailFragment(), "MainFragment");
+                                ft.commit();
 
                             } else {
-                                Toast.makeText(context, "Unable to process", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "Unable to process1", Toast.LENGTH_SHORT).show();
                             }
-
                             commonDialog.dismiss();
 
                         } else {
                             commonDialog.dismiss();
                             Log.e("Data Null : ", "-----------");
-                            Toast.makeText(context, "Unable to process", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Unable to process2", Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e) {
                         commonDialog.dismiss();

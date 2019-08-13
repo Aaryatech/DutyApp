@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.ats.dutyapp.R;
@@ -36,24 +35,42 @@ public class AssigneEmployeeAdapter extends RecyclerView.Adapter<AssigneEmployee
     @Override
     public void onBindViewHolder(@NonNull AssigneEmployeeAdapter.MyViewHolder myViewHolder, int i) {
         final EmpList model=empList.get(i);
+        final int pos = i;
         myViewHolder.tvEmpName.setText(model.getEmpName());
 
-        if(model.getAssigned())
-        {
-            myViewHolder.checkBox.setChecked(true);
-        }else{
-            myViewHolder.checkBox.setChecked(false);
-        }
+//        if(model.getAssigned())
+//        {
+//            myViewHolder.checkBox.setChecked(true);
+//        }else{
+//            myViewHolder.checkBox.setChecked(false);
+//        }
 
-        myViewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        myViewHolder.checkBox.setChecked(empList.get(i).getAssigned());
+
+        myViewHolder.checkBox.setTag(empList.get(i));
+
+
+//        myViewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                if (isChecked) {
+//                    model.setAssigned(true);
+//                } else {
+//                    model.setAssigned(false);
+//
+//                }
+//
+//            }
+//        });
+
+        myViewHolder.checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    model.setAssigned(true);
-                } else {
-                    model.setAssigned(false);
+            public void onClick(View v) {
+                CheckBox cb = (CheckBox) v;
+                EmpList employee = (EmpList) cb.getTag();
 
-                }
+                employee.setAssigned(cb.isChecked());
+                empList.get(pos).setAssigned(cb.isChecked());
 
             }
         });

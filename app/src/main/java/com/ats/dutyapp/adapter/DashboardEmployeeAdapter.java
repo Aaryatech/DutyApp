@@ -39,7 +39,7 @@ public class DashboardEmployeeAdapter extends RecyclerView.Adapter<DashboardEmpl
         final EmpCount model=empList.get(i);
         myViewHolder.tvEmpName.setText(model.getEmpName());
         myViewHolder.tvEmpDesig.setText(model.getDesgName());
-        myViewHolder.tvEmpCount.setText(model.getCompleted()+"/"+model.getCompleted());
+        myViewHolder.tvEmpCount.setText(model.getCompleted()+"/"+model.getTotal());
 
     }
 
