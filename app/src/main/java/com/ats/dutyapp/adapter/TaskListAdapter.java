@@ -22,7 +22,7 @@ import android.widget.Toast;
 import com.ats.dutyapp.R;
 import com.ats.dutyapp.activity.HomeActivity;
 import com.ats.dutyapp.constant.Constants;
-import com.ats.dutyapp.fragment.AddTaskFragment;
+import com.ats.dutyapp.fragment.EditTaskFragment;
 import com.ats.dutyapp.fragment.TaskCommunicationlFragment;
 import com.ats.dutyapp.fragment.TaskListFragment;
 import com.ats.dutyapp.model.ChatTask;
@@ -108,7 +108,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.MyView
 
                             HomeActivity activity = (HomeActivity) context;
 
-                            Fragment adf = new AddTaskFragment();
+                            Fragment adf = new EditTaskFragment();
                             Bundle args = new Bundle();
                             args.putString("model", json);
                             args.putInt("type", 0);

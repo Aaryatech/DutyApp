@@ -37,6 +37,7 @@ import android.widget.Toast;
 import com.ats.dutyapp.R;
 import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.model.ChatHeader;
+import com.ats.dutyapp.model.ChatTask;
 import com.ats.dutyapp.model.Department;
 import com.ats.dutyapp.model.Employee;
 import com.ats.dutyapp.model.GroupList;
@@ -60,56 +61,55 @@ import retrofit2.Response;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AddTaskFragment extends Fragment implements View.OnClickListener {
-public RadioGroup rg,rgType;
-public RadioButton rbIndivsual,rbGroup,rbDaily,rbWeekly,rbNo,rbYes;
-public TextView tvEmp,tvEmpId,tvEmpAdmin,tvEmpIdAdmin,tvDept,tvDeptId,tvDate,tvTime,tvEmpLable,tvDeptLable;
-public EditText edDate,edRemTime,edDesc,edRemark,edDay,edTaskName;
-public View empView,deptView;
-public TextInputLayout textInputLayoutDay;
-public Button btnSubmit;
-public LinearLayout linearLayout;
-public Button btn_mon,btn_sun,btn_tue,btn_wed,btn_thu,btn_fri,btn_sat;
-String selectedText = "Indivsual",rgTypeText,reminderType;
-int rgSelectType;
-Login loginUser;
+public class EditTaskFragment extends Fragment implements View.OnClickListener{
+    public RadioGroup rg,rgType;
+    public RadioButton rbDaily,rbWeekly,rbNo,rbYes;
+    public TextView tvEmp,tvEmpId,tvEmpAdmin,tvEmpIdAdmin,tvDept,tvDeptId,tvDate,tvTime,tvEmpLable,tvDeptLable;
+    public EditText edDate,edRemTime,edDesc,edRemark,edDay,edTaskName;
+    public View empView,deptView;
+    public TextInputLayout textInputLayoutDay;
+    public Button btnSubmit;
+    public LinearLayout linearLayout;
+    public Button btn_mon,btn_sun,btn_tue,btn_wed,btn_thu,btn_fri,btn_sat;
+    String selectedText = "Indivsual",rgTypeText,reminderType;
+    int rgSelectType;
+    Login loginUser;
+    ChatTask model;
 
-Dialog dialog;
-private BroadcastReceiver mBroadcastReceiver;
-DepartmentListDialogAdapter deptAdapter;
-EmployeeListDialogAdapter empAdapter;
+    Dialog dialog;
+    private BroadcastReceiver mBroadcastReceiver;
+    DepartmentListDialogAdapter deptAdapter;
+    EmployeeListDialogAdapter empAdapter;
     EmployeeListAdminDialogAdapter empAdminAdapter;
-int deptId;
-String stringId,stringName,stringIdAdmin,stringNameAdmin;
+    int deptId;
+    String stringId,stringName,stringIdAdmin,stringNameAdmin;
 
-Boolean isMonPressed = false,isSunPressed = false,isTuePressed = false,isWedPressed = false,isThuPressed = false,isFriPressed = false,isSatPressed = false;
+    Boolean isMonPressed = false,isSunPressed = false,isTuePressed = false,isWedPressed = false,isThuPressed = false,isFriPressed = false,isSatPressed = false;
 
-public static ArrayList<Employee> assignStaticTaskEmpList = new ArrayList<>();
+    public static ArrayList<Employee> assignStaticTaskList = new ArrayList<>();
 
-long fromDateMillis, toDateMillis;
-int yyyy, mm, dd;
+    long fromDateMillis, toDateMillis;
+    int yyyy, mm, dd;
 
     ArrayList<String> deptNameList = new ArrayList<>();
     ArrayList<Integer> deptIdList = new ArrayList<>();
     ArrayList<Department> deptList = new ArrayList<>();
 
     ArrayList<String> empNameList = new ArrayList<>();
+    ArrayList<String> empNameList1 = new ArrayList<>();
     ArrayList<Integer> empIdList = new ArrayList<>();
     ArrayList<Employee> empList = new ArrayList<>();
 
     ArrayList<GroupList> grpList =new ArrayList<>();
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_add_task, container, false);
+        View view= inflater.inflate(R.layout.fragment_edit_task, container, false);
 
         rg=view.findViewById(R.id.rg);
         rgType=view.findViewById(R.id.rgType);
-        rbIndivsual=view.findViewById(R.id.rbIndivsual);
-        rbGroup=view.findViewById(R.id.rbGroup);
         rbDaily=view.findViewById(R.id.rbDaily);
         rbWeekly=view.findViewById(R.id.rbWeekly);
         rbNo=view.findViewById(R.id.rbNo);
@@ -129,12 +129,9 @@ int yyyy, mm, dd;
         btn_fri=view.findViewById(R.id.btn_fri);
         btn_sat=view.findViewById(R.id.btn_sat);
 
-        tvDept=view.findViewById(R.id.tvDept);
-        tvDeptId=view.findViewById(R.id.tvDeptId);
         tvDate=view.findViewById(R.id.tvDate);
         tvTime=view.findViewById(R.id.tvTime);
         tvEmpLable=view.findViewById(R.id.tvEmpLable);
-        tvDeptLable=view.findViewById(R.id.tvDeptLable);
         edDate=view.findViewById(R.id.edDate);
         edRemTime=view.findViewById(R.id.edRemTime);
         edDesc=view.findViewById(R.id.edDesc);
@@ -156,50 +153,47 @@ int yyyy, mm, dd;
             e.printStackTrace();
         }
 
+        try {
+            String quoteStr = getArguments().getString("model");
+            Gson gson = new Gson();
+            model = gson.fromJson(quoteStr, ChatTask.class);
+
+            edTaskName.setText(""+model.getHeaderName());
+            edDate.setText(""+model.getLastDate());
+            edRemTime.setText(""+model.getExVar1());
+            edDesc.setText(""+model.getTaskDesc());
+            edRemark.setText(""+model.getTaskCompleteRemark());
+
+            if(model.getIsReminderRequired()==0)
+            {
+                rbNo.setChecked(true);
+            }else if(model.getIsReminderRequired()==1)
+            {
+                rbYes.setChecked(true);
+            }
+
+            if(model.getReminderFrequency().equals("1,2,3,4,5,6,7"))
+            {
+                rbDaily.setChecked(true);
+                linearLayout.setVisibility(View.GONE);
+            }else{
+                rbWeekly.setChecked(true);
+                linearLayout.setVisibility(View.VISIBLE);
+            }
+
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
         final ArrayList<Integer> deptList = new ArrayList<>();
         deptList.add(-1);
 
         Log.e(" Selected Text", "---------------------------------------------" + selectedText);
 
+        getAllEmp(deptList,"");
 
-        //getAllEmp(deptList);
-
-        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                int radioButtonID = group.getCheckedRadioButtonId();
-                View radioButton = group.findViewById(radioButtonID);
-                int idx = group.indexOfChild(radioButton);
-                RadioButton r = (RadioButton) group.getChildAt(idx);
-                selectedText = r.getText().toString();
-                Log.e(" Radio", "----------" + idx);
-                Log.e(" Radio Text", "----------" + selectedText);
-
-                if(selectedText.equalsIgnoreCase("Indivsual"))
-                {
-                    tvEmp.setVisibility(View.VISIBLE);
-                    tvEmpLable.setVisibility(View.VISIBLE);
-                    empView.setVisibility(View.VISIBLE);
-
-                    tvDept.setVisibility(View.GONE);
-                    tvDeptLable.setVisibility(View.GONE);
-                    deptView.setVisibility(View.GONE);
-
-                    getAllEmp(deptList,"");
-
-                }else if(selectedText.equalsIgnoreCase("Group"))
-                {
-                    tvEmp.setVisibility(View.VISIBLE);
-                    tvEmpLable.setVisibility(View.VISIBLE);
-                    empView.setVisibility(View.VISIBLE);
-
-                    tvDept.setVisibility(View.VISIBLE);
-                    tvDeptLable.setVisibility(View.VISIBLE);
-                    deptView.setVisibility(View.VISIBLE);
-
-                }
-            }
-        });
 
         rgType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -215,7 +209,7 @@ int yyyy, mm, dd;
                 if(rgTypeText.equalsIgnoreCase("Daily"))
                 {
                     //edDay.setVisibility(View.GONE);
-                   // textInputLayoutDay.setVisibility(View.GONE);
+                    // textInputLayoutDay.setVisibility(View.GONE);
                     linearLayout.setVisibility(View.GONE);
                 }else if(rgTypeText.equalsIgnoreCase("Custome"))
                 {
@@ -227,11 +221,7 @@ int yyyy, mm, dd;
         });
 
         getAllDept();
-        getAllGroup(1);
-
-        rbDaily.setChecked(true);
-        rbIndivsual.setChecked(true);
-        rbNo.setChecked(true);
+      //  getAllGroup(1);
 
         Date todayDate = Calendar.getInstance().getTime();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
@@ -247,7 +237,7 @@ int yyyy, mm, dd;
         btnSubmit.setOnClickListener(this);
         tvEmp.setOnClickListener(this);
         tvEmpAdmin.setOnClickListener(this);
-        tvDept.setOnClickListener(this);
+
 
         btn_sun.setOnClickListener(this);
         btn_mon.setOnClickListener(this);
@@ -258,47 +248,6 @@ int yyyy, mm, dd;
         btn_sat.setOnClickListener(this);
 
         return view;
-    }
-
-    private void getAllGroup(int isActive) {
-        if (Constants.isOnline(getContext())) {
-            final CommonDialog commonDialog = new CommonDialog(getContext(), "Loading", "Please Wait...");
-            commonDialog.show();
-
-            Call<ArrayList<GroupList>> listCall = Constants.myInterface.getAllChatGroupDisplay(isActive);
-            listCall.enqueue(new Callback<ArrayList<GroupList>>() {
-                @Override
-                public void onResponse(Call<ArrayList<GroupList>> call, Response<ArrayList<GroupList>> response) {
-                    try {
-                        if (response.body() != null) {
-
-                            Log.e("GROUP LIST : ", "------------------------------------------------- " + response.body());
-                            grpList.clear();
-                            grpList = response.body();
-
-                            commonDialog.dismiss();
-
-                        } else {
-                            commonDialog.dismiss();
-                            Log.e("Data Null : ", "-----------");
-                        }
-                    } catch (Exception e) {
-                        commonDialog.dismiss();
-                        Log.e("Exception : ", "-----------" + e.getMessage());
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ArrayList<GroupList>> call, Throwable t) {
-                    commonDialog.dismiss();
-                    Log.e("onFailure : ", "-----------" + t.getMessage());
-                    t.printStackTrace();
-                }
-            });
-        } else {
-            Toast.makeText(getContext(), "No Internet Connection !", Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void getAllDept() {
@@ -473,10 +422,10 @@ int yyyy, mm, dd;
                 isSatPressed = false;
             }
         }
-        else if(v.getId()==R.id.tvDept)
-        {
-            showDialog();
-        }
+//        else if(v.getId()==R.id.tvDept)
+//        {
+//            showDialog();
+//        }
         else if(v.getId()==R.id.btnSubmit)
         {
             String strRemidTime,strDesc,strRemark,strDate,strDay,strTaskName,strEmp,strEmpId,strEmpAdmin;
@@ -516,8 +465,8 @@ int yyyy, mm, dd;
             if (rbDaily.isChecked()) {
                 reminderType = "1,2,3,4,5,6,7";
             }
-           // else if (rbWeekly.isChecked()) {
-             //   reminderType = 1;
+            // else if (rbWeekly.isChecked()) {
+            //   reminderType = 1;
 
 //                if (strDay.isEmpty()) {
 //                    edDay.setError("required");
@@ -525,7 +474,7 @@ int yyyy, mm, dd;
 //                    edDay.setError(null);
 //                    isValidDay = true;
 //                }
-          //  }
+            //  }
 
             if (strRemidTime.isEmpty()) {
                 edRemTime.setError("required");
@@ -573,11 +522,11 @@ int yyyy, mm, dd;
             {
                 Log.e("Successfully","------------------");
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                final ChatHeader chatHeader=new ChatHeader(0, sdf.format(System.currentTimeMillis()),strTaskName,loginUser.getEmpId(),stringIdAdmin,strEmpId,strDesc,"",0,0,0,strRemark,rgSelectType,reminderType,DateComp,1,1,0,0,0,strRemidTime,"","");
+                final ChatHeader chatHeader=new ChatHeader(model.getHeaderId(), model.getCreatedDate(),strTaskName,model.getCreatedUserId(),stringIdAdmin,strEmpId,strDesc,model.getImage(),model.getStatus(),model.getRequestUserId(),model.getTaskCloseUserId(),strRemark,rgSelectType,reminderType,DateComp,model.getIsActive(),model.getDelStatus(),model.getExInt1(),model.getExInt2(),model.getExInt3(),strRemidTime,model.getExVar2(),model.getExVar3());
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
                 builder.setTitle("Confirmation");
-                builder.setMessage("Do you want to add task ?");
+                builder.setMessage("Do you want to edit task ?");
                 builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -705,14 +654,14 @@ int yyyy, mm, dd;
                 ArrayList<Employee> assignedArray = new ArrayList<>();
                 final ArrayList<Integer> assignedEmpIdArray = new ArrayList<>();
                 final ArrayList<String> assignedEmpNameArray = new ArrayList<>();
-                if (assignStaticTaskEmpList != null) {
-                    if (assignStaticTaskEmpList.size() > 0) {
+                if (assignStaticTaskList != null) {
+                    if (assignStaticTaskList.size() > 0) {
                         assignedArray.clear();
-                        for (int i = 0; i < assignStaticTaskEmpList.size(); i++) {
-                            if (assignStaticTaskEmpList.get(i).isChecked()) {
-                                assignedArray.add(assignStaticTaskEmpList.get(i));
-                                assignedEmpIdArray.add(assignStaticTaskEmpList.get(i).getEmpId());
-                                assignedEmpNameArray.add(assignStaticTaskEmpList.get(i).getEmpFname()+" " +assignStaticTaskEmpList.get(i).getEmpMname()+" " +assignStaticTaskEmpList.get(i).getEmpSname());
+                        for (int i = 0; i < assignStaticTaskList.size(); i++) {
+                            if (assignStaticTaskList.get(i).isChecked()) {
+                                assignedArray.add(assignStaticTaskList.get(i));
+                                assignedEmpIdArray.add(assignStaticTaskList.get(i).getEmpId());
+                                assignedEmpNameArray.add(assignStaticTaskList.get(i).getEmpFname()+" " +assignStaticTaskList.get(i).getEmpMname()+" " +assignStaticTaskList.get(i).getEmpSname());
 
                             }
                         }
@@ -813,14 +762,14 @@ int yyyy, mm, dd;
                 ArrayList<Employee> assignedArray = new ArrayList<>();
                 final ArrayList<Integer> assignedEmpIdArray = new ArrayList<>();
                 final ArrayList<String> assignedEmpNameArray = new ArrayList<>();
-                if (assignStaticTaskEmpList != null) {
-                    if (assignStaticTaskEmpList.size() > 0) {
+                if (assignStaticTaskList != null) {
+                    if (assignStaticTaskList.size() > 0) {
                         assignedArray.clear();
-                        for (int i = 0; i < assignStaticTaskEmpList.size(); i++) {
-                            if (assignStaticTaskEmpList.get(i).isChecked()) {
-                                assignedArray.add(assignStaticTaskEmpList.get(i));
-                                assignedEmpIdArray.add(assignStaticTaskEmpList.get(i).getEmpId());
-                                assignedEmpNameArray.add(assignStaticTaskEmpList.get(i).getEmpFname()+" " +assignStaticTaskEmpList.get(i).getEmpMname()+" " +assignStaticTaskEmpList.get(i).getEmpSname());
+                        for (int i = 0; i < assignStaticTaskList.size(); i++) {
+                            if (assignStaticTaskList.get(i).isChecked()) {
+                                assignedArray.add(assignStaticTaskList.get(i));
+                                assignedEmpIdArray.add(assignStaticTaskList.get(i).getEmpId());
+                                assignedEmpNameArray.add(assignStaticTaskList.get(i).getEmpFname()+" " +assignStaticTaskList.get(i).getEmpMname()+" " +assignStaticTaskList.get(i).getEmpSname());
 
                             }
                         }
@@ -973,15 +922,15 @@ int yyyy, mm, dd;
 
         @NonNull
         @Override
-        public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        public DepartmentListDialogAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
             View itemView = LayoutInflater.from(viewGroup.getContext())
                     .inflate(R.layout.adapter_department_dialog, viewGroup, false);
 
-            return new MyViewHolder(itemView);
+            return new DepartmentListDialogAdapter.MyViewHolder(itemView);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull final MyViewHolder myViewHolder, int i) {
+        public void onBindViewHolder(@NonNull final DepartmentListDialogAdapter.MyViewHolder myViewHolder, int i) {
             final GroupList model = custList.get(i);
 
             myViewHolder.tvName.setText(model.getGroupName());
@@ -1050,15 +999,15 @@ int yyyy, mm, dd;
 
         @NonNull
         @Override
-        public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        public EmployeeListDialogAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
             View itemView = LayoutInflater.from(viewGroup.getContext())
                     .inflate(R.layout.adapter_employee_dialog_group_list, viewGroup, false);
             //adapter_department_dialog
-            return new MyViewHolder(itemView);
+            return new EmployeeListDialogAdapter.MyViewHolder(itemView);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull final MyViewHolder myViewHolder, int i) {
+        public void onBindViewHolder(@NonNull final EmployeeListDialogAdapter.MyViewHolder myViewHolder, int i) {
             final Employee model = empList.get(i);
             final int pos = i;
             myViewHolder.tvName.setText(model.getEmpFname()+" "+model.getEmpMname()+" "+model.getEmpSname());
@@ -1146,15 +1095,15 @@ int yyyy, mm, dd;
 
         @NonNull
         @Override
-        public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        public EmployeeListAdminDialogAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
             View itemView = LayoutInflater.from(viewGroup.getContext())
                     .inflate(R.layout.adapter_employee_dialog_group_list, viewGroup, false);
             //adapter_department_dialog
-            return new MyViewHolder(itemView);
+            return new EmployeeListAdminDialogAdapter.MyViewHolder(itemView);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull final MyViewHolder myViewHolder, int i) {
+        public void onBindViewHolder(@NonNull final EmployeeListAdminDialogAdapter.MyViewHolder myViewHolder, int i) {
             final Employee model = empList.get(i);
             final int pos = i;
             myViewHolder.tvName.setText(model.getEmpFname()+" "+model.getEmpMname()+" "+model.getEmpSname());
@@ -1226,32 +1175,74 @@ int yyyy, mm, dd;
                             empList.clear();
                             empList=response.body();
 
-                            assignStaticTaskEmpList.clear();
-                            assignStaticTaskEmpList=empList;
+                            assignStaticTaskList.clear();
+                            assignStaticTaskList=empList;
 
-//                            String strEmpId="";
-//                            if (model != null) {
-//                                strEmpId = model.getUserIds();
-//                            }
+                            String strEmpId="";
+                            if (model != null) {
+                                strEmpId = model.getAdminUserIds();
+                            }
 
-                            List<String> list = Arrays.asList(userIds.split("\\s*,\\s*"));
+                            List<String> list = Arrays.asList(strEmpId.split("\\s*,\\s*"));
 
                             Log.e("LIST", "----------------------" + list);
 
 
                             Log.e("BIN", "---------------------------------Model-----------------" + empList);
-                            for (int j = 0; j < assignStaticTaskEmpList.size(); j++) {
+                            for (int j = 0; j < assignStaticTaskList.size(); j++) {
 
                                 for (int k = 0; k < list.size(); k++) {
 
-                                    if (assignStaticTaskEmpList.get(j).getEmpId() == Integer.parseInt(list.get(k))) {
+                                    if (assignStaticTaskList.get(j).getEmpId() == Integer.parseInt(list.get(k))) {
 
-                                        assignStaticTaskEmpList.get(j).setChecked(true);
+                                        assignStaticTaskList.get(j).setChecked(true);
+                                        empNameList.add(response.body().get(j).getEmpFname() + " " + response.body().get(j).getEmpMname() + " " + response.body().get(j).getEmpSname());
+
                                         // assignStaticList.add(empList.get(j));
 
                                     }
                                 }
                             }
+
+                            String empName=empNameList.toString().trim();
+                            Log.e("ASSIGN EMP NAME","---------------------------------"+empName);
+
+                            String strEmpName = ""+empName.substring(1, empName.length()-1).replace("][", ",")+"";
+                            tvEmpAdmin.setText(""+strEmpName);
+
+
+                            String strAssEmpId="";
+                            if (model != null) {
+                                strAssEmpId = model.getAssignUserIds();
+                            }
+
+                            List<String> list1 = Arrays.asList(strAssEmpId.split("\\s*,\\s*"));
+
+                            Log.e("LIST", "----------------------" + list);
+
+
+                            Log.e("BIN", "---------------------------------Model-----------------" + empList);
+                            for (int j = 0; j < assignStaticTaskList.size(); j++) {
+
+                                for (int k = 0; k < list1.size(); k++) {
+
+                                    if (assignStaticTaskList.get(j).getEmpId() == Integer.parseInt(list1.get(k))) {
+
+                                        assignStaticTaskList.get(j).setChecked(true);
+                                        empNameList1.add(response.body().get(j).getEmpFname() + " " + response.body().get(j).getEmpMname() + " " + response.body().get(j).getEmpSname());
+
+                                        // assignStaticList.add(empList.get(j));
+
+                                    }
+                                }
+                            }
+
+                            String empName1=empNameList1.toString().trim();
+                            Log.e("ASSIGN EMP NAME","---------------------------------"+empName);
+
+                            String strEmpName1 = ""+empName1.substring(1, empName1.length()-1).replace("][", ",")+"";
+                            tvEmp.setText(""+strEmpName1);
+
 
 //                            empNameList.add("");
 //                            empIdList.add(0);

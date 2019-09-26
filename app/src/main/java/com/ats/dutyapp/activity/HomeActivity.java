@@ -37,7 +37,6 @@ import com.ats.dutyapp.fragment.AddGroupFragment;
 import com.ats.dutyapp.fragment.AddTaskFragment;
 import com.ats.dutyapp.fragment.AssignCheckListFragment;
 import com.ats.dutyapp.fragment.CheckListFragment;
-import com.ats.dutyapp.fragment.EditChecklistFragment;
 import com.ats.dutyapp.fragment.CloseDetailFragment;
 import com.ats.dutyapp.fragment.DashboardFragment;
 import com.ats.dutyapp.fragment.DocumentFragment;
@@ -45,6 +44,8 @@ import com.ats.dutyapp.fragment.DutyDetailBySuperwiserFragment;
 import com.ats.dutyapp.fragment.DutyDetailFragment;
 import com.ats.dutyapp.fragment.DutyListFragment;
 import com.ats.dutyapp.fragment.DutyListSuperwiser;
+import com.ats.dutyapp.fragment.EditChecklistFragment;
+import com.ats.dutyapp.fragment.EditTaskFragment;
 import com.ats.dutyapp.fragment.EmployeeDashboardFragment;
 import com.ats.dutyapp.fragment.EmployeeListFragment;
 import com.ats.dutyapp.fragment.GroupListFragment;
@@ -232,6 +233,7 @@ public class HomeActivity extends AppCompatActivity
         Fragment tabFragment = getSupportFragmentManager().findFragmentByTag("TabFragment");
         Fragment taskListFragment = getSupportFragmentManager().findFragmentByTag("TaskListFragment");
 
+
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -317,7 +319,7 @@ public class HomeActivity extends AppCompatActivity
         } else if (communicationListFragment instanceof AboutTaskFragment && communicationListFragment.isVisible()) {
 
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame, new TaskCommunicationlFragment(), "MainFragment");
+            ft.replace(R.id.content_frame, new TaskCommunicationlFragment(), "TaskListFragment");
             ft.commit();
 
         } else if (dutyDetailBySuperwiserFragment instanceof TaskDetailFragment && dutyDetailBySuperwiserFragment.isVisible()) {
@@ -334,7 +336,7 @@ public class HomeActivity extends AppCompatActivity
             ft.commit();
 
         }else if (taskListFragment instanceof TaskCommunicationlFragment && taskListFragment.isVisible() ||
-                    taskListFragment instanceof AddTaskFragment && taskListFragment.isVisible()) {
+                    taskListFragment instanceof EditTaskFragment && taskListFragment.isVisible()) {
 
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, new TaskListFragment(), "MainFragment");

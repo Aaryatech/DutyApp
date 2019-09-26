@@ -237,7 +237,7 @@ private String fileName = null;
         switch (item.getItemId()) {
             case R.id.action_abouttask:
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame, new AboutTaskFragment(), "DashFragment");
+                ft.replace(R.id.content_frame, new AboutTaskFragment(), "TaskCommunicationListFragment");
                 ft.commit();
                 return true;
 

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ats.dutyapp.R;
@@ -29,6 +30,7 @@ import retrofit2.Response;
  */
 public class AboutTaskFragment extends Fragment {
 public RecyclerView recyclerView;
+public TextView tvTaskName,tvCompletionDate,tvRemark,tvDesc;
 ArrayList<Employee> empList = new ArrayList<>();
 EmployeeListAdapter adapter;
 
@@ -40,6 +42,10 @@ EmployeeListAdapter adapter;
         getActivity().setTitle("About Task");
 
         recyclerView=(RecyclerView)view.findViewById(R.id.recyclerView);
+        tvTaskName=(TextView) view.findViewById(R.id.tvTaskName);
+        tvCompletionDate=(TextView)view.findViewById(R.id.tvCompletionDate);
+        tvRemark=(TextView)view.findViewById(R.id.tvRemark);
+        tvDesc=(TextView)view.findViewById(R.id.tvDesc);
 
         final ArrayList<Integer> deptList = new ArrayList<>();
         deptList.add(-1);

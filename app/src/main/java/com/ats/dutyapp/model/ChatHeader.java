@@ -15,8 +15,8 @@ public class ChatHeader {
     private int taskCloseUserId;
     private String taskCompleteRemark;
     private int isReminderRequired;
-    private int reminderFrequency;
-    private int lastDate;
+    private String reminderFrequency;
+    private String lastDate;
     private int isActive;
     private int delStatus;
     private Integer exInt1;
@@ -26,7 +26,7 @@ public class ChatHeader {
     private String exVar2;
     private String exVar3;
 
-    public ChatHeader(int headerId, String createdDate, String headerName, int createdUserId, String adminUserIds, String assignUserIds, String taskDesc, String image, int status, int requestUserId, int taskCloseUserId, String taskCompleteRemark, int isReminderRequired, int reminderFrequency, int lastDate, int isActive, int delStatus, Integer exInt1, Integer exInt2, Integer exInt3, String exVar1, String exVar2, String exVar3) {
+    public ChatHeader(int headerId, String createdDate, String headerName, int createdUserId, String adminUserIds, String assignUserIds, String taskDesc, String image, int status, int requestUserId, int taskCloseUserId, String taskCompleteRemark, int isReminderRequired, String reminderFrequency, String lastDate, int isActive, int delStatus, Integer exInt1, Integer exInt2, Integer exInt3, String exVar1, String exVar2, String exVar3) {
         this.headerId = headerId;
         this.createdDate = createdDate;
         this.headerName = headerName;
@@ -156,19 +156,19 @@ public class ChatHeader {
         this.isReminderRequired = isReminderRequired;
     }
 
-    public int getReminderFrequency() {
+    public String getReminderFrequency() {
         return reminderFrequency;
     }
 
-    public void setReminderFrequency(int reminderFrequency) {
+    public void setReminderFrequency(String reminderFrequency) {
         this.reminderFrequency = reminderFrequency;
     }
 
-    public int getLastDate() {
+    public String getLastDate() {
         return lastDate;
     }
 
-    public void setLastDate(int lastDate) {
+    public void setLastDate(String lastDate) {
         this.lastDate = lastDate;
     }
 

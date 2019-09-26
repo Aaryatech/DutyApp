@@ -5,6 +5,7 @@ import com.ats.dutyapp.model.AssignChecklist;
 import com.ats.dutyapp.model.AssignDetail;
 import com.ats.dutyapp.model.AssignDuty;
 import com.ats.dutyapp.model.ChatGroup;
+import com.ats.dutyapp.model.ChatHeader;
 import com.ats.dutyapp.model.ChatTask;
 import com.ats.dutyapp.model.ChecklistActionHeader;
 import com.ats.dutyapp.model.Detail;
@@ -158,5 +159,8 @@ public interface InterfaceAPI {
 
     @POST("chat/deleteChatHeader")
     Call<Info> deleteChatHeader(@Query("headerId") int headerId);
+
+    @POST("chat/saveChatHeader")
+    Call<ChatHeader> saveChatHeader(@Body ChatHeader chatHeader);
 
 }
