@@ -85,7 +85,6 @@ public class DutyListSuperwiser extends Fragment {
                         deptList.add(loginUser.getEmpDeptId());
                         getDutyListByDept(deptList);
 
-
                     }
                 }else if(syncArray.get(j).getSettingKey().equals("Admin")){
                     if (syncArray.get(j).getSettingValue().equals(String.valueOf(loginUser.getEmpCatId()))) {

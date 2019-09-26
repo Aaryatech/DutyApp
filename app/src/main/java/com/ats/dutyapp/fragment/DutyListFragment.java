@@ -276,9 +276,10 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
     private class ApproveDialog extends Dialog implements View.OnClickListener{
         public Button btnCancel,btnSubmit;
         private EditText edFromDate;
-        public TextView spEmp,tvEmpId;
+        public TextView tvEmp,tvEmpId;
         Login loginUser;
         Dialog dialog;
+        int empId = 0;
 
         long fromDateMillis, toDateMillis;
         int yyyy, mm, dd;
@@ -317,11 +318,11 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
             btnCancel = (Button) findViewById(R.id.btnCancel);
             btnSubmit = (Button) findViewById(R.id.btnSubmit);
             edFromDate = (EditText)findViewById(R.id.edFromDate);
-            spEmp=(TextView)findViewById(R.id.spEmp);
+            tvEmp=(TextView)findViewById(R.id.spEmp);
             tvEmpId=(TextView)findViewById(R.id.tvEmpId);
 
             edFromDate.setOnClickListener(this);
-            spEmp.setOnClickListener(this);
+            tvEmp.setOnClickListener(this);
             btnCancel.setOnClickListener(this);
             btnSubmit.setOnClickListener(this);
 
@@ -374,9 +375,9 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
             }else if(v.getId()==R.id.btnSubmit)
             {
                 boolean isValidEmpName = false;
-                String empName=spEmp.getText().toString();
+                String empName=tvEmp.getText().toString();
                 String strdutyDate=edFromDate.getText().toString();
-                int empId = 0;
+
                 try {
                     empId = Integer.parseInt(tvEmpId.getText().toString());
 
@@ -395,9 +396,9 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
                 }
 
                 if (empName.isEmpty()) {
-                    spEmp.setError("required");
+                    tvEmp.setError("required");
                 } else {
-                    spEmp.setError(null);
+                    tvEmp.setError(null);
                     isValidEmpName = true;
                 }
 
@@ -587,18 +588,21 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
                                 }
 
                                 if (loginUser != null) {
+                                    Log.e("LOGIN USER NOT NULL","----------------------------------------------");
                                     int position = 0;
                                     if (empIdList.size() > 0) {
+                                        Log.e("EMP SIZE","----------------------------------------------");
                                         for (int i = 0; i < empIdList.size(); i++) {
-                                            if (loginUser.getEmpId() == empIdList.get(i)) {
-                                                Log.e("Login id : ", "-----------"+loginUser.getEmpId());
-                                                Log.e("Loop id : ", "-----------"+empIdList.get(i));
+                                            Log.e("EMP ID FOR","----------------------------------------------");
+                                            if (loginUser.getEmpId().equals(empIdList.get(i))) {
+                                                Log.e("CHEK EQUAL","----------------------------------------------");
+                                                empId=empIdList.get(i);
                                                 position = i;
-                                                spEmp.setText(empNameList.get(position));
+                                               // tvEmp.setText(empNameList.get(position));
                                                 break;
                                             }
                                         }
-                                      // spEmp.setText(empNameList.get(position));
+                                       tvEmp.setText(empNameList.get(position));
 
                                     }
                                 }
@@ -699,7 +703,7 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
 //                        customerDataIntent.putExtra("id", model.getEmpDeptId());
 //                        LocalBroadcastManager.getInstance(context).sendBroadcast(customerDataIntent);
                         dialog.dismiss();
-                        spEmp.setText(""+model.getEmpFname()+" "+model.getEmpMname()+" "+model.getEmpSname());
+                        tvEmp.setText(""+model.getEmpFname()+" "+model.getEmpMname()+" "+model.getEmpSname());
                         tvEmpId.setText(""+model.getEmpId());
 
                     }

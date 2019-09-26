@@ -3,7 +3,7 @@ package com.ats.dutyapp.adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
+import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -22,14 +22,13 @@ import android.widget.Toast;
 
 import com.ats.dutyapp.R;
 import com.ats.dutyapp.activity.HomeActivity;
-import com.ats.dutyapp.activity.RemarkActivity;
+import com.ats.dutyapp.activity.ImageZoomActivity;
 import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.fragment.DutyDetailFragment;
 import com.ats.dutyapp.model.DutyDetail;
 import com.ats.dutyapp.model.Info;
 import com.ats.dutyapp.utils.CommonDialog;
 import com.ats.dutyapp.utils.CustomSharedPreference;
-import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -60,7 +59,7 @@ public class DutyDetailAdapter extends RecyclerView.Adapter<DutyDetailAdapter.My
     }
 
     @Override
-    public void onBindViewHolder(@NonNull DutyDetailAdapter.MyViewHolder myViewHolder, int i) {
+    public void onBindViewHolder(@NonNull DutyDetailAdapter.MyViewHolder myViewHolder, final int i) {
         final DutyDetail model=dutyDetailList.get(i);
         Log.e("Model Duty Adapter","------------------"+model);
 
@@ -68,21 +67,38 @@ public class DutyDetailAdapter extends RecyclerView.Adapter<DutyDetailAdapter.My
         language = CustomSharedPreference.getString(context,CustomSharedPreference.LANGUAGE_SELECTED);
         Log.e("LANGUAGE","----------------------------------------"+language);
 
-
         myViewHolder.tvWeight.setText("Wgt "+model.getTaskWeight());
         myViewHolder.tvRemark.setText("Remark : "+model.getRemark());
 
-        if(language.equalsIgnoreCase("0"))
+        myViewHolder.ivPhoto1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, ImageZoomActivity.class);
+                intent.putExtra("image", Constants.IMAGE_URL + model.getPhoto1());
+                context.startActivity(intent);
+            }
+        });
+
+        myViewHolder.ivPhoto2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, ImageZoomActivity.class);
+                intent.putExtra("image", Constants.IMAGE_URL + model.getPhoto2());
+                context.startActivity(intent);
+            }
+        });
+
+        if(language.equalsIgnoreCase("1"))
         {
             myViewHolder.tvTaskName.setText(""+model.getTaskNameEng());
             myViewHolder.tvTaskDesc.setText("Task Description : "+model.getTaskDescEng());
             Log.e("LANGUAGE","------------------------------ENG--------------------------------------");
-        }else if(language.equalsIgnoreCase("1"))
+        }else if(language.equalsIgnoreCase("2"))
         {
             myViewHolder.tvTaskName.setText(""+model.getTaskNameMar());
             myViewHolder.tvTaskDesc.setText("Task Description : "+model.getTaskDescMar());
             Log.e("LANGUAGE","------------------------------MAR--------------------------------------");
-        }else if(language.equalsIgnoreCase("2"))
+        }else if(language.equalsIgnoreCase("3"))
         {
             myViewHolder.tvTaskName.setText(""+model.getTaskNameHin());
             myViewHolder.tvTaskDesc.setText("Task Description : "+model.getTaskDescHin());
@@ -112,6 +128,8 @@ public class DutyDetailAdapter extends RecyclerView.Adapter<DutyDetailAdapter.My
         }else if(model.getTaskStatus()==1)
         {
             myViewHolder.btnDone.setVisibility(View.GONE);
+            myViewHolder.tvTaskName.setPaintFlags(myViewHolder.tvTaskName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            myViewHolder.tvTaskDesc.setPaintFlags(myViewHolder.tvTaskDesc.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             myViewHolder.cardView.setBackgroundColor(context.getResources().getColor(R.color.colorLightPink));
         }
 
@@ -127,22 +145,24 @@ public class DutyDetailAdapter extends RecyclerView.Adapter<DutyDetailAdapter.My
             myViewHolder.tvRemark.setVisibility(View.VISIBLE);
         }
 
-
         myViewHolder.btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(model.getRemarkReq()==1 || model.getPhotoReq()==1) {
                    // new AddApproveDialog(context, model).show();
 
-                    Gson gson = new Gson();
-                    String json = gson.toJson(model);
+//                    Gson gson = new Gson();
+//                    String json = gson.toJson(model);
+//
+//                    Intent intent = new Intent(context, RemarkActivity.class);
+//                    Bundle args = new Bundle();
+//                    args.putString("model", json);
+//                    intent.putExtra("model", json);
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                    context.startActivity(intent);
 
-                    Intent intent = new Intent(context, RemarkActivity.class);
-                    Bundle args = new Bundle();
-                    args.putString("model", json);
-                    intent.putExtra("model", json);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    context.startActivity(intent);
+                    new DutyDetailFragment().onClickData(i,context);
+
 
                 }else if(model.getRemarkReq()==0 && model.getPhotoReq()==0) {
 

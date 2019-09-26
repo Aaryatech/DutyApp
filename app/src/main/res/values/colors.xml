@@ -41,5 +41,11 @@
     <color name="colorLightPink1">#FFD6DC</color>
     <color name="color1">#000000</color>
     <color name="color2">#000000</color>
+    <color name="colorDarkRed">#ff0000</color>
+    <color name="colorPink">#fcebea</color>
+
+    <color name="colorRed">#3EFF0000</color>
+    <color name="colorGreen">#3C88FD00</color>
+    <color name="colorBlue">#3E008EFF</color>
 
 </resources>

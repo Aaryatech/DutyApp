@@ -170,7 +170,7 @@ public class RemarkActivity extends AppCompatActivity implements View.OnClickLis
                         public void onClick(DialogInterface dialog, int which) {
 
                             getTaskDone(dutyDetail.getTaskDoneDetailId(), dutyDetail.getTaskDoneHeaderId(), dutyDetail.getPhotoReq(), dutyDetail.getRemarkReq(), "", "", "", "", "", strRemark, 1);
-
+                            finish();
                         }
                     });
                     builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
@@ -184,7 +184,8 @@ public class RemarkActivity extends AppCompatActivity implements View.OnClickLis
                 }
 
             }else if(dutyDetail.getPhotoReq()==1 && dutyDetail.getRemarkReq()==0) {
-                if (imagePath1 != null && imagePath2 != null ) {
+                if (imagePath1 != null) {
+                 //   && imagePath2 != null
 
                     final ArrayList<String> pathArray = new ArrayList<>();
                     final ArrayList<String> fileNameArray = new ArrayList<>();
@@ -260,7 +261,9 @@ public class RemarkActivity extends AppCompatActivity implements View.OnClickLis
                 }
 
                 if (isValidRemark) {
-                    if (imagePath1 != null && imagePath2 != null ) {
+                    if (imagePath1 != null  ) {
+
+                            //&& imagePath2 != null
 
                         final ArrayList<String> pathArray = new ArrayList<>();
                         final ArrayList<String> fileNameArray = new ArrayList<>();
@@ -563,13 +566,13 @@ public class RemarkActivity extends AppCompatActivity implements View.OnClickLis
 
                                 RemarkActivity activity = (RemarkActivity) context;
                                 Toast.makeText(getApplicationContext(), "Task Done Successfully", Toast.LENGTH_SHORT).show();
-//                                activity.finish();
+                                //activity.finish();
 
-                                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                                //intent.putExtra("model", "Close Meeting");
-                                intent.putExtra("model", "RemarkActivity");
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(intent);
+//                                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+//                                //intent.putExtra("model", "Close Meeting");
+//                                intent.putExtra("model", "RemarkActivity");
+//                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                                startActivity(intent);
 
                                 commonDialog.dismiss();
                             } else {
@@ -636,6 +639,7 @@ public class RemarkActivity extends AppCompatActivity implements View.OnClickLis
 
                 Log.e("Response : ", "--" + response.body());
                 getTaskDone(dutyDetail.getTaskDoneDetailId(), dutyDetail.getTaskDoneHeaderId(), dutyDetail.getPhotoReq(), dutyDetail.getRemarkReq(), dutyDetail.getPhoto1(), dutyDetail.getPhoto2(), "", "", "", dutyDetail.getRemark(), 1);
+                finish();
                 commonDialog.dismiss();
 
             }

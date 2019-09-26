@@ -3,6 +3,7 @@ package com.ats.dutyapp.fragment;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -10,18 +11,24 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ats.dutyapp.R;
+import com.ats.dutyapp.activity.HomeActivity;
 import com.ats.dutyapp.adapter.AssigneEmployeeAdapter;
 import com.ats.dutyapp.adapter.DutyDetailBySuperwiser;
 import com.ats.dutyapp.constant.Constants;
@@ -45,7 +52,7 @@ import retrofit2.Response;
  */
 public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnClickListener {
 
-    public TextView tvTaskStartTime,tvTaskEndTime,tvDate,tvTaskName,tvAssignName,tvType;
+    public TextView tvTaskStartTime,tvTaskEndTime,tvDate,tvTaskName,tvAssignType,tvType;
     public RecyclerView recyclerView,recyclerViewEmp;
     public Button btnSubmit;
     public CardView cardView;
@@ -57,6 +64,7 @@ public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnC
     DutyDetailBySuperwiser adapter;
     ArrayList<AssignDetail> detailList = new ArrayList<>();
     ArrayList<EmpList> empList = new ArrayList<>();
+    ArrayList<EmpList> temp;
 
     public static ArrayList<EmpList> assignEmpStaticList = new ArrayList<>();
     String stringId;
@@ -71,7 +79,7 @@ public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnC
         tvDate=(TextView)view.findViewById(R.id.tvDate);
         tvType=(TextView)view.findViewById(R.id.tvType);
         tvTaskName=(TextView)view.findViewById(R.id.tvTaskName);
-        tvAssignName=(TextView)view.findViewById(R.id.tvAssignName);
+        tvAssignType=(TextView)view.findViewById(R.id.tvAssignType);
         recyclerView=(RecyclerView)view.findViewById(R.id.recyclerView);
         btnSubmit=(Button)view.findViewById(R.id.btnSubmit);
         ivMenu=(ImageView)view.findViewById(R.id.ivMenu);
@@ -116,6 +124,7 @@ public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnC
 
         btnSubmit.setOnClickListener(this);
         ivMenu.setOnClickListener(this);
+        cardView.setOnClickListener(this);
         //cardView.setOnClickListener(this);
 
         return view;
@@ -159,14 +168,21 @@ public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnC
                             tvTaskEndTime.setText("To Time : "+assignDetail.getShiftToTime());
                             tvDate.setText(""+assignDetail.getAssignDate());
                             tvTaskName.setText(""+assignDetail.getDutyName());
-                            tvAssignName.setText(""+assignDetail.getTaskAssignUserName());
+
+                            if(model.getType()==1) {
+                                tvAssignType.setText("Daily Basis");
+                            }else if(model.getType()==2) {
+                                tvAssignType.setText("Day Basis");
+                            }else if(model.getType()==3) {
+                                tvAssignType.setText("Date Basis");
+                            }
 
                             if(assignDetail.getExInt1()==0)
                             {
-                                tvType.setText("OFF");
+                                tvType.setText("Notification OFF");
                             }else if(assignDetail.getExInt1()==1)
                             {
-                                tvType.setText("ON");
+                                tvType.setText("Notification ON");
                             }
 
                             adapterEmp = new AssigneEmployeeAdapter(empList, getActivity());
@@ -206,7 +222,20 @@ public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnC
         if(v.getId()==R.id.btnSubmit)
         {
             AssignUser();
-        }else if(v.getId()==R.id.ivMenu)
+        }else if(v.getId()==R.id.cardView)
+        {
+            Gson gson = new Gson();
+            String json = gson.toJson(model);
+
+            HomeActivity activity = (HomeActivity) getActivity();
+            TaskDetailFragment adf = new TaskDetailFragment();
+            Bundle args = new Bundle();
+            args.putString("model",json);
+            adf.setArguments(args);
+            activity.getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf, "DutyDetailBySuperwiserFragment").commit();
+
+        }
+        else if(v.getId()==R.id.ivMenu)
         {
             PopupMenu popupMenu = new PopupMenu(getActivity(), v);
             popupMenu.getMenuInflater().inflate(R.menu.menu_on_off, popupMenu.getMenu());
@@ -475,4 +504,55 @@ public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnC
             Toast.makeText(getContext(), "No Internet Connection !", Toast.LENGTH_SHORT).show();
         }
     }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        item.setVisible(true);
+
+        SearchView searchView = (SearchView) item.getActionView();
+        EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchEditText.setTextColor(getResources().getColor(R.color.colorWhite));
+        searchEditText.setHintTextColor(getResources().getColor(R.color.colorWhite));
+        ImageView v = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button);
+        v.setImageResource(R.drawable.ic_search_white); //Changing the image
+
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                FilterSearch(charSequence.toString());
+                // empAdapter.getFilter().filter(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        searchView.setQueryHint("search");
+    }
+
+    private void FilterSearch(String s) {
+        temp = new ArrayList();
+        for (EmpList d : empList) {
+            if (d.getEmpName().toLowerCase().contains(s.toLowerCase())) {
+                temp.add(d);
+            }
+        }
+        adapterEmp.updateList(temp);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
 }

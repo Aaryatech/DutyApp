@@ -49,4 +49,11 @@ dependencies {
     //Report
     implementation files('libs/itextg-5.5.10.jar')
 
+    //Audio
+    //compile project(path: ':audio-recorder')
+
+    //Image zoom
+    implementation 'com.jsibbold:zoomage:1.2.0'
+
+
 }

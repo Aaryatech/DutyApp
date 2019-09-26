@@ -82,6 +82,11 @@ public class AssigneEmployeeAdapter extends RecyclerView.Adapter<AssigneEmployee
         return empList.size();
     }
 
+    public void updateList(ArrayList<EmpList> temp) {
+        empList = temp;
+        notifyDataSetChanged();
+    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
         private TextView tvEmpName,tvEmpDesig;
         private CheckBox checkBox;

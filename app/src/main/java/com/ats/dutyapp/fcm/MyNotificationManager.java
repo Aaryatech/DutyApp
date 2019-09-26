@@ -101,8 +101,8 @@ public class MyNotificationManager {
 
     public void showSmallNotification(String title, String message, Intent intent) {
 
-        Uri uri = Uri.parse("mattersofgrey.com/audio/DEX-Gen-MainThemeDing.mp3");
-       // Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        //Uri uri = Uri.parse("mattersofgrey.com/audio/DEX-Gen-MainThemeDing.mp3");
+       Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         final PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
@@ -131,7 +131,7 @@ public class MyNotificationManager {
             mChannel.setDescription("");
             mChannel.enableLights(true);
             mChannel.enableVibration(true);
-            mChannel.setSound(uri, attributes); // This is IMPORTANT
+            mChannel.setSound(alarmSound, attributes); // This is IMPORTANT
 
             notificationManager.createNotificationChannel(mChannel);
 
@@ -145,6 +145,7 @@ public class MyNotificationManager {
                     .setNumber(1)
                     .setColor(255)
                     .setContentText(message)
+                    .setSound(alarmSound)
                     .setWhen(System.currentTimeMillis());
             notificationManager.notify(1, notificationBuilder.build());
 

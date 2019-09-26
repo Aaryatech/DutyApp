@@ -1,13 +1,24 @@
 package com.ats.dutyapp.interfaces;
 
+import com.ats.dutyapp.model.ActionHeaderClose;
+import com.ats.dutyapp.model.AssignChecklist;
 import com.ats.dutyapp.model.AssignDetail;
 import com.ats.dutyapp.model.AssignDuty;
+import com.ats.dutyapp.model.ChatGroup;
+import com.ats.dutyapp.model.ChatTask;
+import com.ats.dutyapp.model.ChecklistActionHeader;
+import com.ats.dutyapp.model.Detail;
+import com.ats.dutyapp.model.GroupList;
+import com.ats.dutyapp.model.SaveAssigneChecklist;
+import com.ats.dutyapp.model.ChecklistHeader;
+import com.ats.dutyapp.model.Department;
 import com.ats.dutyapp.model.DeptCount;
 import com.ats.dutyapp.model.Document;
 import com.ats.dutyapp.model.DutyDetail;
 import com.ats.dutyapp.model.DutyDone;
 import com.ats.dutyapp.model.DutyHeader;
 import com.ats.dutyapp.model.DutyHeaderDetail;
+import com.ats.dutyapp.model.Emp;
 import com.ats.dutyapp.model.EmpCount;
 import com.ats.dutyapp.model.Employee;
 import com.ats.dutyapp.model.Info;
@@ -76,10 +87,76 @@ public interface InterfaceAPI {
     @POST("duty/master/updateAssignDutySchedule")
     Call<Info> updateAssignDutySchedule(@Query("assignId") int assignId, @Query("status") int status);
 
-
     @POST("duty/master/getDutyReportByEmp")
     Call<ArrayList<Document>> getDutyReportByEmp(@Query("empId") int empId,@Query("langId") int langId);
 
     @POST("duty/master/saveTaskDoneHeader")
     Call<DutyDone> saveTaskDoneHeader(@Body DutyDone dutyDone);
+
+    @GET("master/allEmployeeDepartment")
+    Call<ArrayList<Department>> allEmployeeDepartment();
+
+    @GET("master/allEmployeesByDesg")
+    Call<ArrayList<Emp>> allEmployees();
+
+    @POST("checklist/saveChecklistHeaderAndDetail")
+    Call<ChecklistHeader> saveChecklistHeaderAndDetail(@Body ChecklistHeader checklistHeader);
+
+    @GET("checklist/allChecklistHeader")
+    Call<ArrayList<ChecklistHeader>> allChecklistHeader();
+
+    @POST("checklist/getAllChecklistHeaderAndDetail")
+    Call<ArrayList<ChecklistHeader>> getAllChecklistHeaderAndDetail();
+
+    @GET("checklist/getAllAssignedChecklistDisplay")
+    Call<ArrayList<AssignChecklist>> getAllAssignedChecklistDisplay();
+
+    @POST("checklist/deleteChecklistAssign")
+    Call<Info> deleteChecklistAssign(@Query("assignId") int assignId);
+
+    @POST("checklist/saveChecklistAssign")
+    Call<SaveAssigneChecklist> saveChecklistAssign(@Body SaveAssigneChecklist assigneSave);
+
+    @POST("checklist/getOpenChecklistByEmp")
+    Call<ArrayList<Detail>> getOpenChecklistByEmp(@Query("empId") int empId);
+
+    @POST("checklist/getAllChecklistByDept")
+    Call<ArrayList<ChecklistHeader>> getAllChecklistByDept(@Query("deptId") int deptId);
+
+    @POST("checklist/saveChecklistActionHeaderAndDetail")
+    Call<ChecklistActionHeader> saveChecklistActionHeaderAndDetail(@Body ChecklistActionHeader checklistActionHeader);
+
+    @POST("checklist/getClosedChecklistByEmp")
+    Call<ArrayList<ActionHeaderClose>> getClosedChecklistByEmp(@Query("empId") int empId);
+
+    @POST("checklist/updateClosedChecklistDetailStatus")
+    Call<Info> updateClosedChecklistDetailStatus(@Query("actionDetailId") int actionDetailId,@Query("status") int status,@Query("photo") String photo);
+
+    @POST("checklist/updateClosedChecklistDetailPhoto")
+    Call<Info> updateClosedChecklistDetailPhoto(@Query("actionDetailId") int actionDetailId,@Query("photo") String photo);
+
+    @POST("checklist/updateClosedChecklistDetailStatusMultiple")
+    Call<Info> updateClosedChecklistDetailStatusMultiple(@Query("actionDetailId")  ArrayList<Integer>  actionDetailId,@Query("status") int status);
+
+    @POST("checklist/updateClosedChecklistHeaderStatus")
+    Call<Info> updateClosedChecklistHeaderStatus(@Query("actionHeaderId") int actionHeaderId,@Query("status") int status,@Query("empId") int empId);
+
+    @POST("checklist/deleteChecklistHeader")
+    Call<Info> deleteChecklistHeader(@Query("checklistHeaderId") int checklistHeaderId);
+
+    @POST("chat/saveChatGroup")
+    Call<ChatGroup> saveChatGroup(@Body ChatGroup chatGroup);
+
+    @POST("chat/getAllChatGroupDisplay")
+    Call<ArrayList<GroupList>> getAllChatGroupDisplay(@Query("isActive") int isActive);
+
+    @POST("chat/deleteChatGroup")
+    Call<Info> deleteChatGroup(@Query("groupId") int groupId);
+
+    @POST("chat/getAllChatHeaderDisplay")
+    Call<ArrayList<ChatTask>> getAllChatHeaderDisplay(@Query("isActive") int isActive);
+
+    @POST("chat/deleteChatHeader")
+    Call<Info> deleteChatHeader(@Query("headerId") int headerId);
+
 }

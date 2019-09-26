@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/btnSubmit"
+        android:orientation="vertical">
+
+        <!--android:layout_above="@id/btnSubmit"-->
 
     <EditText
         android:id="@+id/edSearch"
@@ -21,4 +30,17 @@
         android:layout_marginTop="5dp"
         android:divider="#00000000" />
 
-</LinearLayout>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/colorWhite"
+        android:text="Submit"
+        android:visibility="gone"
+        android:background="@drawable/rounded_cornner_buttons"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

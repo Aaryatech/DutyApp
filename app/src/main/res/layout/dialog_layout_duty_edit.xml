@@ -113,7 +113,7 @@
             android:layout_weight="1"
             android:layout_marginRight="8dp"
             android:fontFamily="@font/sf_ui_bold"
-            android:text="Close"
+            android:text="Cancel"
             android:textColor="@color/colorWhite" />
 
         <Button
@@ -124,7 +124,7 @@
             android:layout_weight="1"
             android:layout_marginLeft="8dp"
             android:fontFamily="@font/sf_ui_bold"
-            android:text="Submit"
+            android:text="Edit"
             android:textColor="@color/colorWhite" />
 
     </LinearLayout>

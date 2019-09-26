@@ -96,6 +96,39 @@ public class DutyDetail {
     @Expose
     private Integer remarkReq;
 
+    public DutyDetail(Integer taskDoneDetailId, Integer taskDoneHeaderId, Integer dutyId, Integer taskId, String taskName, String taskDesc, String completedDate, String photo1, String photo2, String photo3, String photo4, String photo5, String remark, Integer taskWeight, Integer taskStatus, Integer delStatus, Integer exInt1, Integer exInt2, Integer exInt3, String exVar1, String exVar2, String exVar3, String taskNameEng, String taskNameMar, String taskNameHin, String taskDescEng, String taskDescMar, String taskDescHin, Integer photoReq, Integer remarkReq) {
+        this.taskDoneDetailId = taskDoneDetailId;
+        this.taskDoneHeaderId = taskDoneHeaderId;
+        this.dutyId = dutyId;
+        this.taskId = taskId;
+        this.taskName = taskName;
+        this.taskDesc = taskDesc;
+        this.completedDate = completedDate;
+        this.photo1 = photo1;
+        this.photo2 = photo2;
+        this.photo3 = photo3;
+        this.photo4 = photo4;
+        this.photo5 = photo5;
+        this.remark = remark;
+        this.taskWeight = taskWeight;
+        this.taskStatus = taskStatus;
+        this.delStatus = delStatus;
+        this.exInt1 = exInt1;
+        this.exInt2 = exInt2;
+        this.exInt3 = exInt3;
+        this.exVar1 = exVar1;
+        this.exVar2 = exVar2;
+        this.exVar3 = exVar3;
+        this.taskNameEng = taskNameEng;
+        this.taskNameMar = taskNameMar;
+        this.taskNameHin = taskNameHin;
+        this.taskDescEng = taskDescEng;
+        this.taskDescMar = taskDescMar;
+        this.taskDescHin = taskDescHin;
+        this.photoReq = photoReq;
+        this.remarkReq = remarkReq;
+    }
+
     private boolean isChecked;
 
     public boolean isChecked() {

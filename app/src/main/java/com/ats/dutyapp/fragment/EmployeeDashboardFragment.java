@@ -1,7 +1,9 @@
 package com.ats.dutyapp.fragment;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,10 +20,13 @@ import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.model.DeptCount;
 import com.ats.dutyapp.model.EmpCount;
 import com.ats.dutyapp.model.Login;
+import com.ats.dutyapp.model.Sync;
 import com.ats.dutyapp.utils.CommonDialog;
 import com.ats.dutyapp.utils.CustomSharedPreference;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -37,6 +42,7 @@ public class EmployeeDashboardFragment extends Fragment {
     private RecyclerView recyclerView;
     EmployeeAdapter adapter;
     ArrayList<EmpCount> empList = new ArrayList<>();
+    ArrayList<Sync> syncArray = new ArrayList<>();
     DeptCount model;
     Login loginUserMain;
 
@@ -69,12 +75,60 @@ public class EmployeeDashboardFragment extends Fragment {
             e.printStackTrace();
         }
 
+        try {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            Gson gson = new Gson();
+            String json = prefs.getString("Sync", null);
+            Type type = new TypeToken<ArrayList<Sync>>() {}.getType();
+            syncArray= gson.fromJson(json, type);
+
+            Log.e("SYNC MAIN : ", "--------USER-------" + syncArray);
+
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         ArrayList<Integer> empList = new ArrayList<>();
         empList.add(-1);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
         getEmployeeList(model.getDeptId(),empList,sdf.format(System.currentTimeMillis()));
+
+
+//        if(syncArray!=null) {
+//            for (int j = 0; j < syncArray.size(); j++) {
+//                if(syncArray.get(j).getSettingKey().equals("Supervisor")){
+//                    if (syncArray.get(j).getSettingValue().equals(String.valueOf(loginUserMain.getEmpCatId()))) {
+//
+//                        ArrayList<Integer> empList = new ArrayList<>();
+//                        empList.add(-1);
+//
+//                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//
+//                        getEmployeeList(model.getDeptId(),empList,sdf.format(System.currentTimeMillis()));
+//
+//                        Log.e("Superwiser","--------------------------------");
+//
+//                    }
+//                }else if(syncArray.get(j).getSettingKey().equals("Admin")){
+//                    if (syncArray.get(j).getSettingValue().equals(String.valueOf(loginUserMain.getEmpCatId()))) {
+//
+//                        ArrayList<Integer> empList = new ArrayList<>();
+//                        empList.add(-1);
+//
+//                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//
+//                        getEmployeeList(-1,empList,sdf.format(System.currentTimeMillis()));
+//
+//                        Log.e("Admin","--------------------------------");
+//
+//
+//                    }
+//                }
+//            }
+//        }
 
         return view;
     }

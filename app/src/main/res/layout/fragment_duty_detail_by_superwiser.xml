@@ -6,10 +6,10 @@
     android:orientation="vertical"
     app:cardUseCompatPadding="true">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:orientation="vertical">-->
 
     <android.support.v7.widget.CardView
         android:id="@+id/cardView"
@@ -96,7 +96,7 @@
 
 
         <TextView
-            android:id="@+id/tvAssignName"
+            android:id="@+id/tvAssignType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
@@ -212,14 +212,16 @@
     </LinearLayout>
     </android.support.v7.widget.CardView>
 
+    <!--</LinearLayout>-->
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginBottom="5dp"
+        android:layout_below="@+id/cardView"
+        android:layout_above="@id/btnSubmit"
         android:visibility="visible" />
-
-    </LinearLayout>
 
     <Button
         android:id="@+id/btnSubmit"
