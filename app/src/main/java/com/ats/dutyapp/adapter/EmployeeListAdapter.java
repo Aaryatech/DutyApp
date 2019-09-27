@@ -2,8 +2,11 @@ package com.ats.dutyapp.adapter;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,25 +19,40 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ats.dutyapp.R;
+import com.ats.dutyapp.activity.HomeActivity;
 import com.ats.dutyapp.constant.Constants;
+import com.ats.dutyapp.fragment.DashboardFragment;
+import com.ats.dutyapp.model.ChatMemo;
+import com.ats.dutyapp.model.ChatTask;
 import com.ats.dutyapp.model.Employee;
+import com.ats.dutyapp.model.Login;
+import com.ats.dutyapp.utils.CommonDialog;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapter.MyViewHolder> {
 
     private ArrayList<Employee> empList;
     private Context context;
+    public  static Login loginUser;
+    public  static ChatTask chatTask;
 
 
-    public EmployeeListAdapter(ArrayList<Employee> empList, Context context) {
+    public EmployeeListAdapter(ArrayList<Employee> empList, Context context,ChatTask chatTask,Login loginUser) {
         this.empList = empList;
         this.context = context;
+        this.chatTask = chatTask;
+        this.loginUser = loginUser;
     }
 
     @NonNull
@@ -74,7 +92,7 @@ public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapte
         myViewHolder.tvMemo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AddMemoDialog(context).show();
+                new AddMemoDialog(context,chatTask,model).show();
             }
         });
 
@@ -104,9 +122,13 @@ public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapte
         public Button btnCancel, btnSubmit;
         public TextView tvTaskName,tvTaskDesc;
         public EditText edRemark;
+        ChatTask chatTask;
+        Employee employee;
 
-        public AddMemoDialog(Context context) {
+        public AddMemoDialog(Context context,ChatTask chatTask,Employee employee) {
             super(context);
+            this.chatTask = chatTask;
+            this.employee = employee;
         }
 
         @Override
@@ -130,6 +152,14 @@ public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapte
             tvTaskName=(TextView)findViewById(R.id.tvTaskName);
             tvTaskDesc=(TextView)findViewById(R.id.tvTaskDesc);
 
+            try {
+                tvTaskName.setText("" + chatTask.getHeaderName());
+                tvTaskDesc.setText("" + chatTask.getTaskDesc());
+            }catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
             edRemark=(EditText)findViewById(R.id.edRemark);
 
             btnCancel = (Button) findViewById(R.id.btnCancel);
@@ -142,8 +172,140 @@ public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapte
                 }
             });
 
+            btnSubmit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String strRmark;
+                    boolean isValidRemark=false;
+
+                    strRmark=edRemark.getText().toString();
+
+                    if (strRmark.isEmpty()) {
+                        edRemark.setError("required");
+                    } else {
+                        edRemark.setError(null);
+                        isValidRemark = true;
+                    }
+
+                    if(isValidRemark)
+                    {
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                       final ChatMemo chatMemo=new ChatMemo(0,employee.getEmpId(),chatTask.getHeaderId(),loginUser.getEmpId(),strRmark,sdf.format(System.currentTimeMillis()),0,1,0,0,0,"","","");
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogTheme);
+                        builder.setTitle("Confirmation");
+                        builder.setMessage("Do you want to save memo ?");
+                        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                saveMemo(chatMemo);
+                                dismiss();
+                                Log.e("Save memo", "-------------------------------SAVE----------------------------------" + chatMemo);
+
+                            }
+                        });
+                        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    }
 
 
+                }
+            });
+
+        }
+    }
+
+    private void saveMemo(ChatMemo chatMemo) {
+        Log.e("PARAMETER","---------------------------------------MEMO LIST--------------------------"+chatMemo);
+
+        if (Constants.isOnline(context)) {
+            final CommonDialog commonDialog = new CommonDialog(context, "Loading", "Please Wait...");
+            commonDialog.show();
+
+            Call<ChatMemo> listCall = Constants.myInterface.saveChatMemo(chatMemo);
+            listCall.enqueue(new Callback<ChatMemo>() {
+                @Override
+                public void onResponse(Call<ChatMemo> call, Response<ChatMemo> response) {
+                    try {
+                        if (response.body() != null) {
+
+                            Log.e("SAVE MEMO LIST : ", " ------------------------------SAVE MEMO LIST------------------------- " + response.body());
+                            HomeActivity activity = (HomeActivity) context;
+                            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show();
+                            FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+                            ft.replace(R.id.content_frame, new DashboardFragment(), "MainFragment");
+                            ft.commit();
+
+                            commonDialog.dismiss();
+
+                        } else {
+                            commonDialog.dismiss();
+                            Log.e("Data Null : ", "-----------");
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogTheme);
+                            builder.setTitle("" + context.getResources().getString(R.string.app_name));
+                            builder.setMessage("Unable to process! please try again.");
+
+                            builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+
+                        }
+                    } catch (Exception e) {
+                        commonDialog.dismiss();
+                        Log.e("Exception : ", "-----------" + e.getMessage());
+                        e.printStackTrace();
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogTheme);
+                        builder.setTitle("" + context.getResources().getString(R.string.app_name));
+                        builder.setMessage("Unable to process! please try again.");
+
+                        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ChatMemo> call, Throwable t) {
+                    commonDialog.dismiss();
+                    Log.e("onFailure : ", "-----------" + t.getMessage());
+                    t.printStackTrace();
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogTheme);
+                    builder.setTitle("" + context.getResources().getString(R.string.app_name));
+                    builder.setMessage("Unable to process! please try again.");
+
+                    builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+                }
+            });
+        } else {
+            Toast.makeText(context, "No Internet Connection !", Toast.LENGTH_SHORT).show();
         }
     }
 }

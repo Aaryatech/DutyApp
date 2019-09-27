@@ -107,7 +107,7 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_edit_task, container, false);
-
+        getActivity().setTitle("Edit Task");
         rg=view.findViewById(R.id.rg);
         rgType=view.findViewById(R.id.rgType);
         rbDaily=view.findViewById(R.id.rbDaily);

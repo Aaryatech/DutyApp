@@ -80,14 +80,13 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.MyView
             @Override
             public void onClick(View v) {
                 Gson gson = new Gson();
-                //String json = gson.toJson(model);
+                String json = gson.toJson(model);
 
                 HomeActivity activity = (HomeActivity) context;
                 TaskCommunicationlFragment adf = new TaskCommunicationlFragment();
-               // Bundle args = new Bundle();
-                //args.putString("model",json);
-                //args.putString("type","Visitor List");
-                //adf.setArguments(args);
+                Bundle args = new Bundle();
+                args.putString("model",json);
+                adf.setArguments(args);
                 activity.getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf, "TaskListFragment").commit();
 
             }

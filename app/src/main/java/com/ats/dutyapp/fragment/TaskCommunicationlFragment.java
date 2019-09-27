@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -31,6 +30,10 @@ import android.widget.SeekBar;
 import com.ats.dutyapp.R;
 import com.ats.dutyapp.adapter.ChatArrayAdapter;
 import com.ats.dutyapp.model.ChatMessage;
+import com.ats.dutyapp.model.ChatTask;
+import com.ats.dutyapp.model.Login;
+import com.ats.dutyapp.utils.CustomSharedPreference;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +51,8 @@ public SeekBar seekBar;
 public ListView listView;
 private ChatArrayAdapter chatArrayAdapter;
 private boolean side = false;
+public static Login loginUser;
+public static ChatTask model;
 
 //--------------------------------------------------Audio Recording-----------------------------
 private String fileName = null;
@@ -61,17 +66,36 @@ private String fileName = null;
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_task_communicationl, container, false);
-        getActivity().setTitle("Task");
+        getActivity().setTitle("Task Communication");
 
         edEnterText=(EditText)view.findViewById(R.id.edEnterText);
         ivCamera=(ImageView)view.findViewById(R.id.ivCamera);
-      //  imageViewPlay=(ImageView)view.findViewById(R.id.imageViewPlay);
         btnAudio=(Button)view.findViewById(R.id.btnAudio);
         btnSend=(Button)view.findViewById(R.id.btnSend);
         pai_cron = (Chronometer)view.findViewById(R.id.pai_cron);
-       // seekBar = (SeekBar) view.findViewById(R.id.seekBar);
-        //recyclerView=(RecyclerView) view.findViewById(R.id.recyclerView);
+
         listView=(ListView) view.findViewById(R.id.listView);
+
+
+        try {
+            String userStr = CustomSharedPreference.getString(getActivity(), CustomSharedPreference.MAIN_KEY_USER);
+            Gson gson = new Gson();
+            loginUser = gson.fromJson(userStr, Login.class);
+            Log.e("LOGIN USER MAIN : ", "--------USER-------" + loginUser);
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try {
+            String quoteStr = getArguments().getString("model");
+            Gson gson = new Gson();
+            model = gson.fromJson(quoteStr, ChatTask.class);
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
 
         chatArrayAdapter = new ChatArrayAdapter(getActivity(), R.layout.right);
         listView.setAdapter(chatArrayAdapter);
@@ -236,9 +260,20 @@ private String fileName = null;
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_abouttask:
-                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame, new AboutTaskFragment(), "TaskCommunicationListFragment");
-                ft.commit();
+//                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+//                ft.replace(R.id.content_frame, new AboutTaskFragment(), "TaskCommunicationListFragment");
+//                ft.commit();
+
+                Gson gson = new Gson();
+                String json = gson.toJson(model);
+                String json1 = gson.toJson(loginUser);
+
+                Fragment adf = new AboutTaskFragment();
+                Bundle args = new Bundle();
+                args.putString("model", json);
+                args.putString("login", json1);
+                adf.setArguments(args);
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf, "TaskCommunicationListFragment").commit();
                 return true;
 
             default:

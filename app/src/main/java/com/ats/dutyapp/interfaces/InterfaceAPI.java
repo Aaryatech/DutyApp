@@ -6,6 +6,7 @@ import com.ats.dutyapp.model.AssignDetail;
 import com.ats.dutyapp.model.AssignDuty;
 import com.ats.dutyapp.model.ChatGroup;
 import com.ats.dutyapp.model.ChatHeader;
+import com.ats.dutyapp.model.ChatMemo;
 import com.ats.dutyapp.model.ChatTask;
 import com.ats.dutyapp.model.ChecklistActionHeader;
 import com.ats.dutyapp.model.Detail;
@@ -162,5 +163,8 @@ public interface InterfaceAPI {
 
     @POST("chat/saveChatHeader")
     Call<ChatHeader> saveChatHeader(@Body ChatHeader chatHeader);
+
+    @POST("chat/saveChatMemo")
+    Call<ChatMemo> saveChatMemo(@Body ChatMemo chatMemo);
 
 }

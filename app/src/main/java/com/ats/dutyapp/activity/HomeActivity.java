@@ -267,6 +267,7 @@ public class HomeActivity extends AppCompatActivity
                 mainFragment instanceof AddCheckListFragment && mainFragment.isVisible() ||
                 mainFragment instanceof CheckListFragment && mainFragment.isVisible() ||
                 mainFragment instanceof DocumentFragment && mainFragment.isVisible() ||
+                mainFragment instanceof AboutTaskFragment && mainFragment.isVisible() ||
                 mainFragment instanceof EmployeeDashboardFragment && mainFragment.isVisible()) {
 
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();

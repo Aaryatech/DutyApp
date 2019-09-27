@@ -45,10 +45,10 @@ public class ChatTask {
     private Integer isReminderRequired;
     @SerializedName("reminderFrequency")
     @Expose
-    private Integer reminderFrequency;
+    private String reminderFrequency;
     @SerializedName("lastDate")
     @Expose
-    private Integer lastDate;
+    private String lastDate;
     @SerializedName("isActive")
     @Expose
     private Integer isActive;
@@ -196,19 +196,19 @@ public class ChatTask {
         this.isReminderRequired = isReminderRequired;
     }
 
-    public Integer getReminderFrequency() {
+    public String getReminderFrequency() {
         return reminderFrequency;
     }
 
-    public void setReminderFrequency(Integer reminderFrequency) {
+    public void setReminderFrequency(String reminderFrequency) {
         this.reminderFrequency = reminderFrequency;
     }
 
-    public Integer getLastDate() {
+    public String getLastDate() {
         return lastDate;
     }
 
-    public void setLastDate(Integer lastDate) {
+    public void setLastDate(String lastDate) {
         this.lastDate = lastDate;
     }
 

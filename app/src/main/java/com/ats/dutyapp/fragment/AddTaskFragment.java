@@ -105,7 +105,7 @@ int yyyy, mm, dd;
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_add_task, container, false);
-
+        getActivity().setTitle("Add Task");
         rg=view.findViewById(R.id.rg);
         rgType=view.findViewById(R.id.rgType);
         rbIndivsual=view.findViewById(R.id.rbIndivsual);
@@ -160,7 +160,6 @@ int yyyy, mm, dd;
         deptList.add(-1);
 
         Log.e(" Selected Text", "---------------------------------------------" + selectedText);
-
 
         //getAllEmp(deptList);
 
