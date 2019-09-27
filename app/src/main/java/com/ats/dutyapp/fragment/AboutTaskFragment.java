@@ -23,14 +23,13 @@ import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.model.ChatHeader;
 import com.ats.dutyapp.model.ChatTask;
 import com.ats.dutyapp.model.Employee;
+import com.ats.dutyapp.model.GroupEmp;
 import com.ats.dutyapp.model.Login;
 import com.ats.dutyapp.utils.CommonDialog;
 import com.ats.dutyapp.utils.CustomSharedPreference;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -43,7 +42,7 @@ public class AboutTaskFragment extends Fragment implements View.OnClickListener 
 public RecyclerView recyclerView;
 public CardView cardViewTaskReq,cardViewTaskComp,cardViewTaskStart;
 public TextView tvTaskName,tvCompletionDate,tvRemark,tvDesc;
-ArrayList<Employee> empList = new ArrayList<>();
+ArrayList<GroupEmp> empList = new ArrayList<>();
  ArrayList<Employee> employeeList = new ArrayList<>();
 EmployeeListAdapter adapter;
 public static Login loginUser;
@@ -103,7 +102,7 @@ public static ChatTask model;
 
         final ArrayList<Integer> deptList = new ArrayList<>();
         deptList.add(-1);
-        getAllEmp(deptList);
+        getAllEmp(model.getHeaderId());
 
         cardViewTaskComp.setOnClickListener(this);
         cardViewTaskReq.setOnClickListener(this);
@@ -111,15 +110,15 @@ public static ChatTask model;
         return view;
     }
 
-    private void getAllEmp(ArrayList<Integer> deptId) {
+    private void getAllEmp(int headerId) {
         if (Constants.isOnline(getActivity())) {
             final CommonDialog commonDialog = new CommonDialog(getActivity(), "Loading", "Please Wait...");
             commonDialog.show();
 
-            Call<ArrayList<Employee>> listCall = Constants.myInterface.allEmployeesByDept(deptId);
-            listCall.enqueue(new Callback<ArrayList<Employee>>() {
+            Call<ArrayList<GroupEmp>> listCall = Constants.myInterface.getChatEmpListByHeader(headerId);
+            listCall.enqueue(new Callback<ArrayList<GroupEmp>>() {
                 @Override
-                public void onResponse(Call<ArrayList<Employee>> call, Response<ArrayList<Employee>> response) {
+                public void onResponse(Call<ArrayList<GroupEmp>> call, Response<ArrayList<GroupEmp>> response) {
                     try {
                         if (response.body() != null) {
 
@@ -127,59 +126,9 @@ public static ChatTask model;
                             empList.clear();
                             empList=response.body();
 
-                            String strEmpId="",strAssEmpId="",strAdminEmpId="",strCreatedEmpId="";
-                            if (model != null) {
-                                strEmpId = model.getAssignUserIds();
-                                strAdminEmpId = model.getAdminUserIds();
-                                strCreatedEmpId = String.valueOf(model.getCreatedUserId());
-                            }
-                            Log.e("EMP LIST", "----------------------" + strEmpId);
-
-                            List<String> list = Arrays.asList(strEmpId.split("\\s*,\\s*"));
-
-                            Log.e("LIST", "----------------------" + list);
-
-                            for (int j = 0; j < empList.size(); j++) {
-
-                                for (int k = 0; k < list.size(); k++) {
-
-                                    if (empList.get(j).getEmpId() == Integer.parseInt(list.get(k))) {
-
-                                        employeeList.add(empList.get(j));
-
-                                        // assignStaticList.add(empList.get(j));
-
-                                    }
-                                }
-                            }
-
-//                            String strEmpId1="";
-//                            if (model != null) {
-//                                strEmpId1 = model.getAdminUserIds();
-//                            }
-//
-//                            List<String> list1 = Arrays.asList(strEmpId1.split("\\s*,\\s*"));
-//
-//                            Log.e("LIST", "----------------------" + list1);
-//
-//                            for (int j = 0; j < empList.size(); j++) {
-//
-//                                for (int k = 0; k < list1.size(); k++) {
-//
-//                                    if (empList.get(j).getEmpId() == Integer.parseInt(list1.get(k))) {
-//
-//                                        employeeList.add(empList.get(j));
-//
-//                                        // assignStaticList.add(empList.get(j));
-//
-//                                    }
-//                                }
-//                            }
-
-
                             Log.e("BIN", "---------------------------------Model-----------------" + employeeList);
 
-                            adapter = new EmployeeListAdapter(employeeList,getContext(),model,loginUser);
+                            adapter = new EmployeeListAdapter(empList,getContext(),model,loginUser);
                             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
                             recyclerView.setLayoutManager(mLayoutManager);
                             recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -198,7 +147,7 @@ public static ChatTask model;
                 }
 
                 @Override
-                public void onFailure(Call<ArrayList<Employee>> call, Throwable t) {
+                public void onFailure(Call<ArrayList<GroupEmp>> call, Throwable t) {
                     commonDialog.dismiss();
                     Log.e("onFailure : ", "-----------" + t.getMessage());
                     t.printStackTrace();

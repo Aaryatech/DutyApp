@@ -50,32 +50,32 @@
 
         <item
             android:id="@+id/nav_AddCheklist"
-            android:icon="@drawable/ic_document"
-            android:visible="true"
+            android:icon="@drawable/checklist"
+            android:visible="false"
             android:title="Add Cheklist" />
 
         <item
             android:id="@+id/nav_cheklist"
             android:icon="@drawable/ic_document"
-            android:visible="true"
+            android:visible="false"
             android:title="Cheklist List" />
 
         <item
             android:id="@+id/nav_addAssigncheklist"
-            android:icon="@drawable/ic_document"
-            android:visible="true"
+            android:icon="@drawable/checklist"
+            android:visible="false"
             android:title="Assign Cheklist"/>
 
         <item
             android:id="@+id/nav_assigncheklist"
             android:icon="@drawable/ic_document"
-            android:visible="true"
+            android:visible="false"
             android:title="Assign Cheklist List"/>
 
         <item
             android:id="@+id/nav_closeOpenTask"
-            android:icon="@drawable/ic_document"
-            android:visible="true"
+            android:icon="@drawable/open_close"
+            android:visible="false"
             android:title="Close/Open Task"/>
 
         <item

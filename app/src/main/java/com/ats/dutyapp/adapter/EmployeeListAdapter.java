@@ -27,7 +27,7 @@ import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.fragment.DashboardFragment;
 import com.ats.dutyapp.model.ChatMemo;
 import com.ats.dutyapp.model.ChatTask;
-import com.ats.dutyapp.model.Employee;
+import com.ats.dutyapp.model.GroupEmp;
 import com.ats.dutyapp.model.Login;
 import com.ats.dutyapp.utils.CommonDialog;
 import com.squareup.picasso.Picasso;
@@ -42,13 +42,13 @@ import retrofit2.Response;
 
 public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapter.MyViewHolder> {
 
-    private ArrayList<Employee> empList;
+    private ArrayList<GroupEmp> empList;
     private Context context;
     public  static Login loginUser;
     public  static ChatTask chatTask;
 
 
-    public EmployeeListAdapter(ArrayList<Employee> empList, Context context,ChatTask chatTask,Login loginUser) {
+    public EmployeeListAdapter(ArrayList<GroupEmp> empList, Context context,ChatTask chatTask,Login loginUser) {
         this.empList = empList;
         this.context = context;
         this.chatTask = chatTask;
@@ -65,23 +65,23 @@ public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapte
 
     @Override
     public void onBindViewHolder(@NonNull EmployeeListAdapter.MyViewHolder myViewHolder, int i) {
-        final Employee model=empList.get(i);
+        final GroupEmp model=empList.get(i);
 
-        myViewHolder.tvEmpName.setText(model.getEmpFname());
+        myViewHolder.tvEmpName.setText(model.getName());
 
-
-        if(model.getEmpCatId()==1) {
-            myViewHolder.tvEmpDesig.setText("Superwiser");
-        }else  if(model.getEmpCatId()==2) {
+        if(model.getUserType()==1) {
+            myViewHolder.tvEmpDesig.setText("Created User");
+            myViewHolder.tvMemo.setVisibility(View.GONE);
+        }else  if(model.getUserType()==2) {
             myViewHolder.tvEmpDesig.setText("Admin");
-        }else  if(model.getEmpCatId()==3) {
-            myViewHolder.tvEmpDesig.setText("Employee");
-        }else  if(model.getEmpCatId()==4) {
-            myViewHolder.tvEmpDesig.setText("Security");
+            myViewHolder.tvMemo.setVisibility(View.VISIBLE);
+        }else  if(model.getUserType()==3) {
+            myViewHolder.tvMemo.setVisibility(View.VISIBLE);
         }
 
+
         try {
-            String imageUri = String.valueOf(model.getEmpPhoto());
+            String imageUri = String.valueOf(model.getPhoto());
             Log.e("Image Path","---------------------"+ Constants.IMAGE_URL+imageUri);
             Picasso.with(context).load(Constants.IMAGE_URL+imageUri).placeholder(context.getResources().getDrawable(R.drawable.profile)).into(myViewHolder.ivPhoto);
 
@@ -123,9 +123,9 @@ public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapte
         public TextView tvTaskName,tvTaskDesc;
         public EditText edRemark;
         ChatTask chatTask;
-        Employee employee;
+        GroupEmp employee;
 
-        public AddMemoDialog(Context context,ChatTask chatTask,Employee employee) {
+        public AddMemoDialog(Context context,ChatTask chatTask,GroupEmp employee) {
             super(context);
             this.chatTask = chatTask;
             this.employee = employee;

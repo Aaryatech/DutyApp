@@ -10,6 +10,7 @@ import com.ats.dutyapp.model.ChatMemo;
 import com.ats.dutyapp.model.ChatTask;
 import com.ats.dutyapp.model.ChecklistActionHeader;
 import com.ats.dutyapp.model.Detail;
+import com.ats.dutyapp.model.GroupEmp;
 import com.ats.dutyapp.model.GroupList;
 import com.ats.dutyapp.model.SaveAssigneChecklist;
 import com.ats.dutyapp.model.ChecklistHeader;
@@ -166,5 +167,8 @@ public interface InterfaceAPI {
 
     @POST("chat/saveChatMemo")
     Call<ChatMemo> saveChatMemo(@Body ChatMemo chatMemo);
+
+    @POST("chat/getChatEmpListByHeader")
+    Call<ArrayList<GroupEmp>> getChatEmpListByHeader(@Query("headerId") int headerId);
 
 }

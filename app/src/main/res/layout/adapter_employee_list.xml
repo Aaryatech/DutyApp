@@ -62,7 +62,6 @@
                             android:fontFamily="@font/sf_ui_regular"
                             android:maxLines="1"
                             android:singleLine="true"
-                            android:text="My Leave Pending"
                             android:textColor="@color/colorBlack"
                             android:textSize="14sp" />
 
@@ -80,6 +79,7 @@
                             android:layout_width="50dp"
                             android:layout_height="20dp"
                             android:text="Memo"
+                            android:visibility="gone"
                             android:gravity="center"
                             android:background="@drawable/rectangle_shap"
                             android:fontFamily="@font/sf_ui_regular"
