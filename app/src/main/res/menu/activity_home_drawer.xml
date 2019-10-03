@@ -25,77 +25,91 @@
             android:title="Duty List" />
 
         <item
-            android:id="@+id/nav_add_grp"
-            android:icon="@drawable/ic_add_grp"
-            android:visible="true"
-            android:title="Add Group" />
-
-        <item
-            android:id="@+id/nav_list_grp"
-            android:icon="@drawable/ic_list"
-            android:visible="true"
-            android:title="Group List" />
-
-        <item
-            android:id="@+id/nav_add_task"
-            android:icon="@drawable/ic_task"
-            android:visible="true"
-            android:title="Add Task" />
-
-        <item
-            android:id="@+id/nav_task_list"
-            android:icon="@drawable/ic_task_list"
-            android:visible="true"
-            android:title="Task List" />
-
-        <item
-            android:id="@+id/nav_AddCheklist"
-            android:icon="@drawable/checklist"
-            android:visible="false"
-            android:title="Add Cheklist" />
-
-        <item
-            android:id="@+id/nav_cheklist"
-            android:icon="@drawable/ic_document"
-            android:visible="false"
-            android:title="Cheklist List" />
-
-        <item
-            android:id="@+id/nav_addAssigncheklist"
-            android:icon="@drawable/checklist"
-            android:visible="false"
-            android:title="Assign Cheklist"/>
-
-        <item
-            android:id="@+id/nav_assigncheklist"
-            android:icon="@drawable/ic_document"
-            android:visible="false"
-            android:title="Assign Cheklist List"/>
-
-        <item
-            android:id="@+id/nav_closeOpenTask"
-            android:icon="@drawable/open_close"
-            android:visible="false"
-            android:title="Close/Open Task"/>
-
-        <item
             android:id="@+id/nav_document"
             android:icon="@drawable/ic_document"
             android:title="Document" />
 
-
     </group>
 
     <item
+        android:id="@+id/nav_report2"
+        android:title="Communication"
+        android:visible="true">
+        <menu>
+            <item
+                android:id="@+id/nav_add_grp"
+                android:icon="@drawable/ic_add_grp"
+                android:visible="true"
+                android:title="Add Group" />
+
+            <item
+                android:id="@+id/nav_list_grp"
+                android:icon="@drawable/ic_list"
+                android:visible="true"
+                android:title="Group List" />
+
+            <item
+                android:id="@+id/nav_add_task"
+                android:icon="@drawable/ic_task"
+                android:visible="true"
+                android:title="Add Task" />
+
+            <item
+                android:id="@+id/nav_task_list"
+                android:icon="@drawable/ic_task_list"
+                android:visible="true"
+                android:title="Task List" />
+
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/nav_report1"
+        android:title="Checklist"
+        android:visible="true">
+        <menu>
+            <item
+                android:id="@+id/nav_AddCheklist"
+                android:icon="@drawable/checklist"
+                android:visible="true"
+                android:title="Add Cheklist" />
+
+            <item
+                android:id="@+id/nav_cheklist"
+                android:icon="@drawable/ic_document"
+                android:visible="true"
+                android:title="Cheklist List" />
+
+            <item
+                android:id="@+id/nav_addAssigncheklist"
+                android:icon="@drawable/checklist"
+                android:visible="true"
+                android:title="Assign Cheklist"/>
+
+            <item
+                android:id="@+id/nav_assigncheklist"
+                android:icon="@drawable/ic_document"
+                android:visible="true"
+                android:title="Assign Cheklist List"/>
+
+            <item
+                android:id="@+id/nav_closeOpenTask"
+                android:icon="@drawable/open_close"
+                android:visible="true"
+                android:title="Close/Open Task"/>
+        </menu>
+    </item>
+
+    <item
         android:id="@+id/nav_report"
-        android:title="Select Language"
+        android:title="Setting"
         android:visible="true">
         <menu>
             <item
                 android:id="@+id/nav_Eng"
                 android:icon="@drawable/ic_list"
                 android:visible="false"
-                android:title="English" />
+                android:title="Select Language" />
 
             <item
                 android:id="@+id/nav_Marathi"
@@ -112,7 +126,7 @@
             <item
                 android:id="@+id/nav_language"
                 android:icon="@drawable/ic_language"
-                android:title="Language" />
+                android:title="Select Language" />
         </menu>
     </item>
 

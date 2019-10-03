@@ -42,7 +42,7 @@
                     android:fontFamily="@font/sf_ui_bold"
                     android:gravity="start"
                     android:maxLines="1"
-                    android:text="My Leave Pending"
+                    android:text=""
                     android:singleLine="true"
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="18sp" />
@@ -80,7 +80,7 @@
                     android:drawablePadding="10dp"
                     android:fontFamily="@font/sf_ui_regular"
                     android:gravity="center_vertical"
-                    android:text="6:00"
+                    android:text=""
                     android:textSize="16sp" />
 
                 <TextView
@@ -92,7 +92,7 @@
                     android:drawablePadding="10dp"
                     android:gravity="end"
                     android:fontFamily="@font/sf_ui_regular"
-                    android:text="6:00"
+                    android:text=""
                     android:textSize="16sp" />
 
             </LinearLayout>
@@ -113,7 +113,7 @@
                     android:drawablePadding="10dp"
                     android:layout_marginBottom="10dp"
                     android:singleLine="true"
-                    android:text="My Leave Pending"
+                    android:text=""
                     android:textSize="16sp" />
 
             </LinearLayout>

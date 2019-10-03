@@ -166,7 +166,8 @@ public class DutyDetailBySuperwiserFragment extends Fragment implements View.OnC
 
                             tvTaskStartTime.setText("From Time : "+assignDetail.getShiftFromTime());
                             tvTaskEndTime.setText("To Time : "+assignDetail.getShiftToTime());
-                            tvDate.setText(""+assignDetail.getAssignDate());
+                            tvDate.setText(""+model.getCreatedDate());
+                           // assignDetail.getAssignDate()
                             tvTaskName.setText(""+assignDetail.getDutyName());
 
                             if(model.getType()==1) {

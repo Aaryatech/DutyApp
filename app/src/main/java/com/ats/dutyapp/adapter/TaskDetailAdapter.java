@@ -52,17 +52,17 @@ public class TaskDetailAdapter extends RecyclerView.Adapter<TaskDetailAdapter.My
 
         if(language.equalsIgnoreCase("1"))
         {
-            myViewHolder.tvTaskName.setText(""+model.getTaskNameEng());
+            myViewHolder.tvTaskName.setText("Task Name : "+model.getTaskNameEng());
             myViewHolder.tvTaskDesc.setText("Task Description : "+model.getTaskDescEng());
             Log.e("LANGUAGE","------------------------------ENG--------------------------------------");
         }else if(language.equalsIgnoreCase("2"))
         {
-            myViewHolder.tvTaskName.setText(""+model.getTaskNameMar());
+            myViewHolder.tvTaskName.setText("Task Name : "+model.getTaskNameMar());
             myViewHolder.tvTaskDesc.setText("Task Description : "+model.getTaskDescMar());
             Log.e("LANGUAGE","------------------------------MAR--------------------------------------");
         }else if(language.equalsIgnoreCase("3"))
         {
-            myViewHolder.tvTaskName.setText(""+model.getTaskNameHin());
+            myViewHolder.tvTaskName.setText("Task Name : "+model.getTaskNameHin());
             myViewHolder.tvTaskDesc.setText("Task Description : "+model.getTaskDescHin());
             Log.e("LANGUAGE","------------------------------HIN--------------------------------------");
         }

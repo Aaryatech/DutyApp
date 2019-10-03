@@ -62,11 +62,11 @@ import retrofit2.Response;
  * A simple {@link Fragment} subclass.
  */
 public class EditTaskFragment extends Fragment implements View.OnClickListener{
-    public RadioGroup rg,rgType;
+    public RadioGroup rg,rgType,rgRepotType;
     public RadioButton rbDaily,rbWeekly,rbNo,rbYes;
-    public TextView tvEmp,tvEmpId,tvEmpAdmin,tvEmpIdAdmin,tvDept,tvDeptId,tvDate,tvTime,tvEmpLable,tvDeptLable;
+    public TextView tvEmp,tvEmpId,tvEmpAdmin,tvEmpIdAdmin,tvDept,tvDeptId,tvDate,tvTime,tvEmpLable,tvDeptLable,tvEmpAdminLable;
     public EditText edDate,edRemTime,edDesc,edRemark,edDay,edTaskName;
-    public View empView,deptView;
+    public View empView,deptView,viewAdmin;
     public TextInputLayout textInputLayoutDay;
     public Button btnSubmit;
     public LinearLayout linearLayout;
@@ -87,6 +87,9 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
     Boolean isMonPressed = false,isSunPressed = false,isTuePressed = false,isWedPressed = false,isThuPressed = false,isFriPressed = false,isSatPressed = false;
 
     public static ArrayList<Employee> assignStaticTaskList = new ArrayList<>();
+    public static ArrayList<Employee> assignStaticTaskAdminEmpList = new ArrayList<>();
+
+    ArrayList<Employee> empListAdmin = new ArrayList<>();
 
     long fromDateMillis, toDateMillis;
     int yyyy, mm, dd;
@@ -110,6 +113,7 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
         getActivity().setTitle("Edit Task");
         rg=view.findViewById(R.id.rg);
         rgType=view.findViewById(R.id.rgType);
+        rgRepotType=view.findViewById(R.id.rgRepotType);
         rbDaily=view.findViewById(R.id.rbDaily);
         rbWeekly=view.findViewById(R.id.rbWeekly);
         rbNo=view.findViewById(R.id.rbNo);
@@ -117,8 +121,11 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
         tvEmp=view.findViewById(R.id.tvEmp);
         tvEmpId=view.findViewById(R.id.tvEmpId);
 
+
         tvEmpAdmin=view.findViewById(R.id.tvEmpAdmin);
         tvEmpIdAdmin=view.findViewById(R.id.tvEmpIdAdmin);
+        tvEmpAdminLable=view.findViewById(R.id.tvEmpAdminLable);
+        viewAdmin=view.findViewById(R.id.viewAdmin);
 
         linearLayout=view.findViewById(R.id.linearLayout);
         btn_sun=view.findViewById(R.id.btn_sun);
@@ -163,13 +170,53 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
             edRemTime.setText(""+model.getExVar1());
             edDesc.setText(""+model.getTaskDesc());
             edRemark.setText(""+model.getTaskCompleteRemark());
+            tvEmpIdAdmin.setText(""+model.getAdminUserIds());
+            tvEmpId.setText(""+model.getAssignUserIds());
+            tvEmp.setText(""+model.getAssignUserNames());
+            reminderType=model.getReminderFrequency();
+
+            Log.e("Frquency","---------------------------------"+reminderType);
+
+            String strFrq="";
+            if (model != null) {
+                strFrq = model.getReminderFrequency();
+            }
+           String str= strFrq.replaceAll("\\s","");
+
+            List<String> list = Arrays.asList(str.split("\\s*,\\s*"));
+            Log.e("List","-------------------------------------"+list);
+
+            for(int i=0;i<list.size();i++) {
+                if (list.get(i).equalsIgnoreCase("1")) {
+                    btn_mon.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
+                } else if (list.get(i).equalsIgnoreCase("2")) {
+                    btn_tue.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
+                } else if (list.get(i).equalsIgnoreCase("3")) {
+                    btn_wed.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
+                } else if (list.get(i).equalsIgnoreCase("4")) {
+                    btn_thu.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
+                } else if (list.get(i).equalsIgnoreCase("5")) {
+                    btn_fri.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
+                } else if (list.get(i).equalsIgnoreCase("6")) {
+                    btn_sat.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
+                } else if (list.get(i).equalsIgnoreCase("7")) {
+                    btn_sun.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
+                }
+            }
 
             if(model.getIsReminderRequired()==0)
             {
                 rbNo.setChecked(true);
+                tvEmpAdmin.setVisibility(View.GONE);
+                viewAdmin.setVisibility(View.GONE);
+                tvEmpAdminLable.setVisibility(View.GONE);
+
             }else if(model.getIsReminderRequired()==1)
             {
                 rbYes.setChecked(true);
+                tvEmpAdmin.setVisibility(View.VISIBLE);
+                viewAdmin.setVisibility(View.VISIBLE);
+                tvEmpAdminLable.setVisibility(View.VISIBLE);
             }
 
             if(model.getReminderFrequency().equals("1,2,3,4,5,6,7"))
@@ -180,6 +227,7 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
                 rbWeekly.setChecked(true);
                 linearLayout.setVisibility(View.VISIBLE);
             }
+
 
         }catch (Exception e)
         {
@@ -194,7 +242,33 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
 
         getAllEmp(deptList,"");
 
+        rgRepotType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                int radioButtonID = group.getCheckedRadioButtonId();
+                View radioButton = group.findViewById(radioButtonID);
+                int idx = group.indexOfChild(radioButton);
+                RadioButton r = (RadioButton) group.getChildAt(idx);
+                selectedText = r.getText().toString();
+                Log.e(" Radio", "----------" + idx);
+                Log.e(" Radio Text", "----------" + selectedText);
 
+                if(selectedText.equalsIgnoreCase("No"))
+                {
+                    tvEmpAdmin.setVisibility(View.GONE);
+                    tvEmpIdAdmin.setVisibility(View.GONE);
+                    viewAdmin.setVisibility(View.GONE);
+                    tvEmpAdminLable.setVisibility(View.GONE);
+
+                }else if(selectedText.equalsIgnoreCase("Yes"))
+                {
+                    tvEmpAdmin.setVisibility(View.VISIBLE);
+                    viewAdmin.setVisibility(View.VISIBLE);
+                    tvEmpAdminLable.setVisibility(View.VISIBLE);
+
+                }
+            }
+        });
         rgType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -221,6 +295,7 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
         });
 
         getAllDept();
+        getAllEmployee();
       //  getAllGroup(1);
 
         Date todayDate = Calendar.getInstance().getTime();
@@ -248,6 +323,61 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
         btn_sat.setOnClickListener(this);
 
         return view;
+    }
+
+    private void getAllEmployee() {
+        if (Constants.isOnline(getActivity())) {
+            final CommonDialog commonDialog = new CommonDialog(getActivity(), "Loading", "Please Wait...");
+            commonDialog.show();
+
+            final ArrayList<Integer> deptList = new ArrayList<>();
+            deptList.add(-1);
+
+            Call<ArrayList<Employee>> listCall = Constants.myInterface.allEmployeesByDept(deptList);
+            listCall.enqueue(new Callback<ArrayList<Employee>>() {
+                @Override
+                public void onResponse(Call<ArrayList<Employee>> call, Response<ArrayList<Employee>> response) {
+                    try {
+                        if (response.body() != null) {
+
+                            Log.e("EMPLOYEE LIST : ", " -----------------------------------EMPLOYEE LIST---------------------------- " + response.body());
+
+                            empListAdmin.clear();
+                            empListAdmin=response.body();
+
+                            assignStaticTaskAdminEmpList.clear();
+                            assignStaticTaskAdminEmpList=empListAdmin;
+
+                            for(int i=0;i<empListAdmin.size();i++) {
+                                if (loginUser.getEmpId().equals(empListAdmin.get(i).getEmpId()))
+                                {
+                                    tvEmpAdmin.setText(empListAdmin.get(i).getEmpFname() +" "+empListAdmin.get(i).getEmpMname()+ " " +empListAdmin.get(i).getEmpSname());
+                                    tvEmpIdAdmin.setText(""+empListAdmin.get(i).getEmpId());
+                                }
+                            }
+                            commonDialog.dismiss();
+
+                        } else {
+                            commonDialog.dismiss();
+                            Log.e("Data Null : ", "-----------");
+                        }
+                    } catch (Exception e) {
+                        commonDialog.dismiss();
+                        Log.e("Exception : ", "-----------" + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ArrayList<Employee>> call, Throwable t) {
+                    commonDialog.dismiss();
+                    Log.e("onFailure : ", "-----------" + t.getMessage());
+                    t.printStackTrace();
+                }
+            });
+        } else {
+            Toast.makeText(getActivity(), "No Internet Connection !", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void getAllDept() {
@@ -356,70 +486,84 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
             if (!isMonPressed) {
                 btn_mon.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
                 isMonPressed = true;
-                reminderType="1";
+                reminderType=reminderType+"1,";
             } else {
                 btn_mon.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap));
                 isMonPressed = false;
+                String stop =   reminderType.substring(0, reminderType.length() - 1);
+                reminderType = stop.substring(0, stop.length() - 1);
             }
         }else if(v.getId()==R.id.btn_sun)
         {
             if (!isSunPressed) {
                 btn_sun.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
                 isSunPressed = true;
-                reminderType="7";
+                reminderType=reminderType+"7,";
             } else {
                 btn_sun.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap));
                 isSunPressed = false;
+                String stop =   reminderType.substring(0, reminderType.length() - 1);
+                reminderType = stop.substring(0, stop.length() - 1);
             }
         }else if(v.getId()==R.id.btn_tue)
         {
             if (!isTuePressed) {
                 btn_tue.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
                 isTuePressed = true;
-                reminderType="2";
+                reminderType=reminderType+"2,";
             } else {
                 btn_tue.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap));
                 isTuePressed = false;
+                String stop =   reminderType.substring(0, reminderType.length() - 1);
+                reminderType = stop.substring(0, stop.length() - 1);
             }
         }else if(v.getId()==R.id.btn_wed)
         {
             if (!isWedPressed) {
                 btn_wed.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
                 isWedPressed = true;
-                reminderType="3";
+                reminderType=reminderType+"3,";
             } else {
                 btn_wed.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap));
                 isWedPressed = false;
+                String stop =   reminderType.substring(0, reminderType.length() - 1);
+                reminderType = stop.substring(0, stop.length() - 1);
             }
         }else if(v.getId()==R.id.btn_thu)
         {
             if (!isThuPressed) {
                 btn_thu.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
                 isThuPressed = true;
-                reminderType="4";
+                reminderType=reminderType+"4,";
             } else {
                 btn_thu.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap));
                 isThuPressed = false;
+                String stop =   reminderType.substring(0, reminderType.length() - 1);
+                reminderType = stop.substring(0, stop.length() - 1);
             }
         }else if(v.getId()==R.id.btn_fri)
         {
             if (!isFriPressed) {
                 btn_fri.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
                 isFriPressed = true;
-                reminderType="5";
+                reminderType=reminderType+"5,";
             } else {
                 btn_fri.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap));
                 isFriPressed = false;
+                String stop =   reminderType.substring(0, reminderType.length() - 1);
+                reminderType = stop.substring(0, stop.length() - 1);
             }
         }else if(v.getId()==R.id.btn_sat)
         {
             if (!isSatPressed) {
                 btn_sat.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
                 isSatPressed = true;
-                reminderType="6";
+                reminderType=reminderType+"6,";
             } else {
                 btn_sat.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap));
                 isSatPressed = false;
+                String stop =   reminderType.substring(0, reminderType.length() - 1);
+                reminderType = stop.substring(0, stop.length() - 1);
             }
         }
 //        else if(v.getId()==R.id.tvDept)
@@ -440,6 +584,7 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
             strEmp=tvEmp.getText().toString();
             strEmpId=tvEmpId.getText().toString();
             strEmpAdmin=tvEmpAdmin.getText().toString();
+            stringIdAdmin=tvEmpIdAdmin.getText().toString();
 
             SimpleDateFormat formatter3 = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat formatter1 = new SimpleDateFormat("dd-MM-yyyy");
@@ -654,14 +799,14 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
                 ArrayList<Employee> assignedArray = new ArrayList<>();
                 final ArrayList<Integer> assignedEmpIdArray = new ArrayList<>();
                 final ArrayList<String> assignedEmpNameArray = new ArrayList<>();
-                if (assignStaticTaskList != null) {
-                    if (assignStaticTaskList.size() > 0) {
+                if (assignStaticTaskAdminEmpList != null) {
+                    if (assignStaticTaskAdminEmpList.size() > 0) {
                         assignedArray.clear();
-                        for (int i = 0; i < assignStaticTaskList.size(); i++) {
-                            if (assignStaticTaskList.get(i).isChecked()) {
-                                assignedArray.add(assignStaticTaskList.get(i));
-                                assignedEmpIdArray.add(assignStaticTaskList.get(i).getEmpId());
-                                assignedEmpNameArray.add(assignStaticTaskList.get(i).getEmpFname()+" " +assignStaticTaskList.get(i).getEmpMname()+" " +assignStaticTaskList.get(i).getEmpSname());
+                        for (int i = 0; i < assignStaticTaskAdminEmpList.size(); i++) {
+                            if (assignStaticTaskAdminEmpList.get(i).isChecked()) {
+                                assignedArray.add(assignStaticTaskAdminEmpList.get(i));
+                                assignedEmpIdArray.add(assignStaticTaskAdminEmpList.get(i).getEmpId());
+                                assignedEmpNameArray.add(assignStaticTaskAdminEmpList.get(i).getEmpFname()+" " +assignStaticTaskAdminEmpList.get(i).getEmpMname()+" " +assignStaticTaskAdminEmpList.get(i).getEmpSname());
 
                             }
                         }
@@ -696,7 +841,7 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
             }
         });
 
-        empAdminAdapter = new EmployeeListAdminDialogAdapter(empList, getContext());
+        empAdminAdapter = new EmployeeListAdminDialogAdapter(empListAdmin, getContext());
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         rvCustomerList.setLayoutManager(mLayoutManager);
         rvCustomerList.setItemAnimator(new DefaultItemAnimator());
@@ -947,6 +1092,8 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
                     dialog.dismiss();
                     tvDept.setText(""+model.getGroupName());
                     tvDeptId.setText(""+model.getGroupId());
+                    tvEmp.setText(""+model.getExVar2());
+                    tvEmpId.setText(""+model.getUserIds());
 //                    deptId= Integer.parseInt(tvDeptId.getText().toString());
 //                    Log.e("Department id","--------------------------------------------"+deptId);
                     final ArrayList<Integer> deptList = new ArrayList<>();
@@ -1178,12 +1325,12 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
                             assignStaticTaskList.clear();
                             assignStaticTaskList=empList;
 
-                            String strEmpId="";
-                            if (model != null) {
-                                strEmpId = model.getAdminUserIds();
-                            }
+//                            String strEmpId="";
+//                            if (model != null) {
+//                                strEmpId = model.getAdminUserIds();
+//                            }
 
-                            List<String> list = Arrays.asList(strEmpId.split("\\s*,\\s*"));
+                            List<String> list = Arrays.asList(userIds.split("\\s*,\\s*"));
 
                             Log.e("LIST", "----------------------" + list);
 
@@ -1196,7 +1343,7 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
                                     if (assignStaticTaskList.get(j).getEmpId() == Integer.parseInt(list.get(k))) {
 
                                         assignStaticTaskList.get(j).setChecked(true);
-                                        empNameList.add(response.body().get(j).getEmpFname() + " " + response.body().get(j).getEmpMname() + " " + response.body().get(j).getEmpSname());
+                                       // empNameList.add(response.body().get(j).getEmpFname() + " " + response.body().get(j).getEmpMname() + " " + response.body().get(j).getEmpSname());
 
                                         // assignStaticList.add(empList.get(j));
 
@@ -1204,44 +1351,44 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
                                 }
                             }
 
-                            String empName=empNameList.toString().trim();
-                            Log.e("ASSIGN EMP NAME","---------------------------------"+empName);
-
-                            String strEmpName = ""+empName.substring(1, empName.length()-1).replace("][", ",")+"";
-                            tvEmpAdmin.setText(""+strEmpName);
-
-
-                            String strAssEmpId="";
-                            if (model != null) {
-                                strAssEmpId = model.getAssignUserIds();
-                            }
-
-                            List<String> list1 = Arrays.asList(strAssEmpId.split("\\s*,\\s*"));
-
-                            Log.e("LIST", "----------------------" + list);
-
-
-                            Log.e("BIN", "---------------------------------Model-----------------" + empList);
-                            for (int j = 0; j < assignStaticTaskList.size(); j++) {
-
-                                for (int k = 0; k < list1.size(); k++) {
-
-                                    if (assignStaticTaskList.get(j).getEmpId() == Integer.parseInt(list1.get(k))) {
-
-                                        assignStaticTaskList.get(j).setChecked(true);
-                                        empNameList1.add(response.body().get(j).getEmpFname() + " " + response.body().get(j).getEmpMname() + " " + response.body().get(j).getEmpSname());
-
-                                        // assignStaticList.add(empList.get(j));
-
-                                    }
-                                }
-                            }
-
-                            String empName1=empNameList1.toString().trim();
-                            Log.e("ASSIGN EMP NAME","---------------------------------"+empName);
-
-                            String strEmpName1 = ""+empName1.substring(1, empName1.length()-1).replace("][", ",")+"";
-                            tvEmp.setText(""+strEmpName1);
+//                            String empName=empNameList.toString().trim();
+//                            Log.e("ASSIGN EMP NAME","---------------------------------"+empName);
+//
+//                            String strEmpName = ""+empName.substring(1, empName.length()-1).replace("][", ",")+"";
+//                            tvEmpAdmin.setText(""+strEmpName);
+//
+//
+//                            String strAssEmpId="";
+//                            if (model != null) {
+//                                strAssEmpId = model.getAssignUserIds();
+//                            }
+//
+//                            List<String> list1 = Arrays.asList(strAssEmpId.split("\\s*,\\s*"));
+//
+//                            Log.e("LIST", "----------------------" + list);
+//
+//
+//                            Log.e("BIN", "---------------------------------Model-----------------" + empList);
+//                            for (int j = 0; j < assignStaticTaskList.size(); j++) {
+//
+//                                for (int k = 0; k < list1.size(); k++) {
+//
+//                                    if (assignStaticTaskList.get(j).getEmpId() == Integer.parseInt(list1.get(k))) {
+//
+//                                        assignStaticTaskList.get(j).setChecked(true);
+//                                        empNameList1.add(response.body().get(j).getEmpFname() + " " + response.body().get(j).getEmpMname() + " " + response.body().get(j).getEmpSname());
+//
+//                                        // assignStaticList.add(empList.get(j));
+//
+//                                    }
+//                                }
+//                            }
+//
+//                            String empName1=empNameList1.toString().trim();
+//                            Log.e("ASSIGN EMP NAME","---------------------------------"+empName);
+//
+//                            String strEmpName1 = ""+empName1.substring(1, empName1.length()-1).replace("][", ",")+"";
+//                            tvEmp.setText(""+strEmpName1);
 
 
 //                            empNameList.add("");

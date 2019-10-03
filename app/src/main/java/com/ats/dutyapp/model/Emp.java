@@ -129,6 +129,8 @@ public class Emp {
     @Expose
     private String exVar3;
 
+    private boolean isChecked;
+
     public Emp(Integer empId, String empDsc, String empCode, Integer companyId, Integer empCatId, Integer empTypeId, Integer empDeptId, Integer locId, String empFname, String empMname, String empSname, String empPhoto, String empMobile1, String empMobile2, String empEmail, String empAddressTemp, String empAddressPerm, String empBloodgrp, String empEmergencyPerson1, String empEmergencyNo1, String empEmergencyPerson2, String empEmergencyNo2, float empRatePerhr, String empJoiningDate, Integer empPrevExpYrs, Integer empPrevExpMonths, Object empLeavingDate, Object empLeavingReason, String lockPeriod, Object termConditions, Integer salaryId, Integer delStatus, Integer isActive, Integer makerUserId, String makerEnterDatetime, Integer exInt1, Integer exInt2, Integer exInt3, String exVar1, String exVar2, String exVar3) {
         this.empId = empId;
         this.empDsc = empDsc;
@@ -501,6 +503,14 @@ public class Emp {
         this.exVar3 = exVar3;
     }
 
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
+    }
+
     @Override
     public String toString() {
         return "Emp{" +
@@ -545,6 +555,7 @@ public class Emp {
                 ", exVar1='" + exVar1 + '\'' +
                 ", exVar2='" + exVar2 + '\'' +
                 ", exVar3='" + exVar3 + '\'' +
+                ", isChecked=" + isChecked +
                 '}';
     }
 }

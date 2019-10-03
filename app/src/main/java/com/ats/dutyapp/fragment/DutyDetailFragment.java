@@ -97,10 +97,6 @@ public class DutyDetailFragment extends Fragment {
         tvDate=view.findViewById(R.id.tvDate);
         recyclerView = view.findViewById(R.id.recyclerView);
 
-//        language = CustomSharedPreference.LANGUAGE_SELECTED;
-//        Log.e("LANGUAGE FRAG","----------------------------------------"+language);
-
-
         if (PermissionsUtil.checkAndRequestPermissions(getActivity())) {
         }
 
@@ -219,7 +215,6 @@ public class DutyDetailFragment extends Fragment {
             wlp.height = WindowManager.LayoutParams.WRAP_CONTENT;
             window.setAttributes(wlp);
 
-
             btnCancel = (Button) findViewById(R.id.btnCancel);
             btnSubmit = (Button) findViewById(R.id.btnSubmit);
             edRemark = (EditText) findViewById(R.id.edRemark);
@@ -235,7 +230,6 @@ public class DutyDetailFragment extends Fragment {
             textInputLayout = (TextInputLayout) findViewById(R.id.textInputLayout);
             linearLayoutPhoto1 = (LinearLayout) findViewById(R.id.linearLayoutPhoto1);
             linearLayoutPhoto2 = (LinearLayout) findViewById(R.id.linearLayoutPhoto2);
-
 
             if(dutyDetailList.get(position).getPhotoReq()==1 && dutyDetailList.get(position).getRemarkReq()==0)
             {
@@ -262,8 +256,6 @@ public class DutyDetailFragment extends Fragment {
                 edRemark.setVisibility(View.VISIBLE);
                 textInputLayout.setVisibility(View.VISIBLE);
             }
-
-
             ivCamera1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -348,6 +340,7 @@ public class DutyDetailFragment extends Fragment {
                         }
 
                     }else if(dutyDetailList.get(position).getPhotoReq()==1 && dutyDetailList.get(position).getRemarkReq()==0) {
+
                         if (imagePath1 != null) {
                             //   && imagePath2 != null
 
@@ -411,7 +404,7 @@ public class DutyDetailFragment extends Fragment {
 
                             // getTaskDone(dutyDetail.getTaskDoneDetailId(), dutyDetail.getTaskDoneHeaderId(), dutyDetail.getPhotoReq(), dutyDetail.getRemarkReq(), "", "", "", "", "", "", 1);
                         }else{
-                            Toast.makeText(getActivity(), "Please Attach photo", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Please Attach photo", Toast.LENGTH_SHORT).show();
                         }
                     }else if(dutyDetailList.get(position).getPhotoReq()==1 && dutyDetailList.get(position).getRemarkReq()==1)
                     {
@@ -489,7 +482,7 @@ public class DutyDetailFragment extends Fragment {
                                 dialog.show();
 
                             }else{
-                                Toast.makeText(getActivity(), "Please Attach photo", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "Please Attach photo", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }

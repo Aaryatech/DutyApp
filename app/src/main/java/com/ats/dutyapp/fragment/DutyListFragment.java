@@ -36,6 +36,7 @@ import com.ats.dutyapp.adapter.DutyListAdapter;
 import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.model.DutyDone;
 import com.ats.dutyapp.model.DutyHeader;
+import com.ats.dutyapp.model.EmpCount;
 import com.ats.dutyapp.model.Employee;
 import com.ats.dutyapp.model.Login;
 import com.ats.dutyapp.model.Sync;
@@ -59,7 +60,7 @@ import retrofit2.Response;
  * A simple {@link Fragment} subclass.
  */
 public class DutyListFragment extends Fragment implements View.OnClickListener{
-  public static Employee model;
+  public static EmpCount model;
     private RecyclerView recyclerView;
     private Button btnSubmit;
     DutyListAdapter adapter;
@@ -83,7 +84,7 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
         try {
             String employeeStr = getArguments().getString("model");
             Gson gson = new Gson();
-            model = gson.fromJson(employeeStr, Employee.class);
+            model = gson.fromJson(employeeStr, EmpCount.class);
             Log.e("MODEL EMPLOYEE INFO", "-----------------------------------" + model);
         }catch (Exception e)
         {
@@ -126,7 +127,6 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
                     {
                         Log.e("LIST SET","------------------------"+dutyList.get(k));
                         dutyList.get(k).setChecked(true);
-
                     }
                 }else{
                     for(int k=0;k<dutyList.size();k++)
@@ -136,7 +136,6 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
 
                     }
                 }
-
                 adapter = new DutyListAdapter(dutyList, getContext(),syncArray,loginUserMain);
                 RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
                 recyclerView.setLayoutManager(mLayoutManager);
@@ -157,7 +156,7 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
                     }
                 } else if(syncArray.get(j).getSettingKey().equals("Supervisor")){
                     if (syncArray.get(j).getSettingValue().equals(String.valueOf(loginUserMain.getEmpCatId()))) {
-                        checkBox.setVisibility(View.VISIBLE);
+                        checkBox.setVisibility(View.GONE);
                         btnSubmit.setVisibility(View.VISIBLE);
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                         if(model!=null) {
@@ -167,13 +166,12 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
                     }
                 }else if(syncArray.get(j).getSettingKey().equals("Admin")){
                     if (syncArray.get(j).getSettingValue().equals(String.valueOf(loginUserMain.getEmpCatId()))) {
-                        checkBox.setVisibility(View.VISIBLE);
+                        checkBox.setVisibility(View.GONE);
                         btnSubmit.setVisibility(View.VISIBLE);
                         if(model!=null) {
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                             getDutyList(model.getEmpId(), sdf.format(System.currentTimeMillis()));
                         }
-
                     }
                 }
             }
@@ -265,13 +263,15 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
 //                stringId = ""+empIds.substring(1, empIds.length()-1).replace("][", ",")+"";
 //
 //                Log.e("ASSIGN EMP ID STRING","---------------------------------"+stringId);
-
-                new ApproveDialog(getContext(),assignedDutyIdArray,loginUserMain).show();
+                if(assignedDutyIdArray.size()==0) {
+                    Toast.makeText(getActivity(), "Please select duty you want to edit.....", Toast.LENGTH_SHORT).show();
+                }else{
+                    new ApproveDialog(getContext(), assignedDutyIdArray, loginUserMain,model).show();
+                }
             }
 
         }
         }
-
 
     private class ApproveDialog extends Dialog implements View.OnClickListener{
         public Button btnCancel,btnSubmit;
@@ -280,6 +280,7 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
         Login loginUser;
         Dialog dialog;
         int empId = 0;
+        EmpCount empCount;
 
         long fromDateMillis, toDateMillis;
         int yyyy, mm, dd;
@@ -292,10 +293,11 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
 
         ArrayList<Integer> assignedDutyIdArray = new ArrayList<>();
 
-        public ApproveDialog(Context context, ArrayList<Integer> assignedDutyIdArray, Login loginUser) {
+        public ApproveDialog(Context context, ArrayList<Integer> assignedDutyIdArray, Login loginUser ,EmpCount empCount) {
             super(context);
             this.assignedDutyIdArray=assignedDutyIdArray;
             this.loginUser=loginUser;
+            this.empCount=empCount;
         }
 
         @Override
@@ -338,8 +340,8 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
            // spEmp.setText(loginUser.getEmpId());
 
             ArrayList<Integer> deptIdList = new ArrayList<>();
-            deptIdList.add(loginUser.getEmpDeptId());
-
+            deptIdList.add(-1);
+            //loginUser.getEmpDeptId()
             getEmployeeList(deptIdList);
 
         }
@@ -594,7 +596,7 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
                                         Log.e("EMP SIZE","----------------------------------------------");
                                         for (int i = 0; i < empIdList.size(); i++) {
                                             Log.e("EMP ID FOR","----------------------------------------------");
-                                            if (loginUser.getEmpId().equals(empIdList.get(i))) {
+                                            if (model.getEmpId().equals(empIdList.get(i))) {
                                                 Log.e("CHEK EQUAL","----------------------------------------------");
                                                 empId=empIdList.get(i);
                                                 position = i;

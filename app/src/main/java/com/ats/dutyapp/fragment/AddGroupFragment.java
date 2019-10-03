@@ -737,7 +737,6 @@ ArrayList<String> deptNameList = new ArrayList<>();
 
                             Log.e("LIST", "----------------------" + list);
 
-
                             Log.e("BIN", "---------------------------------Model-----------------" + empList);
                             for (int j = 0; j < assignStaticEmpList.size(); j++) {
 

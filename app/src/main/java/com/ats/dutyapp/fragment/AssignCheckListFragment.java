@@ -36,12 +36,11 @@ public class AssignCheckListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_assign_check_list2, container, false);
+        getActivity().setTitle("Assign Checklist");
         recyclerView=view.findViewById(R.id.recyclerView);
 
        // prepareData();
-        
         getAssigneChecklist();
-
 
         return view;
     }
@@ -92,14 +91,4 @@ public class AssignCheckListFragment extends Fragment {
             Toast.makeText(getContext(), "No Internet Connection !", Toast.LENGTH_SHORT).show();
         }
     }
-
-//    private void prepareData() {
-//        AssignChecklist myListData = new AssignChecklist("Production & Quality","Another interesting feature .","Avinash Kachru,Archana Tarate,Kavita Sonawne");
-//        assignList.add(myListData);
-//
-//        myListData = new AssignChecklist("Maintenance","Checklist Name","Avinash Kachru,Archana Tarate,Kavita Sonawne");
-//        assignList.add(myListData);
-//
-//    }
-
 }

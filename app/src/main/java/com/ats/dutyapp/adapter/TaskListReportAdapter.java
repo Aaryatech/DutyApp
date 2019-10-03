@@ -44,7 +44,7 @@ public class TaskListReportAdapter extends RecyclerView.Adapter<TaskListReportAd
             myViewHolder.tvPhotReq.setText("NO");
         }else if(model.getPhotoReq()==1)
         {
-            myViewHolder.tvPhotReq.setText("YES"+" ("+model.getTaskTime()+")");
+            myViewHolder.tvPhotReq.setText("YES");
         }
 
         if(model.getRemarkReq()==0)
@@ -60,7 +60,7 @@ public class TaskListReportAdapter extends RecyclerView.Adapter<TaskListReportAd
             myViewHolder.tvTimeReq.setText("NO");
         }else if(model.getTimeReq()==1)
         {
-            myViewHolder.tvTimeReq.setText("YES");
+            myViewHolder.tvTimeReq.setText("YES"+" ("+model.getTaskTime()+")");
         }
 
     }
