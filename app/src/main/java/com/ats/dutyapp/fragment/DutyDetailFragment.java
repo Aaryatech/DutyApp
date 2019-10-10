@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import com.ats.dutyapp.BuildConfig;
 import com.ats.dutyapp.R;
+import com.ats.dutyapp.activity.HomeActivity;
 import com.ats.dutyapp.adapter.DutyDetailAdapter;
 import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.model.DutyDetail;
@@ -129,8 +130,8 @@ public class DutyDetailFragment extends Fragment {
     private void getDutyDetail(Integer taskDoneHeaderId) {
         Log.e("PARAMETER","            HEADER ID       "+taskDoneHeaderId);
 
-        if (Constants.isOnline(getContext())) {
-            final CommonDialog commonDialog = new CommonDialog(getContext(), "Loading", "Please Wait...");
+        if (Constants.isOnline(getActivity())) {
+            final CommonDialog commonDialog = new CommonDialog(getActivity(), "Loading", "Please Wait...");
             commonDialog.show();
 
             Call<ArrayList<DutyDetail>> listCall = Constants.myInterface.getTaskDoneDetailByHeaderId(taskDoneHeaderId);
@@ -299,6 +300,12 @@ public class DutyDetailFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     dismiss();
+                    tvPhoto1.setText(" ");
+                    tvPhoto2.setText(" ");
+                    imagePath1=null;
+                    imagePath2=null;
+                    Log.e("Image Path","-----------------------------------------------"+imagePath1);
+                    Log.e("Image Path2","-----------------------------------------------"+imagePath2);
                 }
             });
 
@@ -307,20 +314,20 @@ public class DutyDetailFragment extends Fragment {
                 public void onClick(View v) {
                     if(dutyDetailList.get(position).getPhotoReq()==0 && dutyDetailList.get(position).getRemarkReq()==1) {
                         final String strRemark;
-                        strRemark = edRemark.getText().toString();
+                        strRemark = edRemark.getText().toString().trim();
                         boolean isValidRemark = false;
 
                         if (strRemark.isEmpty()) {
                             edRemark.setError("required");
-                        } else {
+                        }else {
                             edRemark.setError(null);
                             isValidRemark = true;
                         }
 
                         if (isValidRemark) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogTheme);
                             builder.setTitle("Confirmation");
-                            builder.setMessage("Do you want to save remark ?");
+                            builder.setMessage("Do you want to submit task ?");
                             builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -333,6 +340,7 @@ public class DutyDetailFragment extends Fragment {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();
+
                                 }
                             });
                             AlertDialog dialog = builder.create();
@@ -378,9 +386,9 @@ public class DutyDetailFragment extends Fragment {
 
                             //getTaskDone(dutyDetail.getTaskDoneDetailId(), dutyDetail.getTaskDoneHeaderId(), dutyDetail.getPhotoReq(), dutyDetail.getRemarkReq(), photo1, photo2, "", "", "", strRemark, 1);
 
-                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogTheme);
                             builder.setTitle("Confirmation");
-                            builder.setMessage("Do you want to save remark ?");
+                            builder.setMessage("Do you want to submit task ?");
                             builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -397,6 +405,7 @@ public class DutyDetailFragment extends Fragment {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();
+
                                 }
                             });
                             AlertDialog dialog = builder.create();
@@ -409,7 +418,7 @@ public class DutyDetailFragment extends Fragment {
                     }else if(dutyDetailList.get(position).getPhotoReq()==1 && dutyDetailList.get(position).getRemarkReq()==1)
                     {
                         final String strRemark;
-                        strRemark = edRemark.getText().toString();
+                        strRemark = edRemark.getText().toString().trim();
                         boolean isValidRemark = false;
 
                         if (strRemark.isEmpty()) {
@@ -458,9 +467,9 @@ public class DutyDetailFragment extends Fragment {
                                 dutyDetailList.get(position).setRemark(strRemark);
                                 //getTaskDone(dutyDetail.getTaskDoneDetailId(), dutyDetail.getTaskDoneHeaderId(), dutyDetail.getPhotoReq(), dutyDetail.getRemarkReq(), photo1, photo2, "", "", "", strRemark, 1);
 
-                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogTheme);
                                 builder.setTitle("Confirmation");
-                                builder.setMessage("Do you want to save remark ?");
+                                builder.setMessage("Do you want to submit task ?");
                                 builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -476,6 +485,7 @@ public class DutyDetailFragment extends Fragment {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
+
                                     }
                                 });
                                 AlertDialog dialog = builder.create();
@@ -747,7 +757,12 @@ public class DutyDetailFragment extends Fragment {
                             if (!response.body().getError()) {
 
                                 Toast.makeText(mContext, "Task Done Successfully", Toast.LENGTH_SHORT).show();
-                                getDutyDetail(model.getTaskDoneHeaderId());
+                               // getDutyDetail(model.getTaskDoneHeaderId());
+
+                                Intent intent = new Intent(mContext, HomeActivity.class);
+                                intent.putExtra("model", "Duty Detail");
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                mContext.startActivity(intent);
 
 //                                HomeActivity activity = (HomeActivity) mContext;
 //                                FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();

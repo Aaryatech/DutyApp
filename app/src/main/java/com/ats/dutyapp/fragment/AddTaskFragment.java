@@ -220,7 +220,6 @@ int yyyy, mm, dd;
                 if(selectedText.equalsIgnoreCase("No"))
                 {
                     tvEmpAdmin.setVisibility(View.GONE);
-                    tvEmpIdAdmin.setVisibility(View.GONE);
                     viewAdmin.setVisibility(View.GONE);
                     tvEmpAdminLable.setVisibility(View.GONE);
 

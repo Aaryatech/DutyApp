@@ -61,7 +61,8 @@ public class EditChecklistFragment extends Fragment implements View.OnClickListe
     public Button btnAdd,btnSubmit;
     public TextView tvDept,tvDeptId;
     public RadioGroup rg,rgImg;
-    public RadioButton rbYes,rbNo,rbImgYes,rbImgNo;
+    public RadioButton rbYes,rbNo;
+    public static RadioButton rbImgYes,rbImgNo;
     EditCheckListAdapter checkListAdapter;
     public static ArrayList<CheckListTemp> checkList = new ArrayList<>();
     public static int pos;
@@ -144,6 +145,7 @@ public class EditChecklistFragment extends Fragment implements View.OnClickListe
 
             edName.setText(""+model.getChecklistName());
             tvDept.setText(""+model.getExVar1());
+            tvDeptId.setText(""+model.getDeptId());
 
             if(model.getExInt1()==0)
             {
@@ -216,6 +218,7 @@ public class EditChecklistFragment extends Fragment implements View.OnClickListe
         if(v.getId()== R.id.btnAdd)
         {
             String strChekPos=tvCheckId.getText().toString();
+            boolean isValidName=false;
             Log.e("strChekPos","------------------------------"+strChekPos);
 
             photoReq = 0;
@@ -253,16 +256,26 @@ public class EditChecklistFragment extends Fragment implements View.OnClickListe
 //                tvCheckId.setText(""+pos);
                 Log.e("Pos Edit","------------------------------"+pos);
 
-                String strChekListName=edChekListName.getText().toString();
+                String strChekListName=edChekListName.getText().toString().trim();
+
+            if (strChekListName.isEmpty()) {
+                edChekListName.setError("required");
+            } else {
+                edChekListName.setError(null);
+                isValidName = true;
+            }
+
+            if(isValidName) {
                 //CheckListTemp model=new CheckListTemp(strChekListName);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-                ChecklistDetail model1 = new ChecklistDetail(checklistDetail.get(pos).getChecklistDetailId(), model.getChecklistHeaderId(), strChekListName, photoReq, checklistDetail.get(pos).getIsUsed(), checklistDetail.get(pos).getDelStatus(), checklistDetail.get(pos).getCreatedBy(),checklistDetail.get(pos).getCreatedDate(), checklistDetail.get(pos).getExInt1(), checklistDetail.get(pos).getExInt2(), checklistDetail.get(pos).getExVar1(), checklistDetail.get(pos).getExVar2());
-                Log.e("Edit Checklist","------------------------------"+model1);
-                checklistDetail.set(pos,model1);
+                ChecklistDetail model1 = new ChecklistDetail(checklistDetail.get(pos).getChecklistDetailId(), model.getChecklistHeaderId(), strChekListName, photoReq, checklistDetail.get(pos).getIsUsed(), checklistDetail.get(pos).getDelStatus(), checklistDetail.get(pos).getCreatedBy(), checklistDetail.get(pos).getCreatedDate(), checklistDetail.get(pos).getExInt1(), checklistDetail.get(pos).getExInt2(), checklistDetail.get(pos).getExVar1(), checklistDetail.get(pos).getExVar2());
+                Log.e("Edit Checklist", "------------------------------" + model1);
+                checklistDetail.set(pos, model1);
                 checkListAdapter.notifyDataSetChanged();
 
                 edChekListName.setText("");
+            }
                // tvCheckId.setText("pos");
 
           //  }
@@ -308,7 +321,6 @@ public class EditChecklistFragment extends Fragment implements View.OnClickListe
             } else if (rbNo.isChecked()) {
                 reportingType = 0;
             }
-
 
             if(isValidName && isValidDept)
             {
@@ -503,8 +515,17 @@ public class EditChecklistFragment extends Fragment implements View.OnClickListe
         Log.e("Position1","----------------------------"+position);
         Log.e("Position2","----------------------------"+pos);
         String data= checklistDetail.get(position).getChecklist_desc();
+        int photoReq= checklistDetail.get(position).getIsPhoto();
+
         Log.e("Data","----------------------------"+data);
         edChekListName.setText(data);
+        if(photoReq==0)
+        {
+            rbImgNo.setChecked(true);
+        }else if(photoReq==1)
+        {
+            rbImgYes.setChecked(true);
+        }
 
 //        CheckListTemp model=new CheckListTemp(edChekListName.getText().toString());
 //        checkList.add(model);

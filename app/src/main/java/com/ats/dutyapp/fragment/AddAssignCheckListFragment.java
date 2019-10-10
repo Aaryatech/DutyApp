@@ -114,7 +114,7 @@ String stringId,stringName;
             ArrayList<Integer> deptIdList = new ArrayList<>();
             deptIdList.add(model.getDeptId());
             getAllEmp(deptIdList);
-            getCheckList(model.getDeptId());
+            getCheckListAll(model.getDeptId());
 
         }catch (Exception e)
         {
@@ -123,15 +123,20 @@ String stringId,stringName;
 
         if(model==null)
         {
-            getActivity().setTitle("Add Assigne Checklist");
+            getActivity().setTitle("Add Assign Checklist");
         }else{
-            getActivity().setTitle("Edit Assigne Checklist");
+            getActivity().setTitle("Edit Assign Checklist");
+        }
+
+        if(model==null)
+        {
+            tvDept.setOnClickListener(this);
+            tvChecklist.setOnClickListener(this);
         }
 
         getAllDept();
 
-        tvDept.setOnClickListener(this);
-        tvChecklist.setOnClickListener(this);
+
         btnSubmit.setOnClickListener(this);
         tvView.setOnClickListener(this);
 
@@ -150,7 +155,8 @@ String stringId,stringName;
         }
         else if(v.getId()==R.id.tvView)
         {
-            new viewChecklistDialog(getContext(),checkList).show();
+            Log.e("CHECK LIST EDIT","---------------------------------------"+checkList);
+            new viewChecklistDialog(getActivity(),checkList).show();
 
         }else if(v.getId()==R.id.btnSubmit)
         {
@@ -224,50 +230,54 @@ String stringId,stringName;
             }
 
             if(isValidDept && isValidChecklistName) {
-                if (model == null) {
-                    final SaveAssigneChecklist saveAssigneChecklist = new SaveAssigneChecklist(0, strDeptId, strChecklistId, stringId, loginUser.getEmpId(), sdf.format(System.currentTimeMillis()), 1, 0, 0, "", "");
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
-                    builder.setTitle("Confirmation");
-                    builder.setMessage("Do you want to save assign checklist ?");
-                    builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                if(assignedEmpIdArray.size() != 0) {
+                    if (model == null) {
+                        final SaveAssigneChecklist saveAssigneChecklist = new SaveAssigneChecklist(0, strDeptId, strChecklistId, stringId, loginUser.getEmpId(), sdf.format(System.currentTimeMillis()), 1, 0, 0, "", "");
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
+                        builder.setTitle("Confirmation");
+                        builder.setMessage("Do you want to save assign checklist ?");
+                        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
 
-                            saveAssignCheckList(saveAssigneChecklist);
-                            Log.e("Assign Check List", "-----------------------------------Add-------------------------------------------" + saveAssigneChecklist);
+                                saveAssignCheckList(saveAssigneChecklist);
+                                Log.e("Assign Check List", "-----------------------------------Add-------------------------------------------" + saveAssigneChecklist);
 
-                        }
-                    });
-                    builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+                            }
+                        });
+                        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    } else {
+                        final SaveAssigneChecklist saveAssigneChecklist = new SaveAssigneChecklist(model.getAssignId(), strDeptId, strChecklistId, stringId, loginUser.getEmpId(), model.getAssignedDate(), model.getDelStatus(), model.getExInt1(), model.getExInt2(), model.getExVar1(), model.getExVar2());
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
+                        builder.setTitle("Confirmation");
+                        builder.setMessage("Do you want to edit assign checklist ?");
+                        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                saveAssignCheckList(saveAssigneChecklist);
+                                Log.e("Assign Check List", "---------------------------------------Edit------------------------------" + saveAssigneChecklist);
+
+                            }
+                        });
+                        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    }
                 }else{
-                    final SaveAssigneChecklist saveAssigneChecklist = new SaveAssigneChecklist(model.getAssignId(), strDeptId, strChecklistId, stringId, loginUser.getEmpId(), model.getAssignedDate(), model.getDelStatus(), model.getExInt1(), model.getExInt2(), model.getExVar1(), model.getExVar2());
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
-                    builder.setTitle("Confirmation");
-                    builder.setMessage("Do you want to edit assign checklist ?");
-                    builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            saveAssignCheckList(saveAssigneChecklist);
-                            Log.e("Assign Check List", "---------------------------------------Edit------------------------------" + saveAssigneChecklist);
-
-                        }
-                    });
-                    builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+                    Toast.makeText(getActivity(), "Please select employee....", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -467,8 +477,6 @@ String stringId,stringName;
             });
         }
 
-
-
         @Override
         public int getItemCount() {
             return checkList.size();
@@ -629,7 +637,9 @@ String stringId,stringName;
                     deptId= Integer.parseInt(tvDeptId.getText().toString());
                     ArrayList<Integer> deptList = new ArrayList<>();
                     deptList.add(deptId);
-
+                    tvChecklist.setText("");
+                    tvChecklist.setHint("Select Checklist");
+                    tvChecklistId.setText("");
                     getCheckList(deptId);
                     getAllEmp(deptList);
 
@@ -670,8 +680,6 @@ String stringId,stringName;
                             checkList.clear();
                             checkList = response.body();
 
-
-
                             commonDialog.dismiss();
 
                         } else {
@@ -697,6 +705,49 @@ String stringId,stringName;
         }
     }
 
+
+    private void getCheckListAll(int deptId) {
+        Log.e("PARAMETER","          DEPAT      "+ deptId);
+
+        if (Constants.isOnline(getContext())) {
+            final CommonDialog commonDialog = new CommonDialog(getContext(), "Loading", "Please Wait...");
+            commonDialog.show();
+
+            Call<ArrayList<ChecklistHeader>> listCall = Constants.myInterface.getAllChecklistByDeptAll(deptId);
+            listCall.enqueue(new Callback<ArrayList<ChecklistHeader>>() {
+                @Override
+                public void onResponse(Call<ArrayList<ChecklistHeader>> call, Response<ArrayList<ChecklistHeader>> response) {
+                    try {
+                        if (response.body() != null) {
+
+                            Log.e("ASSIGN CHECK LIST : ", " --------------------------------------------- " + response.body());
+                            checkList.clear();
+                            checkList = response.body();
+
+                            commonDialog.dismiss();
+
+                        } else {
+                            commonDialog.dismiss();
+                            Log.e("Data Null : ", "-----------");
+                        }
+                    } catch (Exception e) {
+                        commonDialog.dismiss();
+                        Log.e("Exception : ", "-----------" + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ArrayList<ChecklistHeader>> call, Throwable t) {
+                    commonDialog.dismiss();
+                    Log.e("onFailure : ", "-----------" + t.getMessage());
+                    t.printStackTrace();
+                }
+            });
+        } else {
+            Toast.makeText(getContext(), "No Internet Connection !", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     private class viewChecklistDialog extends Dialog {
 
@@ -750,10 +801,12 @@ String stringId,stringName;
                 {
                     e.printStackTrace();
                 }
+
                 for (int i = 0; i < checklistHeader.size(); i++) {
                     if(checklistHeader.get(i).getChecklistHeaderId()== strCheckId) {
-                        Log.e("Check Id", "--------------------------------" + strCheckId);
+                        Log.e("Check Idsss", "--------------------------------" + strCheckId);
                         for (int j = 0; j < checklistHeader.get(i).getChecklistDetail().size(); j++) {
+                            Log.e("Detaillllllllllllll","------------------------------------Checklist---------------------"+detailList);
                             detailList.add(checklistHeader.get(i).getChecklistDetail().get(j));
                             Log.e("Detail1", "------------------------------------Checklist---------------------" + detailList);
                         }

@@ -49,8 +49,8 @@ public class DutyListAdapter extends RecyclerView.Adapter<DutyListAdapter.MyView
             final DutyHeader model=dutyList.get(i);
             myViewHolder.tvDutyName.setText(""+model.getDutyName());
             myViewHolder.tvDutyCount.setText("Count : "+model.getTaskCompleteWt()+"/"+model.getDutyWeight());
-            myViewHolder.tvTimeOn.setText("From Time : "+model.getShiftFromTime());
-            myViewHolder.tvTimeOff.setText("To Time : "+model.getShiftToTime());
+            myViewHolder.tvTimeOn.setText("Time : "+model.getShiftFromTime()+"-"+model.getShiftToTime());
+            //myViewHolder.tvTimeOff.setText("To Time : "+model.getShiftToTime());
             myViewHolder.tvDate.setText(""+model.getTaskDate());
 
         if(syncArray!=null) {

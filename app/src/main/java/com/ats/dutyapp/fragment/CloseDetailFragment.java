@@ -76,6 +76,7 @@ public class CloseDetailFragment extends Fragment implements View.OnClickListene
     public static ArrayList<ActionDetailList> detailList =new ArrayList<>();
     public static ArrayList<ActionDetailList> assignStaticDetailList = new ArrayList<>();
     Context mContext;
+    public static CloseDetailAdapter adapter;
 
     //-----------------------------------Image-----------------------------------
 
@@ -93,6 +94,7 @@ public class CloseDetailFragment extends Fragment implements View.OnClickListene
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_close_detail, container, false);
+        getActivity().setTitle("Close Detail");
         recyclerView = (RecyclerView)view.findViewById(R.id.recyclerView);
         btnSubmit=(Button)view.findViewById(R.id.btnSubmit);
 
@@ -132,7 +134,7 @@ public class CloseDetailFragment extends Fragment implements View.OnClickListene
 
             Log.e("Detail List", "-----------------------------------------" + detailList);
 
-            CloseDetailAdapter adapter = new CloseDetailAdapter(detailList, getActivity());
+             adapter = new CloseDetailAdapter(detailList, getActivity());
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -153,11 +155,11 @@ public class CloseDetailFragment extends Fragment implements View.OnClickListene
         Log.e("Detail Bin","--------------------------------------------"+detailList);
         Log.e("Detail Position","--------------------------------------------"+detailList.get(position));
         mContext=context;
-        if(detailList.get(position).getCheckStatus()==1) {
+        if(detailList.get(position).getCheckStatus()==1 ||detailList.get(position).getCheckStatus()==0) {
             if (detailList.get(position).getIsPhoto() == 1) {
-                Log.e("if", "--------------------START-------------------------");
+                Log.e("if", "--------------------START-------------------------"+detailList.get(position).getIsPhoto());
                 try {
-
+                    Log.e("if", "--------------------Image-------------------------");
                     new UploadCloseDialog(context, position).show();
 
                 } catch (Exception e) {
@@ -214,19 +216,17 @@ public class CloseDetailFragment extends Fragment implements View.OnClickListene
 
                             Log.e("UPDATE STATUS : ", " - " + response.body());
 
-                            if (!response.body().getError()) {
-
+                                Toast.makeText(mContext, "Success", Toast.LENGTH_SHORT).show();
                                 HomeActivity activity = (HomeActivity) mContext;
+//                                FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+//                                ft.replace(R.id.content_frame, new TabFragment(), "TabFragment");
+//                                ft.commit();
 
-                                Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(mContext, HomeActivity.class);
+                            intent.putExtra("model", "Close Detail");
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            mContext.startActivity(intent);
 
-                                FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
-                                ft.replace(R.id.content_frame, new TabFragment(), "TabFragment");
-                                ft.commit();
-
-                            } else {
-                                Toast.makeText(mContext, "Unable to process", Toast.LENGTH_SHORT).show();
-                            }
 
                             commonDialog.dismiss();
 
@@ -278,7 +278,7 @@ public class CloseDetailFragment extends Fragment implements View.OnClickListene
 
             if(assignedIdArray.size()==0)
             {
-                Toast.makeText(getActivity(), "Please Approve Close Checklist", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Please select checklist....", Toast.LENGTH_SHORT).show();
             }else{
 
                 android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
@@ -485,7 +485,17 @@ public class CloseDetailFragment extends Fragment implements View.OnClickListene
             btnCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
+                    detailList.get(position).setChecked(false);
+                    Log.e("Adapter","-------------------------------------------------"+adapter);
+
+                    adapter.notifyDataSetChanged();
+
+                    tvPhoto4.setText(" ");
+                    imagePath4=null;
+                    Log.e("Image Path","-----------------------------------------------"+imagePath4);
                     dismiss();
+                   //new CloseDetailAdapter(detailList, getActivity()).onClickActivity(position,getActivity());
                 }
             });
 
@@ -541,7 +551,7 @@ public class CloseDetailFragment extends Fragment implements View.OnClickListene
 
                         // getTaskDone(dutyDetail.getTaskDoneDetailId(), dutyDetail.getTaskDoneHeaderId(), dutyDetail.getPhotoReq(), dutyDetail.getRemarkReq(), "", "", "", "", "", "", 1);
                     } else {
-                        Toast.makeText(getActivity(), "Please Attach photo", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Please Attach photo", Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -579,9 +589,7 @@ public class CloseDetailFragment extends Fragment implements View.OnClickListene
 
                 getUpdateStatus(actionDetailId,3,photo);
 
-
                 Log.e("Response : ", "--" + response.body());
-
 
                 commonDialog.dismiss();
 
@@ -591,7 +599,7 @@ public class CloseDetailFragment extends Fragment implements View.OnClickListene
                 Log.e("Error : ", "--" + t.getMessage());
                 commonDialog.dismiss();
                 t.printStackTrace();
-                Toast.makeText(mContext, "Unable To Process", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(mContext, "Unable To Process", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -629,15 +637,15 @@ public class CloseDetailFragment extends Fragment implements View.OnClickListene
             Log.e("Dialog", "---------------------------------------------");
             btnCancel = (Button) findViewById(R.id.btnCancel);
             btnSubmit = (Button) findViewById(R.id.btnSubmit);
-            ivCamera4 = (ImageView) findViewById(R.id.ivCamera1);
+            ivCamera5 = (ImageView) findViewById(R.id.ivCamera1);
             ivPhoto5 = (ImageView) findViewById(R.id.ivPhoto1);
-            tvPhoto4 = (TextView) findViewById(R.id.tvPhoto1);
+            tvPhoto5 = (TextView) findViewById(R.id.tvPhoto1);
 
             tvLabPhoto1 = (TextView) findViewById(R.id.tvLabPhoto1);
             linearLayoutPhoto1 = (LinearLayout) findViewById(R.id.linearLayoutPhoto1);
 
 
-            ivCamera4.setOnClickListener(new View.OnClickListener() {
+            ivCamera5.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Log.e("Photo1 Click", "---------------------------------------");
@@ -661,6 +669,10 @@ public class CloseDetailFragment extends Fragment implements View.OnClickListene
             btnCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
+                    tvPhoto5.setText(" ");
+                    imagePath5=null;
+                    Log.e("Image Path","-----------------------------------------------"+imagePath5);
                     dismiss();
                 }
             });
@@ -717,7 +729,7 @@ public class CloseDetailFragment extends Fragment implements View.OnClickListene
 
                         // getTaskDone(dutyDetail.getTaskDoneDetailId(), dutyDetail.getTaskDoneHeaderId(), dutyDetail.getPhotoReq(), dutyDetail.getRemarkReq(), "", "", "", "", "", "", 1);
                     } else {
-                        Toast.makeText(getActivity(), "Please Attach photo", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Please Attach photo", Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -795,9 +807,14 @@ public class CloseDetailFragment extends Fragment implements View.OnClickListene
 
                                 Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
 
-                                FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
-                                ft.replace(R.id.content_frame, new CloseDetailFragment(), "MainFragment");
-                                ft.commit();
+                                Intent intent = new Intent(mContext, HomeActivity.class);
+                                intent.putExtra("model", "Close Detail");
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                mContext.startActivity(intent);
+
+//                                FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+//                                ft.replace(R.id.content_frame, new CloseDetailFragment(), "MainFragment");
+//                                ft.commit();
 
                             } else {
                                 Toast.makeText(mContext, "Unable to process", Toast.LENGTH_SHORT).show();

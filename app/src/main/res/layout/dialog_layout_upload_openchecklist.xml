@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:padding="10dp"
-                android:src="@drawable/ic_camera" />
+                android:src="@drawable/image" />
 
             <ImageView
                 android:id="@+id/ivPhoto1"

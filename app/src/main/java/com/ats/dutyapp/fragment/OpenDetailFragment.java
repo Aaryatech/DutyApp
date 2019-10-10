@@ -76,7 +76,8 @@ public class OpenDetailFragment extends Fragment implements View.OnClickListener
     public static ArrayList<DetailList> assignStaticDetailList = new ArrayList<>();
     String stringId,stringName;
     Context mContext;
-
+     public static OpenDetailAdapter adapter;
+     public static String pos;
     //-----------------------------------Image-----------------------------------
 
     public static ImageView ivCamera3;
@@ -113,6 +114,8 @@ public class OpenDetailFragment extends Fragment implements View.OnClickListener
 
         try {
             //String openMetting = getIntent().getStringExtra("model");
+            detailList.clear();
+            detailList1.clear();
             String openMetting = getArguments().getString("model");
             Gson gson = new Gson();
             model = gson.fromJson(openMetting, Detail.class);
@@ -139,7 +142,7 @@ public class OpenDetailFragment extends Fragment implements View.OnClickListener
 
             Log.e("Detail List", "-----------------------------------------" + detailList1);
 
-            OpenDetailAdapter adapter = new OpenDetailAdapter(detailList1, getActivity());
+             adapter = new OpenDetailAdapter(detailList1, getActivity());
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -156,7 +159,9 @@ public class OpenDetailFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btnSubmit) {
-
+            Log.e("Position","------------------------------"+pos);
+            if(pos!=null)
+            {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
@@ -165,14 +170,12 @@ public class OpenDetailFragment extends Fragment implements View.OnClickListener
             final ChecklistActionHeader checklistActionHeader = new ChecklistActionHeader(0, model.getAssignId(), model.getDeptId(), model.getChecklistHeaderId(), model.getChecklistName(), 0, loginUser.getEmpId(), sdf.format(System.currentTimeMillis()), sdf1.format(System.currentTimeMillis()), loginUser.getEmpId(), sdf.format(System.currentTimeMillis()), sdf1.format(System.currentTimeMillis()), 1, 0, 0, "", "", detailList1);
             Log.e("Header & Detail", "--------------------------------------------------------------------------" + checklistActionHeader);
 
-
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Confirmation");
             builder.setMessage("Do you want to save Detail ?");
             builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-
 
                     getSaveOpen(checklistActionHeader);
 
@@ -186,6 +189,9 @@ public class OpenDetailFragment extends Fragment implements View.OnClickListener
             });
             AlertDialog dialog = builder.create();
             dialog.show();
+        }else{
+                    Toast.makeText(getActivity(), "Please select checklist.......", Toast.LENGTH_SHORT).show();
+                }
         }
     }
 
@@ -195,6 +201,7 @@ public class OpenDetailFragment extends Fragment implements View.OnClickListener
         Log.e("Detail Bin","--------------------------------------------"+detailList1);
         Log.e("Detail Position","--------------------------------------------"+detailList1.get(position));
         mContext=context;
+        pos= String.valueOf(position);
         if (detailList1.get(position).getIsPhoto() == 1) {
             Log.e("if", "--------------------START-------------------------");
             try {
@@ -277,6 +284,16 @@ public class OpenDetailFragment extends Fragment implements View.OnClickListener
             btnCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
+                    detailList1.get(position).setChecked(false);
+                    Log.e("Adapter","-------------------------------------------------"+adapter);
+                    adapter.notifyDataSetChanged();
+                    pos=null;
+
+                    tvPhoto3.setText(" ");
+                    imagePath3=null;
+                    Log.e("Image Path3","-----------------------------------------------"+imagePath3);
+
                     dismiss();
                 }
             });
@@ -345,7 +362,7 @@ public class OpenDetailFragment extends Fragment implements View.OnClickListener
 
                         // getTaskDone(dutyDetail.getTaskDoneDetailId(), dutyDetail.getTaskDoneHeaderId(), dutyDetail.getPhotoReq(), dutyDetail.getRemarkReq(), "", "", "", "", "", "", 1);
                     } else {
-                        Toast.makeText(getActivity(), "Please Attach photo", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Please Attach photo", Toast.LENGTH_SHORT).show();
                     }
 
                 }

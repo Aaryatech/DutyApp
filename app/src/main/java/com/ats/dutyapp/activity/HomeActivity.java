@@ -58,6 +58,7 @@ import com.ats.dutyapp.model.Login;
 import com.ats.dutyapp.model.Sync;
 import com.ats.dutyapp.utils.Constant;
 import com.ats.dutyapp.utils.CustomSharedPreference;
+import com.ats.dutyapp.utils.PermissionsUtil;
 import com.ats.dutyapp.utils.RealPathUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -104,6 +105,9 @@ public class HomeActivity extends AppCompatActivity
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
 
+        if (PermissionsUtil.checkAndRequestPermissions(HomeActivity.this)) {
+        }
+
         selectLang = Integer.parseInt(CustomSharedPreference.getString(getApplicationContext(), CustomSharedPreference.LANGUAGE_SELECTED));
         Log.e("SELECTED LANG : ", "------------------------------" + selectLang);
         try {
@@ -138,7 +142,7 @@ public class HomeActivity extends AppCompatActivity
         if (loginUser != null) {
             tvNavHeadName.setText("" + loginUser.getEmpFname() + " " + loginUser.getEmpMname() + " " + loginUser.getEmpSname());
             if (loginUser.getEmpCatId() == 1) {
-                tvNavHeadDesg.setText("Superwiser");
+                tvNavHeadDesg.setText("Supervisor");
             } else if (loginUser.getEmpCatId() == 2) {
                 tvNavHeadDesg.setText("Admin");
             } else if (loginUser.getEmpCatId() == 3) {
@@ -169,6 +173,16 @@ public class HomeActivity extends AppCompatActivity
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.content_frame, new DutyDetailFragment(), "MainFragment");
                 ft.commit();
+            }else if(strRemark.equalsIgnoreCase("Duty Detail"))
+            {
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, new DutyDetailFragment(), "MainFragment");
+                ft.commit();
+            }else if(strRemark.equalsIgnoreCase("Close Detail"))
+            {
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, new TabFragment(), "MainFragment");
+                ft.commit();
             }
         } else {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -180,6 +194,18 @@ public class HomeActivity extends AppCompatActivity
         for (int i = 0; i < syncArray.size(); i++) {
             Log.e("MY TAG", "-----syncArray-------");
             if (syncArray.get(i).getSettingKey().equals("Employee")) {
+                Log.e("MY TAG1", "-----Employee-------");
+                if (syncArray.get(i).getSettingValue().equals(String.valueOf(loginUser.getEmpCatId()))) {
+                    navigationView.getMenu().findItem(R.id.nav_home).setVisible(true);
+                    navigationView.getMenu().findItem(R.id.nav_emp_list).setVisible(false);
+                    navigationView.getMenu().findItem(R.id.nav_assigne_emp).setVisible(false);
+                    navigationView.getMenu().findItem(R.id.nav_duty_list_emp).setVisible(true);
+
+                    Log.e("MY TAG", "-----Employee-------");
+                }
+            }
+
+            if (syncArray.get(i).getSettingKey().equals("Superwiser")) {
                 Log.e("MY TAG1", "-----Employee-------");
                 if (syncArray.get(i).getSettingValue().equals(String.valueOf(loginUser.getEmpCatId()))) {
                     navigationView.getMenu().findItem(R.id.nav_home).setVisible(true);
@@ -682,9 +708,9 @@ public class HomeActivity extends AppCompatActivity
             try {
                 realPath = RealPathUtil.getRealPathFromURI_API19(HomeActivity.this, data.getData());
                 Uri uriFromPath = Uri.fromFile(new File(realPath));
-                myBitmap2 = getBitmapFromCameraData(data, HomeActivity.this);
+                myBitmap3 = getBitmapFromCameraData(data, HomeActivity.this);
 
-                ivPhoto3.setImageBitmap(myBitmap2);
+                ivPhoto3.setImageBitmap(myBitmap3);
                 imagePath3 = uriFromPath.getPath();
                 tvPhoto3.setText("" + uriFromPath.getPath());
 
@@ -711,7 +737,7 @@ public class HomeActivity extends AppCompatActivity
                 File imgFile = new File(path);
                 if (imgFile.exists()) {
                     myBitmap4 = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                    ivPhoto4.setImageBitmap(myBitmap3);
+                    ivPhoto4.setImageBitmap(myBitmap4);
 
                     myBitmap4 = shrinkBitmap(imgFile.getAbsolutePath(), 720, 720);
 
@@ -728,7 +754,7 @@ public class HomeActivity extends AppCompatActivity
                     }
                 }
                 imagePath4 = f.getAbsolutePath();
-                //tvPhoto3.setText("" + f.getName());
+                tvPhoto4.setText("" + f.getName());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -739,7 +765,7 @@ public class HomeActivity extends AppCompatActivity
                 Uri uriFromPath = Uri.fromFile(new File(realPath));
                 myBitmap4 = getBitmapFromCameraData(data, HomeActivity.this);
 
-                ivPhoto4.setImageBitmap(myBitmap2);
+                ivPhoto4.setImageBitmap(myBitmap4);
                 imagePath4 = uriFromPath.getPath();
                 tvPhoto4.setText("" + uriFromPath.getPath());
 
@@ -766,7 +792,7 @@ public class HomeActivity extends AppCompatActivity
                 File imgFile = new File(path);
                 if (imgFile.exists()) {
                     myBitmap5 = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                    ivPhoto5.setImageBitmap(myBitmap3);
+                    ivPhoto5.setImageBitmap(myBitmap5);
 
                     myBitmap5 = shrinkBitmap(imgFile.getAbsolutePath(), 720, 720);
 
@@ -783,7 +809,7 @@ public class HomeActivity extends AppCompatActivity
                     }
                 }
                 imagePath5 = f.getAbsolutePath();
-                //tvPhoto3.setText("" + f.getName());
+                tvPhoto5.setText("" + f.getName());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -794,7 +820,7 @@ public class HomeActivity extends AppCompatActivity
                 Uri uriFromPath = Uri.fromFile(new File(realPath));
                 myBitmap5 = getBitmapFromCameraData(data, HomeActivity.this);
 
-                ivPhoto5.setImageBitmap(myBitmap2);
+                ivPhoto5.setImageBitmap(myBitmap5);
                 imagePath5 = uriFromPath.getPath();
                 tvPhoto5.setText("" + uriFromPath.getPath());
 

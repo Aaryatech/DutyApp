@@ -53,8 +53,8 @@ public interface InterfaceAPI {
     @POST("master/updateToken")
     Call<Info> updateUserToken(@Query("empId") int empId, @Query("token") String token);
 
-    @POST("duty/master/getTaskDoneHeaderByEmpAndDate")
-    Call<ArrayList<DutyHeader>> getTaskDoneHeaderByEmpAndDate(@Query("empId") int empId,@Query("date") String date);
+    @POST("duty/master/getTaskDoneHeaderByEmpAndFromToDate")
+    Call<ArrayList<DutyHeader>> getTaskDoneHeaderByEmpAndDate(@Query("empId") int empId,@Query("fromDate") String fromDate,@Query("toDate") String toDate);
 
     @POST("duty/master/getTaskDoneDetailByHeaderId")
     Call<ArrayList<DutyDetail>> getTaskDoneDetailByHeaderId(@Query("headerId") int headerId);
@@ -123,8 +123,11 @@ public interface InterfaceAPI {
     @POST("checklist/getOpenChecklistByEmp")
     Call<ArrayList<Detail>> getOpenChecklistByEmp(@Query("empId") int empId);
 
-    @POST("checklist/getAllChecklistByDept")
+    @POST("checklist/getAllChecklistByDeptAndUnAssigned")
     Call<ArrayList<ChecklistHeader>> getAllChecklistByDept(@Query("deptId") int deptId);
+
+    @POST("checklist/getAllChecklistByDept")
+    Call<ArrayList<ChecklistHeader>> getAllChecklistByDeptAll(@Query("deptId") int deptId);
 
     @POST("checklist/saveChecklistActionHeaderAndDetail")
     Call<ChecklistActionHeader> saveChecklistActionHeaderAndDetail(@Body ChecklistActionHeader checklistActionHeader);

@@ -37,6 +37,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public String strIntent,strIntentSplash;
     ArrayList<Sync> syncArray = new ArrayList<>();
     Sync syncData;
+    CommonDialog commonDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,7 +106,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         Log.e("PARAMETERS : ", "       DSC CODE : " + strDSCCode);
         if (Constants.isOnline(this)) {
-            final CommonDialog commonDialog = new CommonDialog(this, "Loading", "Please Wait...");
+            commonDialog = new CommonDialog(this, "Loading", "Please Wait...");
             commonDialog.show();
 
             Call<Login> listCall = Constants.myInterface.doLogin(strDSCCode);
@@ -135,7 +136,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 dialog.show();
 
                             } else {
-                                commonDialog.dismiss();
+                                //commonDialog.dismiss();
                                 Gson gson = new Gson();
                                 String json = gson.toJson(data);
 
@@ -214,8 +215,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Log.e("PARAMETERS : ", "       EMP ID : " + empId +"             TOKEN:"  +token);
 
         if (Constants.isOnline(this)) {
-            final CommonDialog commonDialog = new CommonDialog(this, "Loading", "Please Wait...");
-            commonDialog.show();
+//            final CommonDialog commonDialog = new CommonDialog(this, "Loading", "Please Wait...");
+//            commonDialog.show();
 
             Call<Info> listCall = Constants.myInterface.updateUserToken(empId, token);
             listCall.enqueue(new Callback<Info>() {

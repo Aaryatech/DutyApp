@@ -45,7 +45,8 @@ public class CheckListAdapter extends RecyclerView.Adapter<CheckListAdapter.MyVi
             public void onClick(View v) {
 
                 checkList.remove(i);
-                notifyItemRemoved(i);
+                //notifyItemRemoved(i);
+                notifyDataSetChanged();
             }
         });
 

@@ -63,7 +63,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
-            android:visibility="gone"
+            android:visibility="visible"
             android:orientation="horizontal">
 
             <ImageView
@@ -87,6 +87,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tvPhoto1"
+                android:textColor="@color/colorBlack"
                 android:visibility="gone"/>
 
         </LinearLayout>
@@ -99,7 +100,6 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
-            android:visibility="gone"
             android:fontFamily="@font/sf_ui_regular"
             android:text="Photo 2"
             android:textStyle="bold" />
@@ -111,7 +111,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
-            android:visibility="gone"
+            android:visibility="visible"
             android:orientation="horizontal">
 
             <ImageView
@@ -135,6 +135,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tvPhoto2"
+                android:textColor="@color/colorBlack"
                 android:visibility="gone"/>
 
         </LinearLayout>

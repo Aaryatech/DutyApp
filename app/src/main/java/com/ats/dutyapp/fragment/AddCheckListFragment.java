@@ -218,8 +218,9 @@ public static ArrayList<ChecklistDetail> checklistDetail = new ArrayList<>();
     public void onClick(View v) {
         if(v.getId()== R.id.btnAdd)
         {
-            String strChekPos=tvCheckId.getText().toString();
+            String strChekPos=tvCheckId.getText().toString().trim();
             Log.e("strChekPos","------------------------------"+strChekPos);
+            boolean isValidName=false;
 
             photoReq = 0;
             if (rbImgYes.isChecked()) {
@@ -233,39 +234,58 @@ public static ArrayList<ChecklistDetail> checklistDetail = new ArrayList<>();
                 tvCheckId.setText("pos");
                 Log.e("Pos Add","------------------------------"+tvCheckId.getText().toString());
 
-                String strChekListName=edChekListName.getText().toString();
+                String strChekListName=edChekListName.getText().toString().trim();
+
 //                CheckListTemp model=new CheckListTemp(strChekListName);
 //                checkList.add(model);
 
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                ChecklistDetail checklistActionDetail = new ChecklistDetail(0,0,strChekListName,photoReq,1,1,loginUser.getEmpId(), sdf.format(System.currentTimeMillis()),0,0,"","");
-                checklistDetail.add(checklistActionDetail);
-                Log.e(" Add Checklist ","-----------------------------------------------"+checklistDetail);
+                if (strChekListName.isEmpty()) {
+                    edChekListName.setError("required");
+                } else {
+                    edChekListName.setError(null);
+                    isValidName = true;
+                }
 
-                checkListAdapter = new CheckListAdapter(checklistDetail, getActivity());
-                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
-                recyclerView.setLayoutManager(mLayoutManager);
-                recyclerView.setItemAnimator(new DefaultItemAnimator());
-                recyclerView.setAdapter(checkListAdapter);
+                if(isValidName) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    ChecklistDetail checklistActionDetail = new ChecklistDetail(0, 0, strChekListName, photoReq, 1, 1, loginUser.getEmpId(), sdf.format(System.currentTimeMillis()), 0, 0, "", "");
+                    checklistDetail.add(checklistActionDetail);
+                    Log.e(" Add Checklist ", "-----------------------------------------------" + checklistDetail);
 
-                edChekListName.setText("");
+                    checkListAdapter = new CheckListAdapter(checklistDetail, getActivity());
+                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+                    recyclerView.setLayoutManager(mLayoutManager);
+                    recyclerView.setItemAnimator(new DefaultItemAnimator());
+                    recyclerView.setAdapter(checkListAdapter);
+
+                    edChekListName.setText("");
+                }
 
             }else{
 
 //                tvCheckId.setText(""+pos);
                 Log.e("Pos Edit","------------------------------"+pos);
 
-                String strChekListName=edChekListName.getText().toString();
+                String strChekListName=edChekListName.getText().toString().trim();
                 //CheckListTemp model=new CheckListTemp(strChekListName);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-                 ChecklistDetail model = new ChecklistDetail(0, 0, strChekListName, photoReq, 1, 1, loginUser.getEmpId(), sdf.format(System.currentTimeMillis()), 0, 0, "", "");
+                if (strChekListName.isEmpty()) {
+                    edChekListName.setError("required");
+                } else {
+                    edChekListName.setError(null);
+                    isValidName = true;
+                }
 
-                checklistDetail.set(pos,model);
-                checkListAdapter.notifyDataSetChanged();
+                if(isValidName) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    ChecklistDetail model = new ChecklistDetail(0, 0, strChekListName, photoReq, 1, 1, loginUser.getEmpId(), sdf.format(System.currentTimeMillis()), 0, 0, "", "");
 
-                edChekListName.setText("");
-                tvCheckId.setText("pos");
+                    checklistDetail.set(pos, model);
+                    checkListAdapter.notifyDataSetChanged();
+
+                    edChekListName.setText("");
+                    tvCheckId.setText("pos");
+                }
 
             }
 
@@ -280,7 +300,7 @@ public static ArrayList<ChecklistDetail> checklistDetail = new ArrayList<>();
             int strDeptId = 0;
             boolean isValidName = false,isValidDept =false;
 
-            strName=edName.getText().toString();
+            strName=edName.getText().toString().trim();
             strNameDetail=edChekListName.getText().toString();
             strDept=tvDept.getText().toString();
 
@@ -312,11 +332,9 @@ public static ArrayList<ChecklistDetail> checklistDetail = new ArrayList<>();
                 reportingType = 0;
             }
 
-
-
-            if(isValidName && isValidDept)
-            {
-                //if(model==null) {
+            if(isValidName && isValidDept) {
+                if (checklistDetail.size() != 0) {
+                    //if(model==null) {
 
                     ArrayList<ChecklistDetail> detailList = new ArrayList<>();
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -348,7 +366,11 @@ public static ArrayList<ChecklistDetail> checklistDetail = new ArrayList<>();
                     });
                     AlertDialog dialog = builder.create();
                     dialog.show();
+                }else{
+                    Toast.makeText(getActivity(), "Please add detail...", Toast.LENGTH_SHORT).show();
                 }
+            }
+
 //                else {
 //                    ArrayList<ChecklistDetail> detailList = new ArrayList<>();
 //                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

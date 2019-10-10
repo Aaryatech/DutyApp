@@ -41,8 +41,8 @@ public class DutyHeaderDetailListAdapter extends RecyclerView.Adapter<DutyHeader
         final DutyHeaderDetail model=dutyList.get(i);
         myViewHolder.tvDutyName.setText(""+model.getDutyName());
         myViewHolder.tvDutyCount.setText("Wgt : "+model.getTotalTaskWt());
-        myViewHolder.tvTimeOn.setText("From Time : "+model.getShiftFromTime());
-        myViewHolder.tvTimeOff.setText("To Time : "+model.getShiftToTime());
+        myViewHolder.tvTimeOn.setText("Time : "+model.getShiftFromTime()+"-"+model.getShiftToTime());
+       // myViewHolder.tvTimeOff.setText("To Time : "+model.getShiftToTime());
         myViewHolder.tvDate.setText(""+model.getCreatedDate());
 
         myViewHolder.cardView.setOnClickListener(new View.OnClickListener() {

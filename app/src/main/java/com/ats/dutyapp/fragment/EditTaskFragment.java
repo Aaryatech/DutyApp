@@ -165,12 +165,15 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
             Gson gson = new Gson();
             model = gson.fromJson(quoteStr, ChatTask.class);
 
+            Log.e("Model","-------------------------------------------------"+model);
+
             edTaskName.setText(""+model.getHeaderName());
             edDate.setText(""+model.getLastDate());
             edRemTime.setText(""+model.getExVar1());
             edDesc.setText(""+model.getTaskDesc());
             edRemark.setText(""+model.getTaskCompleteRemark());
             tvEmpIdAdmin.setText(""+model.getAdminUserIds());
+            tvEmpAdmin.setText(""+model.getAdminUserNames());
             tvEmpId.setText(""+model.getAssignUserIds());
             tvEmp.setText(""+model.getAssignUserNames());
             reminderType=model.getReminderFrequency();
@@ -235,13 +238,6 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
         }
 
 
-        final ArrayList<Integer> deptList = new ArrayList<>();
-        deptList.add(-1);
-
-        Log.e(" Selected Text", "---------------------------------------------" + selectedText);
-
-        getAllEmp(deptList,"");
-
         rgRepotType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -294,6 +290,12 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
             }
         });
 
+        final ArrayList<Integer> deptList = new ArrayList<>();
+        deptList.add(-1);
+
+        Log.e(" Selected Text", "---------------------------------------------" + selectedText);
+
+        getAllEmp(deptList,model.getAssignUserIds());
         getAllDept();
         getAllEmployee();
       //  getAllGroup(1);
@@ -348,12 +350,39 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
                             assignStaticTaskAdminEmpList.clear();
                             assignStaticTaskAdminEmpList=empListAdmin;
 
-                            for(int i=0;i<empListAdmin.size();i++) {
-                                if (loginUser.getEmpId().equals(empListAdmin.get(i).getEmpId()))
-                                {
-                                    tvEmpAdmin.setText(empListAdmin.get(i).getEmpFname() +" "+empListAdmin.get(i).getEmpMname()+ " " +empListAdmin.get(i).getEmpSname());
-                                    tvEmpIdAdmin.setText(""+empListAdmin.get(i).getEmpId());
+                            if(model==null) {
+
+                                for (int i = 0; i < empListAdmin.size(); i++) {
+                                    if (loginUser.getEmpId().equals(empListAdmin.get(i).getEmpId())) {
+                                        tvEmpAdmin.setText(empListAdmin.get(i).getEmpFname() + " " + empListAdmin.get(i).getEmpMname() + " " + empListAdmin.get(i).getEmpSname());
+                                        tvEmpIdAdmin.setText("" + empListAdmin.get(i).getEmpId());
+                                    }
                                 }
+                            }else{
+
+                            String strEmpId="";
+                            if (model != null) {
+                                strEmpId = model.getAdminUserIds();
+                            }
+
+                                List<String> list = Arrays.asList(strEmpId.split("\\s*,\\s*"));
+
+                                Log.e("LIST", "----------------------" + list);
+
+
+                                Log.e("BIN", "---------------------------------Model-----------------" + empListAdmin);
+                                for (int j = 0; j < assignStaticTaskAdminEmpList.size(); j++) {
+
+                                    for (int k = 0; k < list.size(); k++) {
+
+                                        if (assignStaticTaskAdminEmpList.get(j).getEmpId() == Integer.parseInt(list.get(k))) {
+
+                                            assignStaticTaskAdminEmpList.get(j).setChecked(true);
+
+                                        }
+                                    }
+                                }
+
                             }
                             commonDialog.dismiss();
 
@@ -892,13 +921,13 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
         EditText edSearch = dialog.findViewById(R.id.edSearch);
         Button btnSubmit=dialog.findViewById(R.id.btnSubmit);
 
-        if(selectedText.equalsIgnoreCase("Indivsual"))
-        {
-            btnSubmit.setVisibility(View.GONE);
-        }else if(selectedText.equalsIgnoreCase("Group"))
-        {
-            btnSubmit.setVisibility(View.VISIBLE);
-        }
+//        if(selectedText.equalsIgnoreCase("Indivsual"))
+//        {
+//            btnSubmit.setVisibility(View.GONE);
+//        }else if(selectedText.equalsIgnoreCase("Group"))
+//        {
+//            btnSubmit.setVisibility(View.VISIBLE);
+//        }
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1161,13 +1190,13 @@ public class EditTaskFragment extends Fragment implements View.OnClickListener{
             //holder.tvAddress.setText(model.getCustAddress());
 
             Log.e("Adapter","---------------------------selected text----------------------------"+selectedText);
-            if(selectedText.equalsIgnoreCase("Indivsual"))
-            {
-                myViewHolder.checkBox.setVisibility(View.GONE);
-            }else if(selectedText.equalsIgnoreCase("Group"))
-            {
-                myViewHolder.checkBox.setVisibility(View.VISIBLE);
-            }
+//            if(selectedText.equalsIgnoreCase("Indivsual"))
+//            {
+//                myViewHolder.checkBox.setVisibility(View.GONE);
+//            }else if(selectedText.equalsIgnoreCase("Group"))
+//            {
+//                myViewHolder.checkBox.setVisibility(View.VISIBLE);
+//            }
 
             myViewHolder.checkBox.setChecked(empList.get(i).isChecked());
 

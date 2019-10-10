@@ -154,9 +154,6 @@ public class DocumentFragment extends Fragment implements View.OnClickListener{
 
     }
 
-
-
-
         path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/DocumentSuperwiser/Reports";
         dir = new File(path);
         if (!dir.exists()) {
@@ -239,8 +236,10 @@ public class DocumentFragment extends Fragment implements View.OnClickListener{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_pdf:
-                genratePdf(docList);
-                return true;
+
+               genratePdf(docList);
+
+               return true;
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -330,13 +329,16 @@ public class DocumentFragment extends Fragment implements View.OnClickListener{
 
                 //-------------------------------------------------------------------------------------------------------------
                 PdfPTable ptName = new PdfPTable(5);
-                float[] colWidth = new float[]{5,35,50,30,50};
+                float[] colWidth = new float[]{5, 35, 50, 30, 50};
                 ptName.setWidths(colWidth);
                 ptName.setTotalWidth(colWidth);
                 ptName.setWidthPercentage(100);
 
+
                 for (int i = 0; i < docList.size(); i++) {
 
+                    if(docList.get(i).getDutyList() != null)
+                    {
                     cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyType()), boldFont));
                     cell.setBorder(Rectangle.NO_BORDER);
                     cell.setHorizontalAlignment(1);
@@ -349,77 +351,78 @@ public class DocumentFragment extends Fragment implements View.OnClickListener{
                     cell.setHorizontalAlignment(1);
                     ptName.addCell(cell);
 
-                    for (int j = 0; j < docList.get(i).getDutyList().size(); j++) {
+                    if (docList.get(i).getDutyList() != null) {
+                        for (int j = 0; j < docList.get(i).getDutyList().size(); j++) {
 
-                        Log.e("CYCLE of J", "-------------------------------" + j);
+                            Log.e("CYCLE of J", "-------------------------------" + j);
 
-                        cell = new PdfPCell(new Paragraph("" + (j + 1) + ")  ", textFont));
-                        cell.setBorder(Rectangle.NO_BORDER);
-                        cell.setHorizontalAlignment(0);
-                        ptName.addCell(cell);
+                            cell = new PdfPCell(new Paragraph("" + (j + 1) + ")  ", textFont));
+                            cell.setBorder(Rectangle.NO_BORDER);
+                            cell.setHorizontalAlignment(0);
+                            ptName.addCell(cell);
 
-                        cell = new PdfPCell(new Paragraph( "Duty Name: ", textFontLarge));
-                        cell.setBorder(Rectangle.NO_BORDER);
-                        cell.setHorizontalAlignment(0);
-                        ptName.addCell(cell);
+                            cell = new PdfPCell(new Paragraph("Duty Name: ", textFontLarge));
+                            cell.setBorder(Rectangle.NO_BORDER);
+                            cell.setHorizontalAlignment(0);
+                            ptName.addCell(cell);
 
-                        cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getDutyName()), textFontLarge));
-                        cell.setBorder(Rectangle.NO_BORDER);
-                        cell.setHorizontalAlignment(0);
-                        cell.setColspan(3);
-                        ptName.addCell(cell);
+                            cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getDutyName()), textFontLarge));
+                            cell.setBorder(Rectangle.NO_BORDER);
+                            cell.setHorizontalAlignment(0);
+                            cell.setColspan(3);
+                            ptName.addCell(cell);
 
-                        cell = new PdfPCell(new Paragraph(" ", textFont));
-                        cell.setBorder(Rectangle.NO_BORDER);
-                        cell.setHorizontalAlignment(1);
-                        ptName.addCell(cell);
+                            cell = new PdfPCell(new Paragraph(" ", textFont));
+                            cell.setBorder(Rectangle.NO_BORDER);
+                            cell.setHorizontalAlignment(1);
+                            ptName.addCell(cell);
 
-                        cell = new PdfPCell(new Paragraph("Shift: ", textFontLarge));
-                        cell.setBorder(Rectangle.NO_BORDER);
-                        cell.setHorizontalAlignment(0);
-                        ptName.addCell(cell);
+                            cell = new PdfPCell(new Paragraph("Shift: ", textFontLarge));
+                            cell.setBorder(Rectangle.NO_BORDER);
+                            cell.setHorizontalAlignment(0);
+                            ptName.addCell(cell);
 
-                        cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getShiftName()), textFontLarge));
-                        cell.setBorder(Rectangle.NO_BORDER);
-                        cell.setHorizontalAlignment(0);
-                        cell.setColspan(3);
-                        ptName.addCell(cell);
+                            cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getShiftName()), textFontLarge));
+                            cell.setBorder(Rectangle.NO_BORDER);
+                            cell.setHorizontalAlignment(0);
+                            cell.setColspan(3);
+                            ptName.addCell(cell);
 
-                        cell = new PdfPCell(new Paragraph(" ", textFont));
-                        cell.setBorder(Rectangle.NO_BORDER);
-                        cell.setHorizontalAlignment(1);
-                        ptName.addCell(cell);
+                            cell = new PdfPCell(new Paragraph(" ", textFont));
+                            cell.setBorder(Rectangle.NO_BORDER);
+                            cell.setHorizontalAlignment(1);
+                            ptName.addCell(cell);
 
-                        cell = new PdfPCell(new Paragraph("From Time: ", textFontLarge));
-                        cell.setBorder(Rectangle.NO_BORDER);
-                        cell.setHorizontalAlignment(0);
-                        ptName.addCell(cell);
+                            cell = new PdfPCell(new Paragraph("From Time: ", textFontLarge));
+                            cell.setBorder(Rectangle.NO_BORDER);
+                            cell.setHorizontalAlignment(0);
+                            ptName.addCell(cell);
 
-                        cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getShiftFromTime()), textFontLarge));
-                        cell.setBorder(Rectangle.NO_BORDER);
-                        cell.setHorizontalAlignment(0);
-                        ptName.addCell(cell);
+                            cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getShiftFromTime()), textFontLarge));
+                            cell.setBorder(Rectangle.NO_BORDER);
+                            cell.setHorizontalAlignment(0);
+                            ptName.addCell(cell);
 
 //                        cell = new PdfPCell(new Paragraph(" ", textFont));
 //                        cell.setBorder(Rectangle.NO_BORDER);
 //                        cell.setHorizontalAlignment(1);
 //                        ptName.addCell(cell);
 
-                        cell = new PdfPCell(new Paragraph("To Time: ", textFontLarge));
-                        cell.setBorder(Rectangle.NO_BORDER);
-                        cell.setHorizontalAlignment(0);
-                        ptName.addCell(cell);
+                            cell = new PdfPCell(new Paragraph("To Time: ", textFontLarge));
+                            cell.setBorder(Rectangle.NO_BORDER);
+                            cell.setHorizontalAlignment(0);
+                            ptName.addCell(cell);
 
-                        cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getShiftToTime()), textFontLarge));
-                        cell.setBorder(Rectangle.NO_BORDER);
-                        cell.setHorizontalAlignment(0);
-                        ptName.addCell(cell);
+                            cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getShiftToTime()), textFontLarge));
+                            cell.setBorder(Rectangle.NO_BORDER);
+                            cell.setHorizontalAlignment(0);
+                            ptName.addCell(cell);
 
-                        cell = new PdfPCell(new Paragraph(" ", textFont));
-                        cell.setBorder(Rectangle.NO_BORDER);
-                        cell.setHorizontalAlignment(0);
-                        cell.setColspan(5);
-                        ptName.addCell(cell);
+                            cell = new PdfPCell(new Paragraph(" ", textFont));
+                            cell.setBorder(Rectangle.NO_BORDER);
+                            cell.setHorizontalAlignment(0);
+                            cell.setColspan(5);
+                            ptName.addCell(cell);
 
 //                        cell = new PdfPCell(new Paragraph(" ", textFont));
 //                        cell.setBorder(Rectangle.NO_BORDER);
@@ -432,16 +435,16 @@ public class DocumentFragment extends Fragment implements View.OnClickListener{
 //                        ptName.addCell(cell);
 
 
-                        cell = new PdfPCell(new Paragraph(" ", textFont));
-                        cell.setBorder(Rectangle.NO_BORDER);
-                        cell.setHorizontalAlignment(1);
-                        ptName.addCell(cell);
+                            cell = new PdfPCell(new Paragraph(" ", textFont));
+                            cell.setBorder(Rectangle.NO_BORDER);
+                            cell.setHorizontalAlignment(1);
+                            ptName.addCell(cell);
 
-                        cell = new PdfPCell(new Paragraph("Activities : ", boldFont));
-                        cell.setBorder(Rectangle.NO_BORDER);
-                        cell.setHorizontalAlignment(0);
-                        cell.setColspan(4);
-                        ptName.addCell(cell);
+                            cell = new PdfPCell(new Paragraph("Activities : ", boldFont));
+                            cell.setBorder(Rectangle.NO_BORDER);
+                            cell.setHorizontalAlignment(0);
+                            cell.setColspan(4);
+                            ptName.addCell(cell);
 
 //                        cell = new PdfPCell(new Paragraph(" ", textFont));
 //                        cell.setBorder(Rectangle.NO_BORDER);
@@ -449,27 +452,27 @@ public class DocumentFragment extends Fragment implements View.OnClickListener{
 //                        ptName.addCell(cell);
 
 
-                        for (int k = 0; k < docList.get(i).getDutyList().get(j).getTaskList().size(); k++) {
+                            for (int k = 0; k < docList.get(i).getDutyList().get(j).getTaskList().size(); k++) {
 
 
 //                            cell = new PdfPCell(new Paragraph(" ", textFont));
 ////                            cell.setBorder(Rectangle.NO_BORDER);
 ////                            cell.setHorizontalAlignment(0);
 ////                            ptName.addCell(cell);
-                            if(language==1) {
+                                if (language == 1) {
 
 
-                                Chunk bullet = new Chunk("\u2022", FontFactory.getFont(FontFactory.HELVETICA, 30, Font.BOLD));
-                                list.setListSymbol(bullet);
+                                    Chunk bullet = new Chunk("\u2022", FontFactory.getFont(FontFactory.HELVETICA, 30, Font.BOLD));
+                                    list.setListSymbol(bullet);
 
-                               // list.add(docList.get(i).getDutyList().get(j).getTaskList().get(k).getTaskNameEng());
+                                    // list.add(docList.get(i).getDutyList().get(j).getTaskList().get(k).getTaskNameEng());
 
-                               // (k + 1) + ") "
+                                    // (k + 1) + ") "
 
-                                cell = new PdfPCell(new Paragraph(String.valueOf(bullet) + " " , boldFont));
-                                cell.setBorder(Rectangle.NO_BORDER);
-                                cell.setHorizontalAlignment(0);
-                                ptName.addCell(cell);
+                                    cell = new PdfPCell(new Paragraph(String.valueOf(bullet) + " ", boldFont));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setHorizontalAlignment(0);
+                                    ptName.addCell(cell);
 
 //                                cell = new PdfPCell(new Paragraph("" + doc.add(list), textFont));
 //                                cell.setBorder(Rectangle.NO_BORDER);
@@ -477,134 +480,154 @@ public class DocumentFragment extends Fragment implements View.OnClickListener{
 //                                ptName.addCell(cell);
 
 
-                                cell = new PdfPCell(new Paragraph("Task Name : ", textFontLarge));
-                                cell.setBorder(Rectangle.NO_BORDER);
-                                cell.setHorizontalAlignment(0);
-                                ptName.addCell(cell);
+                                    cell = new PdfPCell(new Paragraph("Task Name : ", textFontLarge));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setHorizontalAlignment(0);
+                                    ptName.addCell(cell);
 
-                                cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getTaskList().get(k).getTaskNameEng()), textFontLarge));
-                                cell.setBorder(Rectangle.NO_BORDER);
-                                cell.setHorizontalAlignment(0);
-                                cell.setColspan(3);
-                                ptName.addCell(cell);
+                                    cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getTaskList().get(k).getTaskNameEng()), textFontLarge));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setHorizontalAlignment(0);
+                                    cell.setColspan(3);
+                                    ptName.addCell(cell);
+
+                                    cell = new PdfPCell(new Paragraph(" ", textFont));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setHorizontalAlignment(0);
+                                    ptName.addCell(cell);
+
+                                    cell = new PdfPCell(new Paragraph("Task Description : ", textFontLarge));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setHorizontalAlignment(0);
+                                    ptName.addCell(cell);
+
+                                    cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getTaskList().get(k).getTaskDescEng()), textFontLarge));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setColspan(3);
+                                    cell.setHorizontalAlignment(0);
+                                    ptName.addCell(cell);
+
+                                } else {
+                                    cell = new PdfPCell(new Paragraph("" + (k + 1) + ")  ", textFont));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setHorizontalAlignment(0);
+                                    ptName.addCell(cell);
+
+                                    cell = new PdfPCell(new Paragraph("Task Name : ", textFontLarge));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setHorizontalAlignment(0);
+                                    ptName.addCell(cell);
+
+                                    cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getTaskList().get(k).getTaskNameEng()), font));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setHorizontalAlignment(0);
+                                    cell.setColspan(3);
+                                    ptName.addCell(cell);
+
+                                    cell = new PdfPCell(new Paragraph(" ", textFont));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setHorizontalAlignment(0);
+                                    ptName.addCell(cell);
+
+                                    cell = new PdfPCell(new Paragraph("Task Description : ", textFontLarge));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setHorizontalAlignment(0);
+                                    ptName.addCell(cell);
+
+                                    cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getTaskList().get(k).getTaskDescEng()), font));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setColspan(3);
+                                    cell.setHorizontalAlignment(0);
+                                    ptName.addCell(cell);
+                                }
 
                                 cell = new PdfPCell(new Paragraph(" ", textFont));
                                 cell.setBorder(Rectangle.NO_BORDER);
                                 cell.setHorizontalAlignment(0);
                                 ptName.addCell(cell);
 
-                                cell = new PdfPCell(new Paragraph("Task Description : ", textFontLarge));
+                                cell = new PdfPCell(new Paragraph("Photo Req : ", textFontLarge));
                                 cell.setBorder(Rectangle.NO_BORDER);
                                 cell.setHorizontalAlignment(0);
                                 ptName.addCell(cell);
 
-                                cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getTaskList().get(k).getTaskDescEng()), textFontLarge));
-                                cell.setBorder(Rectangle.NO_BORDER);
-                                cell.setColspan(3);
-                                cell.setHorizontalAlignment(0);
-                                ptName.addCell(cell);
-
-                            }else {
-                                cell = new PdfPCell(new Paragraph("" + (k + 1) + ")  ", textFont));
-                                cell.setBorder(Rectangle.NO_BORDER);
-                                cell.setHorizontalAlignment(0);
-                                ptName.addCell(cell);
-
-                                cell = new PdfPCell(new Paragraph("Task Name : ", textFontLarge));
-                                cell.setBorder(Rectangle.NO_BORDER);
-                                cell.setHorizontalAlignment(0);
-                                ptName.addCell(cell);
-
-                                cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getTaskList().get(k).getTaskNameEng()), font));
-                                cell.setBorder(Rectangle.NO_BORDER);
-                                cell.setHorizontalAlignment(0);
-                                cell.setColspan(3);
-                                ptName.addCell(cell);
-
-                                cell = new PdfPCell(new Paragraph(" ", textFont));
-                                cell.setBorder(Rectangle.NO_BORDER);
-                                cell.setHorizontalAlignment(0);
-                                ptName.addCell(cell);
-
-                                cell = new PdfPCell(new Paragraph("Task Description : ", textFontLarge));
-                                cell.setBorder(Rectangle.NO_BORDER);
-                                cell.setHorizontalAlignment(0);
-                                ptName.addCell(cell);
-
-                                cell = new PdfPCell(new Paragraph(String.valueOf(docList.get(i).getDutyList().get(j).getTaskList().get(k).getTaskDescEng()), font));
-                                cell.setBorder(Rectangle.NO_BORDER);
-                                cell.setColspan(3);
-                                cell.setHorizontalAlignment(0);
-                                ptName.addCell(cell);
-                            }
-
-                            cell = new PdfPCell(new Paragraph(" ", textFont));
-                            cell.setBorder(Rectangle.NO_BORDER);
-                            cell.setHorizontalAlignment(0);
-                            ptName.addCell(cell);
-
-                            cell = new PdfPCell(new Paragraph("Photo Req : ", textFontLarge));
-                            cell.setBorder(Rectangle.NO_BORDER);
-                            cell.setHorizontalAlignment(0);
-                            ptName.addCell(cell);
-
-                            if (docList.get(i).getDutyList().get(j).getTaskList().get(k).getPhotoReq() == 0) {
-                                cell = new PdfPCell(new Paragraph("NO", textFontLarge));
-                                cell.setBorder(Rectangle.NO_BORDER);
-                                cell.setHorizontalAlignment(0);
-                                ptName.addCell(cell);
-                            } else if (docList.get(i).getDutyList().get(j).getTaskList().get(k).getPhotoReq() == 1) {
-                                cell = new PdfPCell(new Paragraph("YES", textFontLarge));
-                                cell.setBorder(Rectangle.NO_BORDER);
-                                cell.setHorizontalAlignment(0);
-                                ptName.addCell(cell);
-                            }
+                                if (docList.get(i).getDutyList().get(j).getTaskList().get(k).getPhotoReq() == 0) {
+                                    cell = new PdfPCell(new Paragraph("NO", textFontLarge));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setHorizontalAlignment(0);
+                                    ptName.addCell(cell);
+                                } else if (docList.get(i).getDutyList().get(j).getTaskList().get(k).getPhotoReq() == 1) {
+                                    cell = new PdfPCell(new Paragraph("YES", textFontLarge));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setHorizontalAlignment(0);
+                                    ptName.addCell(cell);
+                                }
 
 //                            cell = new PdfPCell(new Paragraph(" ", textFont));
 //                            cell.setBorder(Rectangle.NO_BORDER);
 //                            cell.setHorizontalAlignment(0);
 //                            ptName.addCell(cell);
 
-                            cell = new PdfPCell(new Paragraph("Remark Req : ", textFontLarge));
-                            cell.setBorder(Rectangle.NO_BORDER);
-                            cell.setHorizontalAlignment(0);
-                            ptName.addCell(cell);
+                                cell = new PdfPCell(new Paragraph("Remark Req : ", textFontLarge));
+                                cell.setBorder(Rectangle.NO_BORDER);
+                                cell.setHorizontalAlignment(0);
+                                ptName.addCell(cell);
 
-                            if (docList.get(i).getDutyList().get(j).getTaskList().get(k).getRemarkReq() == 0) {
-                                cell = new PdfPCell(new Paragraph("NO", textFontLarge));
+                                if (docList.get(i).getDutyList().get(j).getTaskList().get(k).getRemarkReq() == 0) {
+                                    cell = new PdfPCell(new Paragraph("NO", textFontLarge));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setHorizontalAlignment(0);
+                                    ptName.addCell(cell);
+                                } else if (docList.get(i).getDutyList().get(j).getTaskList().get(k).getRemarkReq() == 1) {
+                                    cell = new PdfPCell(new Paragraph("YES", textFontLarge));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setHorizontalAlignment(0);
+                                    ptName.addCell(cell);
+                                }
+
+                                cell = new PdfPCell(new Paragraph(" ", textFont));
                                 cell.setBorder(Rectangle.NO_BORDER);
                                 cell.setHorizontalAlignment(0);
                                 ptName.addCell(cell);
-                            } else if (docList.get(i).getDutyList().get(j).getTaskList().get(k).getRemarkReq() == 1) {
-                                cell = new PdfPCell(new Paragraph("YES", textFontLarge));
+
+                                cell = new PdfPCell(new Paragraph("Time Req : ", textFontLarge));
                                 cell.setBorder(Rectangle.NO_BORDER);
                                 cell.setHorizontalAlignment(0);
                                 ptName.addCell(cell);
+
+                                if (docList.get(i).getDutyList().get(j).getTaskList().get(k).getTimeReq() == 0) {
+                                    cell = new PdfPCell(new Paragraph("NO", textFontLarge));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setColspan(3);
+                                    cell.setHorizontalAlignment(0);
+                                    ptName.addCell(cell);
+                                } else if (docList.get(i).getDutyList().get(j).getTaskList().get(k).getTimeReq() == 1) {
+                                    cell = new PdfPCell(new Paragraph("YES" + " (" + docList.get(i).getDutyList().get(j).getTaskList().get(k).getTaskTime() + ")", textFontLarge));
+                                    cell.setBorder(Rectangle.NO_BORDER);
+                                    cell.setHorizontalAlignment(0);
+                                    cell.setColspan(3);
+                                    ptName.addCell(cell);
+                                }
+
+                                cell = new PdfPCell(new Paragraph(" ", textFont));
+                                cell.setBorder(Rectangle.NO_BORDER);
+                                cell.setHorizontalAlignment(1);
+                                cell.setColspan(5);
+                                ptName.addCell(cell);
+
+//                            cell = new PdfPCell(new Paragraph(" ", textFont));
+//                            cell.setBorder(Rectangle.NO_BORDER);
+//                            cell.setHorizontalAlignment(0);
+//                            ptName.addCell(cell);
+//
+//                            cell = new PdfPCell(new Paragraph(" ", textFont));
+//                            cell.setBorder(Rectangle.NO_BORDER);
+//                            cell.setHorizontalAlignment(0);
+//                            ptName.addCell(cell);
+
+
                             }
 
-                            cell = new PdfPCell(new Paragraph(" ", textFont));
-                            cell.setBorder(Rectangle.NO_BORDER);
-                            cell.setHorizontalAlignment(0);
-                            ptName.addCell(cell);
-
-                            cell = new PdfPCell(new Paragraph("Time Req : ", textFontLarge));
-                            cell.setBorder(Rectangle.NO_BORDER);
-                            cell.setHorizontalAlignment(0);
-                            ptName.addCell(cell);
-
-                            if (docList.get(i).getDutyList().get(j).getTaskList().get(k).getTimeReq() == 0) {
-                                cell = new PdfPCell(new Paragraph("NO", textFontLarge));
-                                cell.setBorder(Rectangle.NO_BORDER);
-                                cell.setColspan(3);
-                                cell.setHorizontalAlignment(0);
-                                ptName.addCell(cell);
-                            } else if (docList.get(i).getDutyList().get(j).getTaskList().get(k).getTimeReq() == 1) {
-                                cell = new PdfPCell(new Paragraph("YES" + " (" + docList.get(i).getDutyList().get(j).getTaskList().get(k).getTaskTime() + ")", textFontLarge));
-                                cell.setBorder(Rectangle.NO_BORDER);
-                                cell.setHorizontalAlignment(0);
-                                cell.setColspan(3);
-                                ptName.addCell(cell);
-                            }
 
                             cell = new PdfPCell(new Paragraph(" ", textFont));
                             cell.setBorder(Rectangle.NO_BORDER);
@@ -612,37 +635,18 @@ public class DocumentFragment extends Fragment implements View.OnClickListener{
                             cell.setColspan(5);
                             ptName.addCell(cell);
 
-//                            cell = new PdfPCell(new Paragraph(" ", textFont));
-//                            cell.setBorder(Rectangle.NO_BORDER);
-//                            cell.setHorizontalAlignment(0);
-//                            ptName.addCell(cell);
+//                        cell = new PdfPCell(new Paragraph(" ", textFont));
+//                        cell.setBorder(Rectangle.NO_BORDER);
+//                        cell.setHorizontalAlignment(0);
+//                        ptName.addCell(cell);
 //
-//                            cell = new PdfPCell(new Paragraph(" ", textFont));
-//                            cell.setBorder(Rectangle.NO_BORDER);
-//                            cell.setHorizontalAlignment(0);
-//                            ptName.addCell(cell);
+//                        cell = new PdfPCell(new Paragraph(" ", textFont));
+//                        cell.setBorder(Rectangle.NO_BORDER);
+//                        cell.setHorizontalAlignment(0);
+//                        ptName.addCell(cell);
 
 
                         }
-
-
-                        cell = new PdfPCell(new Paragraph(" ", textFont));
-                        cell.setBorder(Rectangle.NO_BORDER);
-                        cell.setHorizontalAlignment(1);
-                        cell.setColspan(5);
-                        ptName.addCell(cell);
-
-//                        cell = new PdfPCell(new Paragraph(" ", textFont));
-//                        cell.setBorder(Rectangle.NO_BORDER);
-//                        cell.setHorizontalAlignment(0);
-//                        ptName.addCell(cell);
-//
-//                        cell = new PdfPCell(new Paragraph(" ", textFont));
-//                        cell.setBorder(Rectangle.NO_BORDER);
-//                        cell.setHorizontalAlignment(0);
-//                        ptName.addCell(cell);
-
-
                     }
 
                     cell = new PdfPCell(new Paragraph(" ", textFont));
@@ -678,6 +682,7 @@ public class DocumentFragment extends Fragment implements View.OnClickListener{
 //                    ptName.addCell(cell);
 
                 }
+            }
 
                 //--------------------------------------------------------------------------------------
 

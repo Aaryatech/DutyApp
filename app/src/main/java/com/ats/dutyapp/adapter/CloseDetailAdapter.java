@@ -148,8 +148,8 @@ public class CloseDetailAdapter extends RecyclerView.Adapter<CloseDetailAdapter.
             myViewHolder.tvPending.setVisibility(View.GONE);
         }else if(model.getCheckStatus()==0)
         {
-            myViewHolder.checkBox.setVisibility(View.GONE);
-            myViewHolder.tvReject.setVisibility(View.GONE);
+            myViewHolder.checkBox.setVisibility(View.VISIBLE);
+            myViewHolder.tvReject.setVisibility(View.VISIBLE);
             myViewHolder.tvPending.setVisibility(View.GONE);
         }else if(model.getCheckStatus()==3)
         {
@@ -224,6 +224,10 @@ public class CloseDetailAdapter extends RecyclerView.Adapter<CloseDetailAdapter.
     public int getItemCount() {
         return detailList.size();
     }
+
+//    public void onClickActivity(int position, FragmentActivity activity) {
+//        detailList.get(position).setChecked();
+//    }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView tvChecklist,tvPending,tvReject,tvPhotoReq,tvDate;
