@@ -33,15 +33,17 @@ import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private EditText edDSCCode;
-    private Button btnSubmit,btnSync;
-    public String strIntent,strIntentSplash;
+    private Button btnSubmit, btnSync;
+    public String strIntent, strIntentSplash;
     ArrayList<Sync> syncArray = new ArrayList<>();
     Sync syncData;
     CommonDialog commonDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
 
         edDSCCode = findViewById(R.id.edDSCCode);
 
@@ -50,7 +52,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnSubmit.setOnClickListener(this);
         btnSync.setOnClickListener(this);
 
-     //   CustomSharedPreference.putString(LoginActivity.this, CustomSharedPreference.LANGUAGE_ENG, CustomSharedPreference.LANGUAGE_ENG_ID);
+        //   CustomSharedPreference.putString(LoginActivity.this, CustomSharedPreference.LANGUAGE_ENG, CustomSharedPreference.LANGUAGE_ENG_ID);
         CustomSharedPreference.putString(LoginActivity.this, CustomSharedPreference.LANGUAGE_SELECTED, CustomSharedPreference.LANGUAGE_ENG_ID);
 
         try {
@@ -58,8 +60,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             Intent intent = getIntent();
             strIntent = intent.getExtras().getString("model");
             Log.e("String", "--------------------------" + strIntent);
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -67,15 +68,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             Gson gson = new Gson();
             String json = prefs.getString("Sync", null);
-            Type type = new TypeToken<ArrayList<Sync>>() {}.getType();
-            syncArray= gson.fromJson(json, type);
+            Type type = new TypeToken<ArrayList<Sync>>() {
+            }.getType();
+            syncArray = gson.fromJson(json, type);
             Log.e("SYNCH ONCR : ", "------------" + syncArray);
-            if(syncArray==null)
-            {
+            if (syncArray == null) {
                 getSynch();
             }
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -87,7 +87,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             String strDSCCode;
             boolean isValidDSCCode = false;
 
-            strDSCCode=edDSCCode.getText().toString();
+            strDSCCode = edDSCCode.getText().toString();
 
             if (strDSCCode.isEmpty()) {
                 edDSCCode.setError("required");
@@ -109,6 +109,24 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             commonDialog = new CommonDialog(this, "Loading", "Please Wait...");
             commonDialog.show();
 
+
+            try {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                Gson gson = new Gson();
+                String json = prefs.getString("Sync", null);
+                Type type = new TypeToken<ArrayList<Sync>>() {
+                }.getType();
+                syncArray = gson.fromJson(json, type);
+
+                if (syncArray==null){
+                    getSynch();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
             Call<Login> listCall = Constants.myInterface.doLogin(strDSCCode);
             listCall.enqueue(new Callback<Login>() {
                 @Override
@@ -119,13 +137,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             Log.e("Empoyee Data : ", "------------" + response.body());
 
                             Login data = response.body();
-                            if (data==null) {
+                            if (data == null) {
                                 commonDialog.dismiss();
                                 //Toast.makeText(LoginActivity.this, "Unable to login", Toast.LENGTH_SHORT).show();
 
                                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this, R.style.AlertDialogTheme);
                                 builder.setTitle(getResources().getString(R.string.app_name));
-                                builder.setMessage("Oops something went wrong! please check username & password.");
+                                builder.setMessage("Login Failed!");
                                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -155,7 +173,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                             AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this, R.style.AlertDialogTheme);
                             builder.setTitle(getResources().getString(R.string.app_name));
-                            builder.setMessage("Oops something went wrong! please check username & password.");
+                            builder.setMessage("Login Failed!");
                             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -173,7 +191,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this, R.style.AlertDialogTheme);
                         builder.setTitle(getResources().getString(R.string.app_name));
-                        builder.setMessage("Oops something went wrong! please check username & password.");
+                        builder.setMessage("Login Failed!");
                         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -194,7 +212,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this, R.style.AlertDialogTheme);
                     builder.setTitle(getResources().getString(R.string.app_name));
-                    builder.setMessage("Oops something went wrong! please check username & password.");
+                    builder.setMessage("Login Failed!");
                     builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -206,13 +224,39 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             });
         } else {
-            Toast.makeText(this, "No Internet Connection !", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "No Internet Connection !", Toast.LENGTH_SHORT).show();
+
+            try {
+                String userStr = CustomSharedPreference.getString(getApplication(), CustomSharedPreference.MAIN_KEY_USER);
+                Gson gson = new Gson();
+                Login loginUser = gson.fromJson(userStr, Login.class);
+                Log.e("LOGIN USER MAIN : ", "--------USER-------" + loginUser);
+
+                if (loginUser == null) {
+                    Toast.makeText(this, "No", Toast.LENGTH_SHORT).show();
+                } else {
+                    if (strDSCCode.equalsIgnoreCase(loginUser.getEmpDsc())) {
+                        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                        intent.putExtra("model", "ChatHeader");
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(this, "Login Failed!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
     }
 
     private void updateToken(Integer empId, String token) {
 
-        Log.e("PARAMETERS : ", "       EMP ID : " + empId +"             TOKEN:"  +token);
+        Log.e("PARAMETERS : ", "       EMP ID : " + empId + "             TOKEN:" + token);
 
         if (Constants.isOnline(this)) {
 //            final CommonDialog commonDialog = new CommonDialog(this, "Loading", "Please Wait...");
@@ -228,7 +272,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             Log.e("INFO Data : ", "------------" + response.body());
 
                             Info data = response.body();
-                            if (data.getError()) {
+
+                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                            intent.putExtra("model", strIntent);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                            finish();
+
+                           /* if (data.getError()) {
                                 commonDialog.dismiss();
 
                                 Intent intent=new Intent(LoginActivity.this, HomeActivity.class);
@@ -244,12 +295,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(intent);
                                 finish();
-                            }
+                            }*/
                         } else {
                             commonDialog.dismiss();
                             Log.e("Data Null : ", "-----------");
 
-                            Intent intent=new Intent(LoginActivity.this, HomeActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                             intent.putExtra("model", strIntent);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intent);
@@ -278,7 +329,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             });
         } else {
-            Toast.makeText(this, "No Internet Connection !", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(this, "No Internet Connection !", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -298,14 +349,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             Log.e("SYNCH DATA : ", "------------" + response.body());
 
                             Sync data;
-                            syncArray=response.body();
-                            if (syncArray!=null) {
+                            syncArray = response.body();
+                            if (syncArray != null) {
                                 commonDialog.dismiss();
 //                                Gson gson = new Gson();
 //                                String json = gson.toJson(syncArray);
 //                                Log.e("JSON","-------------------------------"+json);
 
-                                if(syncData==null) {
+                                if (syncData == null) {
 
                                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
                                     SharedPreferences.Editor editor = prefs.edit();
@@ -390,7 +441,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             });
         } else {
-            Toast.makeText(this, "No Internet Connection !", Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(this, "No Internet Connection !", Toast.LENGTH_SHORT).show();
         }
     }
 

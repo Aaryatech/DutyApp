@@ -965,6 +965,7 @@ public class DutyListFragment extends Fragment implements View.OnClickListener{
                     {
                         Log.e("Mytag Equal","fromDate"+fromDate);
                         Log.e("Mytag Equal","toDate"+toDate);
+                        Log.e("Mytag Equal","MODEL --- "+model);
 
                         getDutyList(model.getEmpId(), fromDate, toDate);
 

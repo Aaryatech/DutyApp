@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingBottom="7dp"
+    android:paddingTop="7dp"
+    android:background="@color/colorAccent">
+
+    <LinearLayout
+        android:gravity="center_vertical"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    <ImageView
+        android:id="@+id/ivBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_alignParentLeft="true"
+        android:visibility="visible"
+        android:paddingLeft="15dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingRight="15dp"
+        android:src="@drawable/ic_left_arrow"/>
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/ivPic"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@id/ivBack"
+        android:visibility="visible"
+        android:src="@drawable/profile"/>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:id="@+id/tvTitle"
+                android:layout_centerHorizontal="true"
+                android:textSize="18sp"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:fontFamily="@font/sf_ui_regular"
+                android:layout_width="wrap_content"
+                android:textColor="@color/colorWhite"
+                android:layout_height="wrap_content"
+                android:text="AJKShjk  hja s ajkshja skhasjkajs"
+                />
+
+            <TextView
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:id="@+id/tvLastDate"
+                android:layout_centerHorizontal="true"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:fontFamily="@font/sf_ui_regular"
+                android:layout_width="wrap_content"
+                android:textColor="@color/colorWhite"
+                android:layout_height="wrap_content"
+                android:text="Completion : 12/20/2019"
+                />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ivMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_alignParentLeft="true"
+        android:visibility="visible"
+        android:padding="10dp"
+        android:src="@drawable/ic_menu_dots"/>
+
+
+</LinearLayout>

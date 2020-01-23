@@ -4,24 +4,16 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class GroupEmp {
-    @SerializedName("empId")
-    @Expose
-    private Integer empId;
-    @SerializedName("name")
-    @Expose
+    private int empId;
     private String name;
-    @SerializedName("photo")
-    @Expose
     private String photo;
-    @SerializedName("userType")
-    @Expose
-    private Integer userType;
+    private int userType;
 
-    public Integer getEmpId() {
+    public int getEmpId() {
         return empId;
     }
 
-    public void setEmpId(Integer empId) {
+    public void setEmpId(int empId) {
         this.empId = empId;
     }
 
@@ -41,13 +33,14 @@ public class GroupEmp {
         this.photo = photo;
     }
 
-    public Integer getUserType() {
+    public int getUserType() {
         return userType;
     }
 
-    public void setUserType(Integer userType) {
+    public void setUserType(int userType) {
         this.userType = userType;
     }
+
 
     @Override
     public String toString() {

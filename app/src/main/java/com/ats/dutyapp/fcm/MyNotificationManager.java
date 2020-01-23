@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import com.ats.dutyapp.R;
 
@@ -35,6 +36,8 @@ public class MyNotificationManager {
 
     public static final int ID_BIG_NOTIFICATION = 234;
     public static final int ID_SMALL_NOTIFICATION = 235;
+    String KEY_REPLY = "key_reply";
+    String KEY_REPLY_HISTORY = "key_reply_history";
 
     public Context mCtx;
 
@@ -44,13 +47,13 @@ public class MyNotificationManager {
 
 
     public void showBigNotification(String title, String message, Intent intent) {
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(mCtx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Log.e("ANDROID","----------------------------------O");
+            Log.e("ANDROID", "----------------------------------O");
             NotificationManager notificationManager = (NotificationManager) mCtx.getSystemService(NOTIFICATION_SERVICE);
             String id = "id_product";
-            int importance = NotificationManager.IMPORTANCE_HIGH;
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
             NotificationChannel mChannel = new NotificationChannel(id, title, importance);
             mChannel.setDescription(message);
             mChannel.enableLights(true);
@@ -60,49 +63,105 @@ public class MyNotificationManager {
             NotificationCompat.BigTextStyle bigPictureStyle = new NotificationCompat.BigTextStyle();
             bigPictureStyle.setBigContentTitle(title);
             bigPictureStyle.bigText(message);
-            // bigPictureStyle.setSummaryText(Html.fromHtml(message).toString());
+
+            Bitmap largeIcon = BitmapFactory.decodeResource(mCtx.getResources(), R.drawable.ic_monginis_chat);
 
             PendingIntent pendingIntent = PendingIntent.getActivity(mCtx, 123, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mCtx,"id_product")
-                    .setSmallIcon(R.mipmap.ic_launcher_round) //your app icon
-                    .setBadgeIconType(R.mipmap.ic_launcher) //your app icon
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mCtx, "id_product")
+                    .setSmallIcon(R.drawable.ic_monginis_chat) //your app icon
+                    .setBadgeIconType(R.drawable.ic_monginis_chat) //your app icon
+                    .setLargeIcon(largeIcon)
                     .setChannelId(id)
                     .setContentTitle(title)
-                    .setAutoCancel(true).setContentIntent(pendingIntent)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent)
                     .setNumber(1)
                     .setLargeIcon(BitmapFactory.decodeResource(mCtx.getResources(), R.mipmap.ic_launcher_round))
                     .setStyle(bigPictureStyle)
                     .setColor(255)
                     .setContentText(message)
                     .setWhen(System.currentTimeMillis());
+
+
+            notificationBuilder.getNotification().flags |=Notification.FLAG_AUTO_CANCEL;
+
             notificationManager.notify(1, notificationBuilder.build());
 
+
         } else {
-            Log.e("ANDROID","---------------------------------- < O");
+            Log.e("ANDROID", "---------------------------------- < O");
 
             NotificationCompat.BigTextStyle bigPictureStyle1 = new NotificationCompat.BigTextStyle();
             bigPictureStyle1.setBigContentTitle(title);
             bigPictureStyle1.bigText(message);
-            //bigPictureStyle1.setSummaryText(Html.fromHtml(message).toString());
+
+            Bitmap largeIcon = BitmapFactory.decodeResource(mCtx.getResources(), R.drawable.ic_monginis_chat);
+
+            PendingIntent pendingIntent = PendingIntent.getActivity(mCtx, 123, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(mCtx)
                     .setAutoCancel(true)
-                    .setSmallIcon(R.mipmap.ic_launcher).setDefaults(Notification.DEFAULT_ALL)
+                    .setSmallIcon(R.drawable.ic_monginis_chat).setDefaults(Notification.DEFAULT_ALL)
+                    .setLargeIcon(largeIcon)
                     .setContentTitle(title)
+                    .setContentIntent(pendingIntent)
                     .setStyle(bigPictureStyle1)
                     .setContentText(message)
-                    .setContentIntent(resultPendingIntent);
+                    .setNumber(1)
+                    .setWhen(System.currentTimeMillis());
+
             NotificationManager manager = (NotificationManager) mCtx.getSystemService(NOTIFICATION_SERVICE);
             manager.notify(0, builder.build());
-            builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS | Notification.DEFAULT_VIBRATE);
+          //  builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS | Notification.DEFAULT_VIBRATE);
         }
 
     }
 
+    public void customNoNotifyImage(String title, String message, Intent intent) {
+
+        final RemoteViews remoteViews = new RemoteViews(mCtx.getPackageName(), R.layout.custom_image_notification);
+
+        //remoteViews.setImageViewBitmap(R.id.ivImg, result);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(mCtx, 123, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationManager notificationManager = (NotificationManager) mCtx.getSystemService(NOTIFICATION_SERVICE);
+
+
+        try {
+            Log.e("NOTI_MGR", "------------------URL-----------");
+            URL imgUrlLink = new URL("http://api.androidhive.info/images/sample.jpg");
+            remoteViews.setImageViewBitmap(R.id.ivImg, BitmapFactory.decodeStream(imgUrlLink.openConnection().getInputStream()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
+        final NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mCtx, "id_product")
+                .setSmallIcon(R.drawable.ic_monginis_chat) //your app icon
+                .setBadgeIconType(R.drawable.ic_monginis_chat) //your app icon
+                .setChannelId("id_product")
+                .setContentTitle(title)
+                .setAutoCancel(true).setContentIntent(pendingIntent)
+                .setNumber(1)
+                .setLargeIcon(BitmapFactory.decodeResource(mCtx.getResources(), R.mipmap.ic_launcher_round))
+                .setColor(255)
+                .setContentText(message)
+                .setCustomBigContentView(remoteViews)
+                .setWhen(System.currentTimeMillis());
+
+        notificationManager.notify(1, notificationBuilder.build());
+
+
+    }
+
+
     public void showSmallNotification(String title, String message, Intent intent) {
 
         //Uri uri = Uri.parse("mattersofgrey.com/audio/DEX-Gen-MainThemeDing.mp3");
-       Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         final PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
@@ -114,7 +173,7 @@ public class MyNotificationManager {
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Log.e("ANDROID","----------------------------------O");
+            Log.e("ANDROID", "----------------------------------O");
             NotificationManager notificationManager = (NotificationManager) mCtx.getSystemService(NOTIFICATION_SERVICE);
             String id = "id_product";
             int importance = NotificationManager.IMPORTANCE_HIGH;
@@ -136,7 +195,7 @@ public class MyNotificationManager {
             notificationManager.createNotificationChannel(mChannel);
 
             PendingIntent pendingIntent = PendingIntent.getActivity(mCtx, 123, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mCtx,"id_product")
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mCtx, "id_product")
                     .setSmallIcon(R.mipmap.ic_launcher) //your app icon
                     .setBadgeIconType(R.mipmap.ic_launcher) //your app icon
                     .setChannelId(id)
@@ -151,7 +210,7 @@ public class MyNotificationManager {
 
 
         } else {
-            Log.e("ANDROID","---------------------------------- < O");
+            Log.e("ANDROID", "---------------------------------- < O");
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(mCtx)
                     .setAutoCancel(true)
@@ -174,7 +233,7 @@ public class MyNotificationManager {
         manager.notify(0, builder.build());
         builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS | Notification.DEFAULT_VIBRATE);
 */
-      //  playNotificationSound();
+        //  playNotificationSound();
 
         //Log.e("showSmallNotification", "-------------------------------------");
     }
@@ -227,7 +286,7 @@ public class MyNotificationManager {
             r.play();
             Vibrator v = (Vibrator) mCtx.getSystemService(Context.VIBRATOR_SERVICE);
             v.vibrate(500);
-            Log.e("playNotificationSound","----------------------------");
+            Log.e("playNotificationSound", "----------------------------");
 
         } catch (Exception e) {
             e.printStackTrace();

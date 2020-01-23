@@ -16,7 +16,10 @@ import com.ats.dutyapp.R;
 import com.ats.dutyapp.adapter.GroupListAdapter;
 import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.model.GroupList;
+import com.ats.dutyapp.model.Login;
 import com.ats.dutyapp.utils.CommonDialog;
+import com.ats.dutyapp.utils.CustomSharedPreference;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -28,28 +31,41 @@ import retrofit2.Response;
  * A simple {@link Fragment} subclass.
  */
 public class GroupListFragment extends Fragment {
-public RecyclerView recyclerView;
-    ArrayList<GroupList> grpList =new ArrayList<>();
+    public RecyclerView recyclerView;
+    ArrayList<GroupList> grpList = new ArrayList<>();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_group_list, container, false);
-        recyclerView=view.findViewById(R.id.recyclerView);
+        View view = inflater.inflate(R.layout.fragment_group_list, container, false);
+        getActivity().setTitle("Group List");
+
+        recyclerView = view.findViewById(R.id.recyclerView);
 
         //prepareData();
-        
-        groupList(1);
+        try {
+            String userStr = CustomSharedPreference.getString(getContext(), CustomSharedPreference.MAIN_KEY_USER);
+            Gson gson = new Gson();
+            Login loginUser = gson.fromJson(userStr, Login.class);
+            Log.e("USER  : ", "--------PREF-------" + loginUser);
+
+            groupList(loginUser.getEmpId());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //groupList(1);
 
         return view;
     }
 
-    private void groupList(int isActive) {
+    private void groupList(int userId) {
         if (Constants.isOnline(getContext())) {
             final CommonDialog commonDialog = new CommonDialog(getContext(), "Loading", "Please Wait...");
             commonDialog.show();
 
-            Call<ArrayList<GroupList>> listCall = Constants.myInterface.getAllChatGroupDisplay(isActive);
+            Call<ArrayList<GroupList>> listCall = Constants.myInterface.getAllChatGroupDisplayMasterByUser(userId);
             listCall.enqueue(new Callback<ArrayList<GroupList>>() {
                 @Override
                 public void onResponse(Call<ArrayList<GroupList>> call, Response<ArrayList<GroupList>> response) {
@@ -60,7 +76,7 @@ public RecyclerView recyclerView;
                             grpList.clear();
                             grpList = response.body();
 
-                            GroupListAdapter adapter = new GroupListAdapter(grpList,getActivity());
+                            GroupListAdapter adapter = new GroupListAdapter(grpList, getActivity());
                             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
                             recyclerView.setLayoutManager(mLayoutManager);
                             recyclerView.setItemAnimator(new DefaultItemAnimator());

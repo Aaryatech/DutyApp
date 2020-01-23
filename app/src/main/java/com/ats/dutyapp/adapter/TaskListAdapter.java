@@ -2,6 +2,7 @@ package com.ats.dutyapp.adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -15,11 +16,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ats.dutyapp.R;
+import com.ats.dutyapp.activity.ChatActivity;
+import com.ats.dutyapp.activity.GroupwiseTaskChatActivity;
 import com.ats.dutyapp.activity.HomeActivity;
 import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.fragment.EditTaskFragment;
@@ -27,39 +31,162 @@ import com.ats.dutyapp.fragment.TaskCommunicationlFragment;
 import com.ats.dutyapp.fragment.TaskListFragment;
 import com.ats.dutyapp.model.ChatTask;
 import com.ats.dutyapp.model.Info;
+import com.ats.dutyapp.model.Login;
 import com.ats.dutyapp.utils.CommonDialog;
+import com.ats.dutyapp.utils.CustomSharedPreference;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.MyViewHolder>  {
+public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.MyViewHolder> {
     private ArrayList<ChatTask> taskList;
     private static Context context;
+    private String fragmentName;
 
-    public TaskListAdapter(ArrayList<ChatTask> taskList, Context context) {
+   /* public TaskListAdapter(ArrayList<ChatTask> taskList, Context context) {
         this.taskList = taskList;
         this.context = context;
 
-    }
+    }*/
 
+    public TaskListAdapter(ArrayList<ChatTask> taskList, Context context, String fragmentName) {
+        this.taskList = taskList;
+        this.context = context;
+        this.fragmentName = fragmentName;
+    }
 
     @NonNull
     @Override
     public TaskListAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View itemView = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.adapter_task_list_detail, viewGroup, false);
+                .inflate(R.layout.adapter_task_header_list, viewGroup, false);
 
         return new MyViewHolder(itemView);
     }
 
+    public class MyViewHolder extends RecyclerView.ViewHolder {
+        /*public TextView tvGenrateDate,tvCompletionDate,tvRemark,tvEmpName,tvStatus,tvTaskName;
+        public CardView cardView;
+        public ImageView ivEdit;
+        */
+
+        public LinearLayout llBack;
+        private TextView tvName, tvCount, tvCloseReq;
+        private CircleImageView ivPic;
+        private View viewLine;
+        private ImageView ivDelete;
+
+        public MyViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            llBack = (itemView).findViewById(R.id.llBack);
+            tvName = (itemView).findViewById(R.id.tvName);
+            tvCount = (itemView).findViewById(R.id.tvCount);
+            ivPic = (itemView).findViewById(R.id.ivPic);
+            tvCloseReq = (itemView).findViewById(R.id.tvCloseReq);
+            viewLine = (itemView).findViewById(R.id.viewLine);
+            ivDelete = (itemView).findViewById(R.id.ivDelete);
+
+        }
+    }
+
     @Override
     public void onBindViewHolder(@NonNull TaskListAdapter.MyViewHolder myViewHolder, int i) {
-        final ChatTask model =taskList.get(i);
-        myViewHolder.tvCompletionDate.setText(""+model.getLastDate());
+
+        String userStr = CustomSharedPreference.getString(context, CustomSharedPreference.MAIN_KEY_USER);
+        Gson gson = new Gson();
+        Login loginUser = gson.fromJson(userStr, Login.class);
+
+
+        final ChatTask model = taskList.get(i);
+
+        if (loginUser.getEmpId() .equals(model.getCreatedUserId()) ) {
+            myViewHolder.ivDelete.setVisibility(View.VISIBLE);
+        } else {
+            myViewHolder.ivDelete.setVisibility(View.GONE);
+        }
+
+
+        myViewHolder.tvName.setText("" + model.getHeaderName());
+
+        if (model.getUnreadCount() == 0) {
+            myViewHolder.tvCount.setVisibility(View.GONE);
+        } else {
+            myViewHolder.tvCount.setVisibility(View.VISIBLE);
+            myViewHolder.tvCount.setText("" + model.getUnreadCount());
+        }
+
+        if (model.getStatus() == 1) {
+            myViewHolder.viewLine.setVisibility(View.VISIBLE);
+            myViewHolder.tvCloseReq.setVisibility(View.VISIBLE);
+            myViewHolder.tvCloseReq.setText("Close Request by - " + model.getRequestUserName());
+        } else {
+            myViewHolder.viewLine.setVisibility(View.INVISIBLE);
+            myViewHolder.tvCloseReq.setVisibility(View.GONE);
+        }
+
+        try {
+            String image = Constants.CHAT_IMAGE_URL + "/" + model.getImage();
+            Log.e("TASK ADAPTER", "---------- IMAGE ---------- " + image);
+            Picasso.with(context).load(image).placeholder(context.getResources().getDrawable(R.drawable.profile)).error(context.getResources().getDrawable(R.drawable.profile)).into(myViewHolder.ivPic);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        myViewHolder.llBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Gson gson = new Gson();
+                String json = gson.toJson(model);
+
+                if (fragmentName.equalsIgnoreCase("group")) {
+                    Intent intent = new Intent(context, GroupwiseTaskChatActivity.class);
+                    intent.putExtra("header", json);
+                    context.startActivity(intent);
+                } else {
+                    Intent intent = new Intent(context, ChatActivity.class);
+                    intent.putExtra("header", json);
+                    context.startActivity(intent);
+                }
+            }
+        });
+        
+        myViewHolder.ivDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                AlertDialog.Builder  builder = new AlertDialog.Builder(context);
+                builder.setMessage("Do you want to delete this task ?");
+                builder.setCancelable(false);
+
+                builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteTask(model.getHeaderId());
+                    }
+                });
+
+                builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                AlertDialog alert = builder.create();
+                alert.setTitle("Delete Task");
+                alert.show();
+            }
+        });
+
+       /* myViewHolder.tvCompletionDate.setText(""+model.getLastDate());
         myViewHolder.tvGenrateDate.setText(""+model.getCreatedDate());
         myViewHolder.tvEmpName.setText(""+model.getAssignUserNames());
         myViewHolder.tvRemark.setText(""+model.getTaskCompleteRemark());
@@ -82,17 +209,17 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.MyView
                 Gson gson = new Gson();
                 String json = gson.toJson(model);
 
-                HomeActivity activity = (HomeActivity) context;
-                TaskCommunicationlFragment adf = new TaskCommunicationlFragment();
-                Bundle args = new Bundle();
-                args.putString("model",json);
-                adf.setArguments(args);
-                activity.getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf, "TaskListFragment").commit();
+                Intent intent=new Intent(context, ChatActivity.class);
+                intent.putExtra("header",json);
+                context.startActivity(intent);
+
 
             }
         });
 
-        myViewHolder.ivEdit.setOnClickListener(new View.OnClickListener() {
+        */
+
+        /*myViewHolder.ivEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 PopupMenu popupMenu = new PopupMenu(context, v);
@@ -139,7 +266,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.MyView
                 });
                 popupMenu.show();
             }
-        });
+        });*/
 
     }
 
@@ -161,7 +288,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.MyView
 
                                 HomeActivity activity = (HomeActivity) context;
 
-                                Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show();
+                               // Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show();
 
                                 FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
                                 ft.replace(R.id.content_frame, new TaskListFragment(), "MainFragment");
@@ -204,20 +331,5 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.MyView
         return taskList.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView tvGenrateDate,tvCompletionDate,tvRemark,tvEmpName,tvStatus,tvTaskName;
-        public CardView cardView;
-        public ImageView ivEdit;
-        public MyViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tvGenrateDate=(itemView).findViewById(R.id.tvGenrateDate);
-            tvCompletionDate=(itemView).findViewById(R.id.tvCompletionDate);
-            tvRemark=(itemView).findViewById(R.id.tvRemark);
-            tvEmpName=(itemView).findViewById(R.id.tvEmpName);
-            tvStatus=(itemView).findViewById(R.id.tvStatus);
-            tvTaskName=(itemView).findViewById(R.id.tvTaskName);
-            cardView=(itemView).findViewById(R.id.cardView);
-            ivEdit=(itemView).findViewById(R.id.ivEdit);
-        }
-    }
+
 }

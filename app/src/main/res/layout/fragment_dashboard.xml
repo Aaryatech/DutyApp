@@ -1,14 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".fragment.EmployeeListFragment">
 
     <android.support.v7.widget.RecyclerView
+        android:layout_centerInParent="true"
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginBottom="100dp"
+        android:clickable="true"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_group_white" />
+
+    <TextView
+        android:id="@+id/tv_fab1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="88dp"
+        android:layout_marginBottom="186dp"
+        android:background="@color/colorPrimaryDark"
+        android:padding="8dp"
+        android:text="Group List"
+        android:textColor="#ffffff"
+        android:visibility="gone" />
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabAddTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="100dp"
+        android:layout_marginBottom="100dp"
+        android:clickable="true"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_add_white" />
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="100dp"
+        android:layout_marginBottom="@dimen/fab_margin"
+        android:clickable="true"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_task_white" />
+
+    <TextView
+        android:id="@+id/tv_fab2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="88dp"
+        android:layout_marginBottom="116dp"
+        android:background="@color/colorPrimaryDark"
+        android:padding="8dp"
+        android:text="Task List"
+        android:textColor="#ffffff"
+        android:visibility="gone" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:visibility="visible"
+        app:srcCompat="@drawable/ic_chat_white"
+        tools:ignore="VectorDrawableCompat" />
+
+</RelativeLayout>

@@ -45,6 +45,12 @@
                 android:textColorHint="@color/colorBlack"
                 android:textSize="16sp" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvGroupId"
+                android:visibility="gone"/>
+
             <View
                 android:id="@+id/view"
                 android:layout_width="match_parent"
@@ -115,7 +121,7 @@
                 android:layout_marginRight="20dp"
                 android:visibility="visible"
                 android:fontFamily="@font/sf_ui_regular"
-                android:text="Assign to Admin"
+                android:text="Assign Admin"
                 android:textSize="12sp" />
 
             <TextView
@@ -165,16 +171,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginRight="15dp"
                 android:orientation="horizontal">
 
                 <RadioButton
+                    android:layout_margin="5dp"
                     android:id="@+id/rbDaily"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginRight="25dp"
-                    android:layout_marginBottom="10dp"
                     android:layout_weight="1"
                     android:buttonTint="@color/colorPrimary"
                     android:fontFamily="@font/sf_ui_regular"
@@ -184,16 +188,61 @@
                     android:id="@+id/rbWeekly"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="10dp"
+                    android:layout_margin="5dp"
                     android:layout_weight="1"
                     android:buttonTint="@color/colorPrimary"
                     android:fontFamily="@font/sf_ui_regular"
-                    android:text="Custome"/>
+                    android:text="Custom Weekly"/>
+
+                <RadioButton
+                    android:visibility="gone"
+                    android:id="@+id/rbDatewise"
+                    android:layout_width="match_parent"
+                    android:layout_margin="5dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:buttonTint="@color/colorPrimary"
+                    android:fontFamily="@font/sf_ui_regular"
+                    android:text="Custom Datewise"/>
 
             </RadioGroup>
+
+            <LinearLayout
+                android:id="@+id/llDatewise"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp">
+
+                    <EditText
+                        android:id="@+id/edDatewise"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:editable="false"
+                        android:fontFamily="@font/sf_ui_regular"
+                        android:hint="Select Date"
+                        android:inputType="none"
+                        android:maxLines="5"
+                        android:padding="15dp"
+                        android:singleLine="true" />
+                </android.support.design.widget.TextInputLayout>
+
+
+                <TextView
+                    android:id="@+id/tvDateIds"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/linearLayout"
@@ -423,6 +472,53 @@
                     android:padding="15dp"
                     android:singleLine="false" />
             </android.support.design.widget.TextInputLayout>
+
+            <TextView
+                android:id="@+id/tvImageLable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:fontFamily="@font/sf_ui_regular"
+                android:text="Task Photo"
+                android:visibility="visible"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/linearLayoutImage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/ivCamera1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:padding="10dp"
+                    android:src="@drawable/photo" />
+
+                <ImageView
+                    android:id="@+id/ivPhoto1"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginBottom="5dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvPhoto1"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
 
             <Button
                 android:id="@+id/btnSubmit"

@@ -4,93 +4,84 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class ChatTask {
-    @SerializedName("headerId")
-    @Expose
     private Integer headerId;
-    @SerializedName("createdDate")
-    @Expose
     private String createdDate;
-    @SerializedName("headerName")
-    @Expose
     private String headerName;
-    @SerializedName("createdUserId")
-    @Expose
     private Integer createdUserId;
-    @SerializedName("adminUserIds")
-    @Expose
     private String adminUserIds;
-    @SerializedName("assignUserIds")
-    @Expose
     private String assignUserIds;
-    @SerializedName("taskDesc")
-    @Expose
     private String taskDesc;
-    @SerializedName("image")
-    @Expose
     private String image;
-    @SerializedName("status")
-    @Expose
     private Integer status;
-    @SerializedName("requestUserId")
-    @Expose
     private Integer requestUserId;
-    @SerializedName("taskCloseUserId")
-    @Expose
     private Integer taskCloseUserId;
-    @SerializedName("taskCompleteRemark")
-    @Expose
     private String taskCompleteRemark;
-    @SerializedName("isReminderRequired")
-    @Expose
     private Integer isReminderRequired;
-    @SerializedName("reminderFrequency")
-    @Expose
     private String reminderFrequency;
-    @SerializedName("lastDate")
-    @Expose
     private String lastDate;
-    @SerializedName("isActive")
-    @Expose
     private Integer isActive;
-    @SerializedName("delStatus")
-    @Expose
     private Integer delStatus;
-    @SerializedName("exInt1")
-    @Expose
     private Integer exInt1;
-    @SerializedName("exInt2")
-    @Expose
     private Integer exInt2;
-    @SerializedName("exInt3")
-    @Expose
     private Integer exInt3;
-    @SerializedName("exVar1")
-    @Expose
     private String exVar1;
-    @SerializedName("exVar2")
-    @Expose
     private String exVar2;
-    @SerializedName("exVar3")
-    @Expose
     private String exVar3;
-    @SerializedName("createdByName")
-    @Expose
     private String createdByName;
-    @SerializedName("adminUserNames")
-    @Expose
     private String adminUserNames;
-    @SerializedName("assignUserNames")
-    @Expose
     private String assignUserNames;
-    @SerializedName("requestUserName")
-    @Expose
-    private Object requestUserName;
-    @SerializedName("taskCloseUserName")
-    @Expose
-    private Object taskCloseUserName;
-    @SerializedName("privilege")
-    @Expose
+    private String requestUserName;
+    private String taskCloseUserName;
     private Integer privilege;
+    private int unreadCount;
+
+    public ChatTask() {
+    }
+
+    public ChatTask(Integer headerId, String createdDate, String headerName, Integer createdUserId, String adminUserIds, String assignUserIds, String taskDesc, String image, Integer status, Integer privilege) {
+        this.headerId = headerId;
+        this.createdDate = createdDate;
+        this.headerName = headerName;
+        this.createdUserId = createdUserId;
+        this.adminUserIds = adminUserIds;
+        this.assignUserIds = assignUserIds;
+        this.taskDesc = taskDesc;
+        this.image = image;
+        this.status = status;
+        this.privilege = privilege;
+    }
+
+    public ChatTask(Integer headerId, String createdDate, String headerName, Integer createdUserId, String adminUserIds, String assignUserIds, String taskDesc, String image, Integer status, Integer requestUserId, String requestUserName, Integer privilege) {
+        this.headerId = headerId;
+        this.createdDate = createdDate;
+        this.headerName = headerName;
+        this.createdUserId = createdUserId;
+        this.adminUserIds = adminUserIds;
+        this.assignUserIds = assignUserIds;
+        this.taskDesc = taskDesc;
+        this.image = image;
+        this.status = status;
+        this.requestUserId = requestUserId;
+        this.requestUserName = requestUserName;
+        this.privilege = privilege;
+    }
+
+    public ChatTask(Integer headerId, String createdDate, String headerName, Integer createdUserId, String adminUserIds, String assignUserIds, String taskDesc, String image, Integer status, Integer requestUserId, String requestUserName, Integer privilege,String lastDate) {
+        this.headerId = headerId;
+        this.createdDate = createdDate;
+        this.headerName = headerName;
+        this.createdUserId = createdUserId;
+        this.adminUserIds = adminUserIds;
+        this.assignUserIds = assignUserIds;
+        this.taskDesc = taskDesc;
+        this.image = image;
+        this.status = status;
+        this.requestUserId = requestUserId;
+        this.requestUserName = requestUserName;
+        this.privilege = privilege;
+        this.lastDate = lastDate;
+    }
+
 
     public Integer getHeaderId() {
         return headerId;
@@ -300,19 +291,19 @@ public class ChatTask {
         this.assignUserNames = assignUserNames;
     }
 
-    public Object getRequestUserName() {
+    public String getRequestUserName() {
         return requestUserName;
     }
 
-    public void setRequestUserName(Object requestUserName) {
+    public void setRequestUserName(String requestUserName) {
         this.requestUserName = requestUserName;
     }
 
-    public Object getTaskCloseUserName() {
+    public String getTaskCloseUserName() {
         return taskCloseUserName;
     }
 
-    public void setTaskCloseUserName(Object taskCloseUserName) {
+    public void setTaskCloseUserName(String taskCloseUserName) {
         this.taskCloseUserName = taskCloseUserName;
     }
 
@@ -322,6 +313,14 @@ public class ChatTask {
 
     public void setPrivilege(Integer privilege) {
         this.privilege = privilege;
+    }
+
+    public int getUnreadCount() {
+        return unreadCount;
+    }
+
+    public void setUnreadCount(int unreadCount) {
+        this.unreadCount = unreadCount;
     }
 
     @Override
@@ -340,8 +339,8 @@ public class ChatTask {
                 ", taskCloseUserId=" + taskCloseUserId +
                 ", taskCompleteRemark='" + taskCompleteRemark + '\'' +
                 ", isReminderRequired=" + isReminderRequired +
-                ", reminderFrequency=" + reminderFrequency +
-                ", lastDate=" + lastDate +
+                ", reminderFrequency='" + reminderFrequency + '\'' +
+                ", lastDate='" + lastDate + '\'' +
                 ", isActive=" + isActive +
                 ", delStatus=" + delStatus +
                 ", exInt1=" + exInt1 +
@@ -353,9 +352,10 @@ public class ChatTask {
                 ", createdByName='" + createdByName + '\'' +
                 ", adminUserNames='" + adminUserNames + '\'' +
                 ", assignUserNames='" + assignUserNames + '\'' +
-                ", requestUserName=" + requestUserName +
-                ", taskCloseUserName=" + taskCloseUserName +
+                ", requestUserName='" + requestUserName + '\'' +
+                ", taskCloseUserName='" + taskCloseUserName + '\'' +
                 ", privilege=" + privilege +
+                ", unreadCount=" + unreadCount +
                 '}';
     }
 }

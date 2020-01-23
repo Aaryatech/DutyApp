@@ -51,6 +51,14 @@ public class Department {
     @Expose
     private Object exVar3;
 
+    public Department() {
+    }
+
+    public Department(Integer empDeptId, String empDeptName) {
+        this.empDeptId = empDeptId;
+        this.empDeptName = empDeptName;
+    }
+
     public Integer getEmpDeptId() {
         return empDeptId;
     }

@@ -30,6 +30,7 @@ import com.ats.dutyapp.R;
 import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.model.ChatGroup;
 import com.ats.dutyapp.model.Department;
+import com.ats.dutyapp.model.Emp;
 import com.ats.dutyapp.model.Employee;
 import com.ats.dutyapp.model.GroupList;
 import com.ats.dutyapp.model.Login;
@@ -49,22 +50,22 @@ import retrofit2.Response;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AddGroupFragment extends Fragment implements View.OnClickListener{
-public EditText edGrpName,edGrpDesc;
-public TextView tvDept,tvEmp,tvDeptId,tvEmpId;
-public Button btnSubmit;
-Dialog dialog;
-GroupList model;
-String stringId,stringName;
-Login loginUser;
+public class AddGroupFragment extends Fragment implements View.OnClickListener {
+    public EditText edGrpName, edGrpDesc;
+    public TextView tvDept, tvEmp, tvDeptId, tvEmpId;
+    public Button btnSubmit;
+    Dialog dialog;
+    GroupList model;
+    String stringId, stringName;
+    Login loginUser;
 
-int deptId;
-DepartmentListDialogAdapter deptAdapter;
-EmployeeListDialogAdapter empAdapter;
-public static ArrayList<Employee> assignStaticEmpList = new ArrayList<>();
+    int deptId;
+    DepartmentListDialogAdapter deptAdapter;
+    EmployeeListDialogAdapter empAdapter;
+    public static ArrayList<Employee> assignStaticEmpList = new ArrayList<>();
 
-//DepartmentListDialogAdapter deptAdapter;
-ArrayList<String> deptNameList = new ArrayList<>();
+    //DepartmentListDialogAdapter deptAdapter;
+    ArrayList<String> deptNameList = new ArrayList<>();
     ArrayList<Integer> deptIdList = new ArrayList<>();
     ArrayList<Department> deptList = new ArrayList<>();
 
@@ -76,22 +77,23 @@ ArrayList<String> deptNameList = new ArrayList<>();
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_add_group, container, false);
-        edGrpName=(EditText)view.findViewById(R.id.edGrpName);
-        edGrpDesc=(EditText)view.findViewById(R.id.edGrpDesc);
-        tvDept=(TextView) view.findViewById(R.id.tvDept);
-        tvEmp=(TextView)view.findViewById(R.id.tvEmp);
-        tvDeptId=(TextView)view.findViewById(R.id.tvDeptId);
-        tvEmpId=(TextView)view.findViewById(R.id.tvEmpId);
-        btnSubmit=(Button)view.findViewById(R.id.btnSubmit);
+        View view = inflater.inflate(R.layout.fragment_add_group, container, false);
+        getActivity().setTitle("Add Group");
+
+        edGrpName = (EditText) view.findViewById(R.id.edGrpName);
+        edGrpDesc = (EditText) view.findViewById(R.id.edGrpDesc);
+        tvDept = (TextView) view.findViewById(R.id.tvDept);
+        tvEmp = (TextView) view.findViewById(R.id.tvEmp);
+        tvDeptId = (TextView) view.findViewById(R.id.tvDeptId);
+        tvEmpId = (TextView) view.findViewById(R.id.tvEmpId);
+        btnSubmit = (Button) view.findViewById(R.id.btnSubmit);
 
         try {
             String userStr = CustomSharedPreference.getString(getActivity(), CustomSharedPreference.MAIN_KEY_USER);
             Gson gson = new Gson();
             loginUser = gson.fromJson(userStr, Login.class);
             Log.e("LOGIN USER MAIN : ", "--------USER-------" + loginUser);
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -103,20 +105,27 @@ ArrayList<String> deptNameList = new ArrayList<>();
             Gson gson = new Gson();
             model = gson.fromJson(quoteStr, GroupList.class);
 
-            edGrpName.setText(""+model.getGroupName());
-            edGrpDesc.setText(""+model.getGroupDesc());
-            tvDept.setText(""+model.getExVar1());
-            tvDeptId.setText(""+model.getExInt1());
-            tvEmp.setText(""+model.getExVar2());
-            tvEmpId.setText(""+model.getUserIds());
+            edGrpName.setText("" + model.getGroupName());
+            edGrpDesc.setText("" + model.getGroupDesc());
+            tvDept.setText("" + model.getExVar1());
+            tvDeptId.setText("" + model.getExInt1());
+            tvEmp.setText("" + model.getExVar2());
+            tvEmpId.setText("" + model.getUserIds());
 
-            deptId= Integer.parseInt(tvDeptId.getText().toString());
+            deptId = Integer.parseInt(tvDeptId.getText().toString());
             final ArrayList<Integer> deptList = new ArrayList<>();
             deptList.add(deptId);
-            getAllEmp(deptList);
 
-        }catch (Exception e)
-        {
+            if (deptId == 0) {
+
+                final ArrayList<Integer> deptList1 = new ArrayList<>();
+                deptList1.add(-1);
+                getAllEmp(deptList1);
+            } else {
+                getAllEmp(deptList);
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -129,28 +138,24 @@ ArrayList<String> deptNameList = new ArrayList<>();
 
     @Override
     public void onClick(View v) {
-        if(v.getId()==R.id.tvDept)
-        {
+        if (v.getId() == R.id.tvDept) {
             showDialog();
-        }else if(v.getId()==R.id.tvEmp)
-        {
+        } else if (v.getId() == R.id.tvEmp) {
             showDialog1();
-        }else if(v.getId()==R.id.btnSubmit)
-        {
-            String strGrpName,strGrpDesc,strDept,strEmp,strEmpId,strDeptId;
-            boolean isValidGrpName = false,isValidDept =false,isValidEmp =false,isValidGrpDesc =false;
+        } else if (v.getId() == R.id.btnSubmit) {
+            String strGrpName, strGrpDesc, strDept, strEmp, strEmpId, strDeptId;
+            boolean isValidGrpName = false, isValidDept = false, isValidEmp = false, isValidGrpDesc = false;
             int deptIds = 0;
-            strGrpName=edGrpName.getText().toString();
-            strGrpDesc=edGrpDesc.getText().toString();
-            strDept=tvDept.getText().toString();
-            strDeptId=tvDeptId.getText().toString();
-            strEmp=tvEmp.getText().toString();
-            strEmpId=tvEmpId.getText().toString();
+            strGrpName = edGrpName.getText().toString();
+            strGrpDesc = edGrpDesc.getText().toString();
+            strDept = tvDept.getText().toString();
+            strDeptId = tvDeptId.getText().toString();
+            strEmp = tvEmp.getText().toString();
+            strEmpId = tvEmpId.getText().toString();
 
-            try{
-                deptIds= Integer.parseInt(strDeptId);
-            }catch (Exception e)
-            {
+            try {
+                deptIds = Integer.parseInt(strDeptId);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -181,7 +186,7 @@ ArrayList<String> deptNameList = new ArrayList<>();
                 isValidEmp = true;
             }
 
-            if(isValidGrpName && isValidGrpDesc && isValidDept && isValidEmp) {
+            if (isValidGrpName && isValidGrpDesc && isValidDept && isValidEmp) {
                 if (model == null) {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                     final ChatGroup model = new ChatGroup(0, strGrpName, strGrpDesc, strEmpId, loginUser.getEmpId(), sdf.format(System.currentTimeMillis()), 1, 1, deptIds, 0, strDept, strEmp);
@@ -205,9 +210,9 @@ ArrayList<String> deptNameList = new ArrayList<>();
                     });
                     AlertDialog dialog = builder.create();
                     dialog.show();
-                }else{
+                } else {
 
-                    final ChatGroup chatGroup = new ChatGroup(model.getGroupId(), strGrpName, strGrpDesc, strEmpId,model.getGroupCreatedUserId(), model.getGroupCreatedDate(), model.getIsActive(), model.getDelStatus(), deptIds, 0, strDept, strEmp);
+                    final ChatGroup chatGroup = new ChatGroup(model.getGroupId(), strGrpName, strGrpDesc, strEmpId, model.getGroupCreatedUserId(), model.getGroupCreatedDate(), model.getIsActive(), model.getDelStatus(), deptIds, 0, strDept, strEmp);
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
                     builder.setTitle("Confirmation");
                     builder.setMessage("Do you want to edit group ?");
@@ -235,7 +240,7 @@ ArrayList<String> deptNameList = new ArrayList<>();
     }
 
     private void saveGroup(ChatGroup model) {
-        Log.e("PARAMETER","---------------------------------------ADD GROUP--------------------------"+model);
+        Log.e("PARAMETER", "---------------------------------------ADD GROUP--------------------------" + model);
 
         if (Constants.isOnline(getContext())) {
             final CommonDialog commonDialog = new CommonDialog(getContext(), "Loading", "Please Wait...");
@@ -335,9 +340,14 @@ ArrayList<String> deptNameList = new ArrayList<>();
 
                             Log.e("DEPT LIST : ", " - " + response.body());
 
-                            deptNameList.clear();
-                            deptIdList.clear();
-                            deptList=response.body();
+//                            deptNameList.clear();
+//                            deptIdList.clear();
+
+                            Department dept = new Department(0, "All");
+
+                            deptList.clear();
+                            deptList.add(dept);
+                            deptList.addAll(response.body());
 
 
                             commonDialog.dismiss();
@@ -365,7 +375,6 @@ ArrayList<String> deptNameList = new ArrayList<>();
         }
 
     }
-
 
 
     private void showDialog() {
@@ -406,6 +415,7 @@ ArrayList<String> deptNameList = new ArrayList<>();
 
         dialog.show();
     }
+
     void filterDept(String text) {
         ArrayList<Department> temp = new ArrayList();
         for (Department d : deptList) {
@@ -427,7 +437,7 @@ ArrayList<String> deptNameList = new ArrayList<>();
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         RecyclerView rvCustomerList = dialog.findViewById(R.id.rvCustomerList);
         EditText edSearch = dialog.findViewById(R.id.edSearch);
-        Button btnSubmit=dialog.findViewById(R.id.btnSubmit);
+        Button btnSubmit = dialog.findViewById(R.id.btnSubmit);
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -443,7 +453,7 @@ ArrayList<String> deptNameList = new ArrayList<>();
                             if (assignStaticEmpList.get(i).isChecked()) {
                                 assignedArray.add(assignStaticEmpList.get(i));
                                 assignedEmpIdArray.add(assignStaticEmpList.get(i).getEmpId());
-                                assignedEmpNameArray.add(assignStaticEmpList.get(i).getEmpFname()+" " +assignStaticEmpList.get(i).getEmpMname()+" " +assignStaticEmpList.get(i).getEmpSname());
+                                assignedEmpNameArray.add(assignStaticEmpList.get(i).getEmpFname() + " " + assignStaticEmpList.get(i).getEmpMname() + " " + assignStaticEmpList.get(i).getEmpSname());
 
                             }
                         }
@@ -453,27 +463,27 @@ ArrayList<String> deptNameList = new ArrayList<>();
                     Log.e("ASSIGN EMP ID", "---------------------------------" + assignedEmpIdArray);
                     Log.e("ASSIGN EMP Name", "---------------------------------" + assignedEmpNameArray);
 
-                    String empIds=assignedEmpIdArray.toString().trim();
-                    Log.e("ASSIGN EMP ID","---------------------------------"+empIds);
+                    String empIds = assignedEmpIdArray.toString().trim();
+                    Log.e("ASSIGN EMP ID", "---------------------------------" + empIds);
 
-                    String a1 = ""+empIds.substring(1, empIds.length()-1).replace("][", ",")+"";
-                    stringId = a1.replaceAll("\\s","");
+                    String a1 = "" + empIds.substring(1, empIds.length() - 1).replace("][", ",") + "";
+                    stringId = a1.replaceAll("\\s", "");
 
-                    Log.e("ASSIGN EMP ID STRING","---------------------------------"+stringId);
-                    Log.e("ASSIGN EMP ID STRING1","---------------------------------"+a1);
+                    Log.e("ASSIGN EMP ID STRING", "---------------------------------" + stringId);
+                    Log.e("ASSIGN EMP ID STRING1", "---------------------------------" + a1);
 
-                    String empName=assignedEmpNameArray.toString().trim();
-                    Log.e("ASSIGN EMP NAME","---------------------------------"+empName);
+                    String empName = assignedEmpNameArray.toString().trim();
+                    Log.e("ASSIGN EMP NAME", "---------------------------------" + empName);
 
-                     stringName = ""+empName.substring(1, empName.length()-1).replace("][", ",")+"";
+                    stringName = "" + empName.substring(1, empName.length() - 1).replace("][", ",") + "";
 
-                   // stringName = a.replaceAll("\\s","");
+                    // stringName = a.replaceAll("\\s","");
 
-                    Log.e("ASSIGN EMP NAME STRING","---------------------------------"+stringName);
+                    Log.e("ASSIGN EMP NAME STRING", "---------------------------------" + stringName);
                     //Log.e("ASSIGN EMP NAME STRING1","---------------------------------"+a);
 
-                    tvEmp.setText(""+stringName);
-                    tvEmpId.setText(""+stringId);
+                    tvEmp.setText("" + stringName);
+                    tvEmpId.setText("" + stringId);
                 }
             }
         });
@@ -567,16 +577,22 @@ ArrayList<String> deptNameList = new ArrayList<>();
 //                        customerDataIntent.putExtra("id", model.getEmpDeptId());
 //                        LocalBroadcastManager.getInstance(context).sendBroadcast(customerDataIntent);
                     dialog.dismiss();
-                    tvDept.setText(""+model.getEmpDeptName());
-                    tvDeptId.setText(""+model.getEmpDeptId());
-                    deptId= Integer.parseInt(tvDeptId.getText().toString());
+                    tvDept.setText("" + model.getEmpDeptName());
+                    tvDeptId.setText("" + model.getEmpDeptId());
+                    deptId = Integer.parseInt(tvDeptId.getText().toString());
                     final ArrayList<Integer> deptList = new ArrayList<>();
                     deptList.add(deptId);
-                    getAllEmp(deptList);
+
+                    if (deptId == 0) {
+                        final ArrayList<Integer> deptList1 = new ArrayList<>();
+                        deptList1.add(-1);
+                        getAllEmp(deptList1);
+                    } else {
+                        getAllEmp(deptList);
+                    }
                 }
             });
         }
-
 
 
         @Override
@@ -629,7 +645,7 @@ ArrayList<String> deptNameList = new ArrayList<>();
         public void onBindViewHolder(@NonNull final MyViewHolder myViewHolder, int i) {
             final Employee model = empList.get(i);
             final int pos = i;
-            myViewHolder.tvName.setText(model.getEmpFname()+" "+model.getEmpMname()+" "+model.getEmpSname());
+            myViewHolder.tvName.setText(model.getEmpFname() + " " + model.getEmpMname() + " " + model.getEmpSname());
             //holder.tvAddress.setText(model.getCustAddress());
 
             myViewHolder.checkBox.setChecked(empList.get(i).isChecked());
@@ -690,7 +706,6 @@ ArrayList<String> deptNameList = new ArrayList<>();
         }
 
 
-
         @Override
         public int getItemCount() {
             return empList.size();
@@ -719,7 +734,7 @@ ArrayList<String> deptNameList = new ArrayList<>();
 //                            empNameList.clear();
 //                            empIdList.clear();
                             empList.clear();
-                            empList=response.body();
+                            empList = response.body();
 
                             assignStaticEmpList.clear();
                             assignStaticEmpList = empList;
@@ -728,7 +743,7 @@ ArrayList<String> deptNameList = new ArrayList<>();
                                 assignStaticEmpList.get(i).setChecked(false);
                             }
 
-                            String strEmpId="";
+                            String strEmpId = "";
                             if (model != null) {
                                 strEmpId = model.getUserIds();
                             }
@@ -775,5 +790,76 @@ ArrayList<String> deptNameList = new ArrayList<>();
             Toast.makeText(getActivity(), "No Internet Connection !", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void getAllEmp() {
+        if (Constants.isOnline(getActivity())) {
+            final CommonDialog commonDialog = new CommonDialog(getActivity(), "Loading", "Please Wait...");
+            commonDialog.show();
+
+            Call<ArrayList<Employee>> listCall = Constants.myInterface.getAllEmployees();
+            listCall.enqueue(new Callback<ArrayList<Employee>>() {
+                @Override
+                public void onResponse(Call<ArrayList<Employee>> call, Response<ArrayList<Employee>> response) {
+                    try {
+                        if (response.body() != null) {
+
+                            empList.clear();
+                            empList = response.body();
+
+                            assignStaticEmpList.clear();
+                            assignStaticEmpList = empList;
+
+                            for (int i = 0; i < assignStaticEmpList.size(); i++) {
+                                assignStaticEmpList.get(i).setChecked(false);
+                            }
+
+                            String strEmpId = "";
+                            if (model != null) {
+                                strEmpId = model.getUserIds();
+                            }
+
+                            List<String> list = Arrays.asList(strEmpId.split("\\s*,\\s*"));
+
+                            Log.e("LIST", "----------------------" + list);
+
+                            Log.e("BIN", "---------------------------------Model-----------------" + empList);
+                            for (int j = 0; j < assignStaticEmpList.size(); j++) {
+
+                                for (int k = 0; k < list.size(); k++) {
+
+                                    if (assignStaticEmpList.get(j).getEmpId() == Integer.parseInt(list.get(k))) {
+
+                                        assignStaticEmpList.get(j).setChecked(true);
+                                        // assignStaticList.add(empList.get(j));
+
+                                    }
+                                }
+                            }
+
+                            commonDialog.dismiss();
+
+                        } else {
+                            commonDialog.dismiss();
+                            Log.e("Data Null : ", "-----------");
+                        }
+                    } catch (Exception e) {
+                        commonDialog.dismiss();
+                        Log.e("Exception : ", "-----------" + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ArrayList<Employee>> call, Throwable t) {
+                    commonDialog.dismiss();
+                    Log.e("onFailure : ", "-----------" + t.getMessage());
+                    t.printStackTrace();
+                }
+            });
+        } else {
+            Toast.makeText(getActivity(), "No Internet Connection !", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
 }

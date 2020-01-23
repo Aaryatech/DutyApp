@@ -18,9 +18,12 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Constants {
-  //  public static final String BASE_URL ="http://192.168.2.8:9000/";
- public static final String BASE_URL = "http://132.148.151.41:8080/SecurityAppApi/";
+   // public static final String BASE_URL ="http://192.168.2.5:9000/";
+    public static final String BASE_URL = "http://132.148.151.41:8080/SecurityAppApi/";
     public static final String IMAGE_URL = "http://132.148.151.41:8080/uploads/APP/";
+    public static final String CHAT_IMAGE_URL = "http://132.148.151.41:8080/uploads/APP/CHAT/";
+
+    public static final String FOLDER_NAME = "GFPL_CHAT";
 
 
     public static OkHttpClient client = new OkHttpClient.Builder()

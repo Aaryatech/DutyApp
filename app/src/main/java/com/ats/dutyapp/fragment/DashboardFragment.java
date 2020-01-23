@@ -4,7 +4,9 @@ package com.ats.dutyapp.fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +14,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ats.dutyapp.R;
@@ -47,6 +52,10 @@ public class DashboardFragment extends Fragment {
     DashboardEmployeeAdapter adapterEmp;
     ArrayList<EmpCount> empList = new ArrayList<>();
 
+    private FloatingActionButton fab,fabGroup,fabTask,fabAddTask;
+    private Animation fab_open, fab_close;
+    private TextView tv_fab1,tv_fab2;
+    Boolean isOpen = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,6 +64,16 @@ public class DashboardFragment extends Fragment {
         View view= inflater.inflate(R.layout.fragment_dashboard, container, false);
         getActivity().setTitle("Dashboard");
         recyclerView = view.findViewById(R.id.recyclerView);
+        fab=view.findViewById(R.id.fab);
+        fabGroup=view.findViewById(R.id.fabGroup);
+        fabTask=view.findViewById(R.id.fabTask);
+        fabAddTask=view.findViewById(R.id.fabAddTask);
+
+        tv_fab1 = (TextView) view.findViewById(R.id.tv_fab1);
+        tv_fab2 = (TextView) view.findViewById(R.id.tv_fab2);
+
+        fab_close = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_close);
+        fab_open = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_open);
 
         try {
             String userStr = CustomSharedPreference.getString(getActivity(), CustomSharedPreference.MAIN_KEY_USER);
@@ -117,6 +136,76 @@ public class DashboardFragment extends Fragment {
         }
 
 
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (isOpen) {
+
+                    fabGroup.startAnimation(fab_close);
+                    fabTask.startAnimation(fab_close);
+                    fabAddTask.startAnimation(fab_close);
+
+                    fabGroup.setClickable(false);
+                    fabTask.setClickable(false);
+                    fabAddTask.setClickable(false);
+                    isOpen = false;
+
+                } else {
+                    fabGroup.setClickable(true);
+                    fabTask.setClickable(true);
+                    fabAddTask.setClickable(true);
+
+                    fabGroup.startAnimation(fab_open);
+                    fabTask.startAnimation(fab_open);
+                    fabAddTask.startAnimation(fab_open);
+                    isOpen = true;
+                }
+
+
+//                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+//                ft.replace(R.id.content_frame, new TaskListFragment(), "MainFragment");
+//                ft.commit();
+
+
+            }
+        });
+
+        fabAddTask.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, new AddTaskFragment(), "MainFragment");
+                ft.commit();
+            }
+        });
+
+
+        fabGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, new GroupListDashFragment(), "MainFragment");
+                ft.commit();
+            }
+        });
+
+        fabTask.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, new TaskListFragment(), "MainFragment");
+                ft.commit();
+            }
+        });
+
+
+
+
         return view;
     }
 
@@ -165,7 +254,7 @@ public class DashboardFragment extends Fragment {
                 }
             });
         } else {
-            Toast.makeText(getContext(), "No Internet Connection !", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(getContext(), "No Internet Connection !", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -214,7 +303,7 @@ public class DashboardFragment extends Fragment {
                 }
             });
         } else {
-            Toast.makeText(getContext(), "No Internet Connection !", Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(getContext(), "No Internet Connection !", Toast.LENGTH_SHORT).show();
         }
     }
 

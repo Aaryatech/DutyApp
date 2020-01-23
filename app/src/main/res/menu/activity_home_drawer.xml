@@ -10,6 +10,13 @@
             android:title="Dashboard" />
 
         <item
+            android:visible="false"
+            android:id="@+id/nav_chat"
+            android:icon="@drawable/ic_employee"
+            android:title="Chat" />
+
+
+        <item
             android:id="@+id/nav_emp_list"
             android:icon="@drawable/ic_employee"
             android:title="Employee Task Done" />
@@ -33,7 +40,7 @@
 
     <item
         android:id="@+id/nav_report2"
-        android:title="Communication"
+        android:title="Task Allocation"
         android:visible="true">
         <menu>
             <item
@@ -59,6 +66,24 @@
                 android:icon="@drawable/ic_task_list"
                 android:visible="true"
                 android:title="Task List" />
+
+            <item
+                android:id="@+id/nav_memo_list"
+                android:icon="@drawable/ic_document"
+                android:visible="true"
+                android:title="Memo Generated" />
+
+            <item
+                android:id="@+id/nav_emp_list_task"
+                android:icon="@drawable/ic_task_list"
+                android:visible="true"
+                android:title="Employee Task" />
+
+            <item
+                android:id="@+id/nav_closed_task_list"
+                android:icon="@drawable/ic_task_list"
+                android:visible="true"
+                android:title="Closed Task List" />
 
         </menu>
     </item>

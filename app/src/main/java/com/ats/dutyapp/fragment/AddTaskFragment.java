@@ -48,6 +48,7 @@ import com.ats.dutyapp.BuildConfig;
 import com.ats.dutyapp.R;
 import com.ats.dutyapp.constant.Constants;
 import com.ats.dutyapp.model.ChatHeader;
+import com.ats.dutyapp.model.DatewiseModel;
 import com.ats.dutyapp.model.Department;
 import com.ats.dutyapp.model.Employee;
 import com.ats.dutyapp.model.GroupList;
@@ -67,8 +68,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -83,37 +87,37 @@ import static android.app.Activity.RESULT_OK;
  * A simple {@link Fragment} subclass.
  */
 public class AddTaskFragment extends Fragment implements View.OnClickListener {
-public RadioGroup rg,rgType,rgRepotType;
-public RadioButton rbIndivsual,rbGroup,rbDaily,rbWeekly,rbNo,rbYes;
-public TextView tvEmp,tvEmpId,tvEmpAdmin,tvEmpIdAdmin,tvDept,tvDeptId,tvDate,tvTime,tvEmpLable,tvDeptLable,tvEmpAdminLable;
-public EditText edDate,edRemTime,edDesc,edRemark,edDay,edTaskName;
-public View empView,deptView,viewAdmin;
-public TextInputLayout textInputLayoutDay;
-public Button btnSubmit;
-public LinearLayout linearLayout;
-public Button btn_mon,btn_sun,btn_tue,btn_wed,btn_thu,btn_fri,btn_sat;
-String selectedText = "Indivsual",rgTypeText,reminderType=" ";
-int rgSelectType;
-Login loginUser;
+    public RadioGroup rg, rgType, rgRepotType;
+    public RadioButton rbIndivsual, rbGroup, rbDaily, rbWeekly,rbDatewise, rbNo, rbYes;
+    public TextView tvGroupId,tvEmp, tvEmpId, tvEmpAdmin, tvEmpIdAdmin, tvDept, tvDeptId, tvDate, tvTime, tvEmpLable, tvDeptLable, tvEmpAdminLable;
+    public EditText edDate, edRemTime, edDesc, edRemark, edDay, edTaskName,edDatewise;
+    public View empView, deptView, viewAdmin;
+    public TextInputLayout textInputLayoutDay;
+    public Button btnSubmit;
+    public LinearLayout linearLayout,llDatewise;
+    public Button btn_mon, btn_sun, btn_tue, btn_wed, btn_thu, btn_fri, btn_sat;
+    String selectedText = "Indivsual", rgTypeText, reminderType = " ";
+    int rgSelectType,remTypeValue;
+    Login loginUser;
 
-private ImageView ivCamera1,ivPhoto1;
-private TextView tvPhoto1;
+    private ImageView ivCamera1, ivPhoto1;
+    private TextView tvPhoto1;
 
-Dialog dialog;
-private BroadcastReceiver mBroadcastReceiver;
-DepartmentListDialogAdapter deptAdapter;
-EmployeeListDialogAdapter empAdapter;
-EmployeeListAdminDialogAdapter empAdminAdapter;
-int deptId;
-String stringId,stringName,stringIdAdmin,stringNameAdmin;
+    Dialog dialog,dateDialog;
+    private BroadcastReceiver mBroadcastReceiver;
+    DepartmentListDialogAdapter deptAdapter;
+    EmployeeListDialogAdapter empAdapter;
+    EmployeeListAdminDialogAdapter empAdminAdapter;
+    int deptId;
+    String stringId, stringName, stringIdAdmin, stringNameAdmin;
 
-Boolean isMonPressed = false,isSunPressed = false,isTuePressed = false,isWedPressed = false,isThuPressed = false,isFriPressed = false,isSatPressed = false;
+    Boolean isMonPressed = false, isSunPressed = false, isTuePressed = false, isWedPressed = false, isThuPressed = false, isFriPressed = false, isSatPressed = false;
 
-public static ArrayList<Employee> assignStaticTaskEmpList = new ArrayList<>();
-public static ArrayList<Employee> assignStaticTaskAdminEmpList = new ArrayList<>();
+    public static ArrayList<Employee> assignStaticTaskEmpList = new ArrayList<>();
+    public static ArrayList<Employee> assignStaticTaskAdminEmpList = new ArrayList<>();
 
-long fromDateMillis, toDateMillis;
-int yyyy, mm, dd;
+    long fromDateMillis, toDateMillis;
+    int yyyy, mm, dd;
 
     ArrayList<String> deptNameList = new ArrayList<>();
     ArrayList<Integer> deptIdList = new ArrayList<>();
@@ -124,67 +128,75 @@ int yyyy, mm, dd;
     ArrayList<Employee> empList = new ArrayList<>();
     ArrayList<Employee> empListAdmin = new ArrayList<>();
 
-    ArrayList<GroupList> grpList =new ArrayList<>();
+    ArrayList<GroupList> grpList = new ArrayList<>();
 
-    File folder = new File(Environment.getExternalStorageDirectory() + File.separator, "gfpl_security");
+    File folder = new File(Environment.getExternalStorageDirectory() + File.separator, Constants.FOLDER_NAME);
     File f;
 
     Bitmap myBitmap1 = null;
     public static String path1, imagePath1 = null;
 
+    private ArrayList<String> notifyDaysArray=new ArrayList<>();
+
+    static  ArrayList<DatewiseModel> staticDateList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_add_task, container, false);
+        View view = inflater.inflate(R.layout.fragment_add_task, container, false);
         getActivity().setTitle("Add Task");
-        rg=view.findViewById(R.id.rg);
-        rgType=view.findViewById(R.id.rgType);
-        rgRepotType=view.findViewById(R.id.rgRepotType);
-        rbIndivsual=view.findViewById(R.id.rbIndivsual);
-        rbGroup=view.findViewById(R.id.rbGroup);
-        rbDaily=view.findViewById(R.id.rbDaily);
-        rbWeekly=view.findViewById(R.id.rbWeekly);
-        rbNo=view.findViewById(R.id.rbNo);
-        rbYes=view.findViewById(R.id.rbYes);
-        tvEmp=view.findViewById(R.id.tvEmp);
-        tvEmpId=view.findViewById(R.id.tvEmpId);
+        rg = view.findViewById(R.id.rg);
+        rgType = view.findViewById(R.id.rgType);
+        rgRepotType = view.findViewById(R.id.rgRepotType);
+        rbIndivsual = view.findViewById(R.id.rbIndivsual);
+        rbGroup = view.findViewById(R.id.rbGroup);
+        rbDaily = view.findViewById(R.id.rbDaily);
+        rbWeekly = view.findViewById(R.id.rbWeekly);
+        rbDatewise = view.findViewById(R.id.rbDatewise);
+        rbNo = view.findViewById(R.id.rbNo);
+        rbYes = view.findViewById(R.id.rbYes);
+        tvEmp = view.findViewById(R.id.tvEmp);
+        tvEmpId = view.findViewById(R.id.tvEmpId);
+        edDatewise = view.findViewById(R.id.edDatewise);
+        tvGroupId = view.findViewById(R.id.tvGroupId);
+        tvGroupId.setText("");
 
-        tvEmpAdmin=view.findViewById(R.id.tvEmpAdmin);
-        tvEmpIdAdmin=view.findViewById(R.id.tvEmpIdAdmin);
-        tvEmpAdminLable=view.findViewById(R.id.tvEmpAdminLable);
-        viewAdmin=view.findViewById(R.id.viewAdmin);
+        tvEmpAdmin = view.findViewById(R.id.tvEmpAdmin);
+        tvEmpIdAdmin = view.findViewById(R.id.tvEmpIdAdmin);
+        tvEmpAdminLable = view.findViewById(R.id.tvEmpAdminLable);
+        viewAdmin = view.findViewById(R.id.viewAdmin);
 
         ivCamera1 = view.findViewById(R.id.ivCamera1);
         ivPhoto1 = view.findViewById(R.id.ivPhoto1);
         tvPhoto1 = view.findViewById(R.id.tvPhoto1);
 
-        linearLayout=view.findViewById(R.id.linearLayout);
-        btn_sun=view.findViewById(R.id.btn_sun);
-        btn_mon=view.findViewById(R.id.btn_mon);
-        btn_tue=view.findViewById(R.id.btn_tue);
-        btn_wed=view.findViewById(R.id.btn_wed);
-        btn_thu=view.findViewById(R.id.btn_thu);
-        btn_fri=view.findViewById(R.id.btn_fri);
-        btn_sat=view.findViewById(R.id.btn_sat);
+        linearLayout = view.findViewById(R.id.linearLayout);
+        llDatewise = view.findViewById(R.id.llDatewise);
+        btn_sun = view.findViewById(R.id.btn_sun);
+        btn_mon = view.findViewById(R.id.btn_mon);
+        btn_tue = view.findViewById(R.id.btn_tue);
+        btn_wed = view.findViewById(R.id.btn_wed);
+        btn_thu = view.findViewById(R.id.btn_thu);
+        btn_fri = view.findViewById(R.id.btn_fri);
+        btn_sat = view.findViewById(R.id.btn_sat);
 
-        tvDept=view.findViewById(R.id.tvDept);
-        tvDeptId=view.findViewById(R.id.tvDeptId);
-        tvDate=view.findViewById(R.id.tvDate);
-        tvTime=view.findViewById(R.id.tvTime);
-        tvEmpLable=view.findViewById(R.id.tvEmpLable);
-        tvDeptLable=view.findViewById(R.id.tvDeptLable);
-        edDate=view.findViewById(R.id.edDate);
-        edRemTime=view.findViewById(R.id.edRemTime);
-        edDesc=view.findViewById(R.id.edDesc);
-        edRemark=view.findViewById(R.id.edRemark);
-        edDay=view.findViewById(R.id.edDay);
-        edTaskName=view.findViewById(R.id.edTaskName);
-        textInputLayoutDay=view.findViewById(R.id.textInputLayoutDay);
-        empView=view.findViewById(R.id.view);
-        deptView=view.findViewById(R.id.viewDept);
-        btnSubmit=view.findViewById(R.id.btnSubmit);
+        tvDept = view.findViewById(R.id.tvDept);
+        tvDeptId = view.findViewById(R.id.tvDeptId);
+        tvDate = view.findViewById(R.id.tvDate);
+        tvTime = view.findViewById(R.id.tvTime);
+        tvEmpLable = view.findViewById(R.id.tvEmpLable);
+        tvDeptLable = view.findViewById(R.id.tvDeptLable);
+        edDate = view.findViewById(R.id.edDate);
+        edRemTime = view.findViewById(R.id.edRemTime);
+        edDesc = view.findViewById(R.id.edDesc);
+        edRemark = view.findViewById(R.id.edRemark);
+        edDay = view.findViewById(R.id.edDay);
+        edTaskName = view.findViewById(R.id.edTaskName);
+        textInputLayoutDay = view.findViewById(R.id.textInputLayoutDay);
+        empView = view.findViewById(R.id.view);
+        deptView = view.findViewById(R.id.viewDept);
+        btnSubmit = view.findViewById(R.id.btnSubmit);
 
         if (PermissionsUtil.checkAndRequestPermissions(getActivity())) {
         }
@@ -194,8 +206,7 @@ int yyyy, mm, dd;
             Gson gson = new Gson();
             loginUser = gson.fromJson(userStr, Login.class);
             Log.e("LOGIN USER MAIN : ", "--------USER-------" + loginUser);
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -217,14 +228,12 @@ int yyyy, mm, dd;
                 Log.e(" Radio", "----------" + idx);
                 Log.e(" Radio Text", "----------" + selectedText);
 
-                if(selectedText.equalsIgnoreCase("No"))
-                {
+                if (selectedText.equalsIgnoreCase("No")) {
                     tvEmpAdmin.setVisibility(View.GONE);
                     viewAdmin.setVisibility(View.GONE);
                     tvEmpAdminLable.setVisibility(View.GONE);
 
-                }else if(selectedText.equalsIgnoreCase("Yes"))
-                {
+                } else if (selectedText.equalsIgnoreCase("Yes")) {
                     tvEmpAdmin.setVisibility(View.VISIBLE);
                     viewAdmin.setVisibility(View.VISIBLE);
                     tvEmpAdminLable.setVisibility(View.VISIBLE);
@@ -244,8 +253,7 @@ int yyyy, mm, dd;
                 Log.e(" Radio", "----------" + idx);
                 Log.e(" Radio Text", "----------" + selectedText);
 
-                if(selectedText.equalsIgnoreCase("Individual"))
-                {
+                if (selectedText.equalsIgnoreCase("Manual")) {
                     tvEmp.setVisibility(View.VISIBLE);
                     tvEmpLable.setVisibility(View.VISIBLE);
                     empView.setVisibility(View.VISIBLE);
@@ -254,10 +262,11 @@ int yyyy, mm, dd;
                     tvDeptLable.setVisibility(View.GONE);
                     deptView.setVisibility(View.GONE);
 
-                    getAllEmp(deptList,"");
+                    tvGroupId.setText("0");
 
-                }else if(selectedText.equalsIgnoreCase("Group"))
-                {
+                    getAllEmp(deptList, "");
+
+                } else if (selectedText.equalsIgnoreCase("Group")) {
                     tvEmp.setVisibility(View.VISIBLE);
                     tvEmpLable.setVisibility(View.VISIBLE);
                     empView.setVisibility(View.VISIBLE);
@@ -265,6 +274,7 @@ int yyyy, mm, dd;
                     tvDept.setVisibility(View.VISIBLE);
                     tvDeptLable.setVisibility(View.VISIBLE);
                     deptView.setVisibility(View.VISIBLE);
+
 
                 }
             }
@@ -281,19 +291,22 @@ int yyyy, mm, dd;
                 Log.e(" Radio Type", "----------" + idx);
                 Log.e(" Radio Type", "----------" + rgTypeText);
 
-                if(rgTypeText.equalsIgnoreCase("Daily"))
-                {
+                if (rgTypeText.equalsIgnoreCase("Daily")) {
                     linearLayout.setVisibility(View.GONE);
-                }else if(rgTypeText.equalsIgnoreCase("Custome"))
-                {
+                    llDatewise.setVisibility(View.GONE);
+                } else if (rgTypeText.equalsIgnoreCase("Custom Weekly")) {
                     linearLayout.setVisibility(View.VISIBLE);
+                    llDatewise.setVisibility(View.GONE);
+                } else if (rgTypeText.equalsIgnoreCase("Custom Datewise")) {
+                    linearLayout.setVisibility(View.GONE);
+                    llDatewise.setVisibility(View.VISIBLE);
                 }
             }
         });
 
         getAllDept();
         getAllEmployee();
-        getAllGroup(1);
+        getAllGroup(loginUser.getEmpId());
 
         rbDaily.setChecked(true);
         rbIndivsual.setChecked(true);
@@ -317,6 +330,7 @@ int yyyy, mm, dd;
         tvEmpAdmin.setOnClickListener(this);
         tvDept.setOnClickListener(this);
         ivCamera1.setOnClickListener(this);
+        edDatewise.setOnClickListener(this);
 
         btn_sun.setOnClickListener(this);
         btn_mon.setOnClickListener(this);
@@ -325,6 +339,13 @@ int yyyy, mm, dd;
         btn_thu.setOnClickListener(this);
         btn_fri.setOnClickListener(this);
         btn_sat.setOnClickListener(this);
+
+
+        staticDateList=new ArrayList<>();
+        for (int i=1;i<=31;i++){
+
+            staticDateList.add(new DatewiseModel(""+i,false));
+        }
 
         return view;
     }
@@ -347,16 +368,15 @@ int yyyy, mm, dd;
                             Log.e("EMPLOYEE LIST : ", " -----------------------------------EMPLOYEE LIST---------------------------- " + response.body());
 
                             empListAdmin.clear();
-                            empListAdmin=response.body();
+                            empListAdmin = response.body();
 
                             assignStaticTaskAdminEmpList.clear();
-                            assignStaticTaskAdminEmpList=empListAdmin;
+                            assignStaticTaskAdminEmpList = empListAdmin;
 
-                            for(int i=0;i<empListAdmin.size();i++) {
-                                if (loginUser.getEmpId().equals(empListAdmin.get(i).getEmpId()))
-                                {
-                                    tvEmpAdmin.setText(empListAdmin.get(i).getEmpFname() +" "+empListAdmin.get(i).getEmpMname()+ " " +empListAdmin.get(i).getEmpSname());
-                                    tvEmpIdAdmin.setText(""+empListAdmin.get(i).getEmpId());
+                            for (int i = 0; i < empListAdmin.size(); i++) {
+                                if (loginUser.getEmpId().equals(empListAdmin.get(i).getEmpId())) {
+                                    tvEmpAdmin.setText(empListAdmin.get(i).getEmpFname() + " " + empListAdmin.get(i).getEmpMname() + " " + empListAdmin.get(i).getEmpSname());
+                                    tvEmpIdAdmin.setText("" + empListAdmin.get(i).getEmpId());
                                 }
                             }
                             commonDialog.dismiss();
@@ -384,12 +404,12 @@ int yyyy, mm, dd;
         }
     }
 
-    private void getAllGroup(int isActive) {
+    private void getAllGroup(int userId) {
         if (Constants.isOnline(getContext())) {
             final CommonDialog commonDialog = new CommonDialog(getContext(), "Loading", "Please Wait...");
             commonDialog.show();
 
-            Call<ArrayList<GroupList>> listCall = Constants.myInterface.getAllChatGroupDisplay(isActive);
+            Call<ArrayList<GroupList>> listCall = Constants.myInterface.getAllChatGroupDisplayMasterByUser(userId);
             listCall.enqueue(new Callback<ArrayList<GroupList>>() {
                 @Override
                 public void onResponse(Call<ArrayList<GroupList>> call, Response<ArrayList<GroupList>> response) {
@@ -441,7 +461,7 @@ int yyyy, mm, dd;
 
                             deptNameList.clear();
                             deptIdList.clear();
-                            deptList=response.body();
+                            deptList = response.body();
 
                             commonDialog.dismiss();
 
@@ -470,8 +490,7 @@ int yyyy, mm, dd;
 
     @Override
     public void onClick(View v) {
-        if(v.getId()==R.id.edDate)
-        {
+        if (v.getId() == R.id.edDate) {
             int yr, mn, dy;
 
             Calendar purchaseCal;
@@ -489,8 +508,8 @@ int yyyy, mm, dd;
             DatePickerDialog dialog = new DatePickerDialog(getContext(), fromDateListener, yr, mn, dy);
             dialog.getDatePicker().setMinDate(minDate);
             dialog.show();
-        }else if(v.getId()==R.id.edRemTime)
-        {
+
+        } else if (v.getId() == R.id.edRemTime) {
             Calendar mcurrentTime = Calendar.getInstance();
             int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
             int minute = mcurrentTime.get(Calendar.MINUTE);
@@ -500,16 +519,16 @@ int yyyy, mm, dd;
                 @Override
                 public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
 
-                    Log.e("Selecte Hrs","------------------"+selectedHour);
-                    Log.e("Selecte Min","------------------"+selectedMinute);
+                    Log.e("Selecte Hrs", "------------------" + selectedHour);
+                    Log.e("Selecte Min", "------------------" + selectedMinute);
 
-                    if(selectedHour>12) {
-                        edRemTime.setText(String.valueOf(selectedHour-12)+ ":"+(String.valueOf(selectedMinute)+" pm"));
+                    if (selectedHour > 12) {
+                        edRemTime.setText(String.valueOf(selectedHour - 12) + ":" + (String.valueOf(selectedMinute) + " pm"));
                         //edFrom.setText(selectedHour + ":" + selectedMinute);
-                    } else if(selectedHour==12) {
-                        edRemTime.setText("12"+ ":"+(String.valueOf(selectedMinute)+" pm"));
-                    } else if(selectedHour<12) {
-                        if(selectedHour!=0) {
+                    } else if (selectedHour == 12) {
+                        edRemTime.setText("12" + ":" + (String.valueOf(selectedMinute) + " pm"));
+                    } else if (selectedHour < 12) {
+                        if (selectedHour != 0) {
                             edRemTime.setText(String.valueOf(selectedHour) + ":" + (String.valueOf(selectedMinute) + " am"));
                         } else {
                             edRemTime.setText("12" + ":" + (String.valueOf(selectedMinute) + " am"));
@@ -517,130 +536,134 @@ int yyyy, mm, dd;
                     }
 
                 }
-            }, hour, minute,false);//Yes 24 hour time
+            }, hour, minute, false);//Yes 24 hour time
             mTimePicker.setTitle("Select Time");
             mTimePicker.show();
-        }else if(v.getId()==R.id.tvEmp)
-        {
+
+        } else if (v.getId() == R.id.tvEmp) {
             showDialog1();
-        }else if(v.getId()==R.id.tvEmpAdmin)
-        {
+
+        } else if (v.getId() == R.id.tvEmpAdmin) {
             showDialogAdmin();
-        }else if(v.getId()==R.id.btn_mon)
-        {
+
+        }else if (v.getId() == R.id.edDatewise) {
+            showDateDialog(staticDateList);
+
+        } else if (v.getId() == R.id.btn_mon) {
             if (!isMonPressed) {
                 btn_mon.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
                 isMonPressed = true;
-                reminderType= reminderType+"1,";
+                reminderType = reminderType + "1,";
+                notifyDaysArray.add("1");
             } else {
                 btn_mon.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap));
                 isMonPressed = false;
-                String stop =   reminderType.substring(0, reminderType.length() - 1);
-                 reminderType = stop.substring(0, stop.length() - 1);
-
+                String stop = reminderType.substring(0, reminderType.length() - 1);
+                reminderType = stop.substring(0, stop.length() - 1);
+                notifyDaysArray.remove("1");
             }
-        }else if(v.getId()==R.id.btn_sun)
-        {
+        } else if (v.getId() == R.id.btn_sun) {
             if (!isSunPressed) {
                 btn_sun.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
                 isSunPressed = true;
-                reminderType= reminderType+"7,";
+                reminderType = reminderType + "7,";
+                notifyDaysArray.add("7");
             } else {
                 btn_sun.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap));
                 isSunPressed = false;
-                String stop =   reminderType.substring(0, reminderType.length() - 1);
+                String stop = reminderType.substring(0, reminderType.length() - 1);
                 reminderType = stop.substring(0, stop.length() - 1);
-
+                notifyDaysArray.remove("7");
             }
-        }else if(v.getId()==R.id.btn_tue)
-        {
+        } else if (v.getId() == R.id.btn_tue) {
             if (!isTuePressed) {
                 btn_tue.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
                 isTuePressed = true;
-                reminderType= reminderType+"2,";
+                reminderType = reminderType + "2,";
+                notifyDaysArray.add("2");
             } else {
                 btn_tue.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap));
                 isTuePressed = false;
-                String stop =   reminderType.substring(0, reminderType.length() - 1);
+                String stop = reminderType.substring(0, reminderType.length() - 1);
                 reminderType = stop.substring(0, stop.length() - 1);
-
+                notifyDaysArray.remove("2");
             }
-        }else if(v.getId()==R.id.btn_wed)
-        {
+        } else if (v.getId() == R.id.btn_wed) {
             if (!isWedPressed) {
                 btn_wed.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
                 isWedPressed = true;
-                reminderType= reminderType+"3,";
+                reminderType = reminderType + "3,";
+                notifyDaysArray.add("3");
             } else {
                 btn_wed.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap));
                 isWedPressed = false;
-                String stop =   reminderType.substring(0, reminderType.length() - 1);
+                String stop = reminderType.substring(0, reminderType.length() - 1);
                 reminderType = stop.substring(0, stop.length() - 1);
-
+                notifyDaysArray.remove("3");
             }
-        }else if(v.getId()==R.id.btn_thu)
-        {
+        } else if (v.getId() == R.id.btn_thu) {
             if (!isThuPressed) {
                 btn_thu.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
                 isThuPressed = true;
-                reminderType= reminderType+"4,";
+                reminderType = reminderType + "4,";
+                notifyDaysArray.add("4");
             } else {
                 btn_thu.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap));
                 isThuPressed = false;
-                String stop =   reminderType.substring(0, reminderType.length() - 1);
+                String stop = reminderType.substring(0, reminderType.length() - 1);
                 reminderType = stop.substring(0, stop.length() - 1);
-
+                notifyDaysArray.remove("4");
             }
-        }else if(v.getId()==R.id.btn_fri)
-        {
+        } else if (v.getId() == R.id.btn_fri) {
             if (!isFriPressed) {
                 btn_fri.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
                 isFriPressed = true;
-                reminderType=reminderType+ "5,";
+                reminderType = reminderType + "5,";
+                notifyDaysArray.add("5");
             } else {
                 btn_fri.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap));
                 isFriPressed = false;
-                String stop =   reminderType.substring(0, reminderType.length() - 1);
+                String stop = reminderType.substring(0, reminderType.length() - 1);
                 reminderType = stop.substring(0, stop.length() - 1);
-
+                notifyDaysArray.remove("5");
             }
-        }else if(v.getId()==R.id.btn_sat)
-        {
+        } else if (v.getId() == R.id.btn_sat) {
             if (!isSatPressed) {
                 btn_sat.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap_primary));
                 isSatPressed = true;
-                reminderType= reminderType+"6,";
+                reminderType = reminderType + "6,";
+                notifyDaysArray.add("6");
             } else {
                 btn_sat.setBackground(getActivity().getResources().getDrawable(R.drawable.circle_shap));
                 isSatPressed = false;
-                String stop =   reminderType.substring(0, reminderType.length() - 1);
+                String stop = reminderType.substring(0, reminderType.length() - 1);
                 reminderType = stop.substring(0, stop.length() - 1);
-
+                notifyDaysArray.remove("6");
             }
-        }
-        else if(v.getId()==R.id.tvDept)
-        {
+        } else if (v.getId() == R.id.tvDept) {
             showDialog();
-        }if (v.getId() == R.id.ivCamera1) {
+        } else if (v.getId() == R.id.ivCamera1) {
 
-            showCameraDialog("Photo1");
+             showCameraDialog("Photo1");
 
-        }
-        else if(v.getId()==R.id.btnSubmit)
-        {
-            String strRemidTime,strDesc,strRemark,strDate,strDay,strTaskName,strEmp,strEmpId,strEmpAdmin;
-            boolean isValidTime = false,isValidDesc =false,isValidRemark =false,isValidDay =false,isValidTaskName =false,isValidEmp =false,isValidEmpAdmin =false;
+        } else if (v.getId() == R.id.btnSubmit) {
+            String strRemidTime, strDesc, strRemark, strDate, strDay, strTaskName, strEmp, strEmpId, strEmpAdmin;
+            boolean isValidTime = false, isValidDesc = false, isValidRemark = false, isValidDay = false, isValidTaskName = false, isValidEmp = false, isValidEmpAdmin = false;
 
-            strRemidTime=edRemTime.getText().toString();
-            strDesc=edDesc.getText().toString();
-            strRemark=edRemark.getText().toString();
-            strDate=edDate.getText().toString();
-            strDay=edDay.getText().toString();
-            strTaskName=edTaskName.getText().toString();
-            strEmp=tvEmp.getText().toString();
-            strEmpId=tvEmpId.getText().toString();
-            strEmpAdmin=tvEmpAdmin.getText().toString();
-            stringIdAdmin=tvEmpIdAdmin.getText().toString();
+            int groupId=0;
+
+            groupId= Integer.parseInt(tvGroupId.getText().toString().trim());
+
+            strRemidTime = edRemTime.getText().toString();
+            strDesc = edDesc.getText().toString();
+            strRemark = edRemark.getText().toString();
+            strDate = edDate.getText().toString();
+            strDay = edDay.getText().toString();
+            strTaskName = edTaskName.getText().toString();
+            strEmp = tvEmp.getText().toString();
+            strEmpId = tvEmpId.getText().toString();
+            strEmpAdmin = tvEmpAdmin.getText().toString();
+            stringIdAdmin = tvEmpIdAdmin.getText().toString();
 
             SimpleDateFormat formatter3 = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat formatter1 = new SimpleDateFormat("dd-MM-yyyy");
@@ -653,7 +676,7 @@ int yyyy, mm, dd;
             }
 
             final String DateComp = formatter3.format(ToDate);
-            Log.e("Date Completion","--------------------"+DateComp);
+            Log.e("Date Completion", "--------------------" + DateComp);
 
             rgSelectType = 0;
             if (rbNo.isChecked()) {
@@ -662,19 +685,48 @@ int yyyy, mm, dd;
                 rgSelectType = 1;
             }
 
-            //reminderType = "1,2,3,4,5,6,7";
+            remTypeValue = 0;
             if (rbDaily.isChecked()) {
+                remTypeValue = 0;
                 reminderType = "1,2,3,4,5,6,7";
-            }
-//            else if(rbWeekly.isChecked())
-//            {
-//              //String  str = reminderType.substring(4);
-//             // String  str =reminderType.replace("null", "");
-//              String str = reminderType.substring(0, reminderType.length() - 1);
-//                reminderType=str;
-//            }
+            } else if (rbWeekly.isChecked()) {
+                remTypeValue = 1;
 
-            Log.e("REMIND TYPE","---------------------------------"+reminderType);
+                if (notifyDaysArray.isEmpty()){
+                    reminderType="";
+                }else {
+                    Set<String> s = new LinkedHashSet<String>(notifyDaysArray);
+                    notifyDaysArray.clear();
+                    notifyDaysArray.addAll(s);
+                    Collections.sort(notifyDaysArray);
+                    reminderType = notifyDaysArray.toString().trim().substring(1, (notifyDaysArray.toString().length() - 1)).replaceAll("\\s+","");
+                }
+                Log.e("ARRAY ","------------------------------ "+reminderType.replaceAll("\\s+",""));
+
+
+            } else if (rbDatewise.isChecked()) {
+                remTypeValue = 2;
+
+                reminderType=edDatewise.getText().toString().trim();
+
+            }
+
+           /* if (rbDaily.isChecked()) {
+                reminderType = "1,2,3,4,5,6,7";
+            }else{
+
+                if (notifyDaysArray.isEmpty()){
+                 reminderType="";
+                }else {
+                    Set<String> s = new LinkedHashSet<String>(notifyDaysArray);
+                    notifyDaysArray.clear();
+                    notifyDaysArray.addAll(s);
+                    Collections.sort(notifyDaysArray);
+                    reminderType = notifyDaysArray.toString().trim().substring(1, (notifyDaysArray.toString().length() - 1)).replaceAll("\\s+","");
+                }
+                Log.e("ARRAY ","------------------------------ "+reminderType.replaceAll("\\s+",""));
+
+            }*/
 
             if (strRemidTime.isEmpty()) {
                 edRemTime.setError("required");
@@ -697,13 +749,14 @@ int yyyy, mm, dd;
                 isValidEmp = true;
             }
 
-            if (strDesc.isEmpty()) {
+          /*  if (strDesc.isEmpty()) {
                 edDesc.setError("required");
             } else {
                 edDesc.setError(null);
                 isValidDesc = true;
-            }
+            }*/
 
+/*
             if (strRemark.isEmpty()) {
                 edRemark.setError("required");
             } else {
@@ -711,11 +764,14 @@ int yyyy, mm, dd;
                 isValidRemark = true;
             }
 
-            if(isValidTime && isValidDesc && isValidRemark && isValidTaskName && isValidEmp)
-            {
+
+*/
+
+            // if (isValidTime && isValidDesc && isValidRemark && isValidTaskName && isValidEmp) {
+            if (isValidTime && isValidTaskName && isValidEmp) {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                final ChatHeader chatHeader = new ChatHeader(0, sdf.format(System.currentTimeMillis()), strTaskName, loginUser.getEmpId(), stringIdAdmin, strEmpId, strDesc, "", 0, 0, 0, strRemark, rgSelectType, reminderType, DateComp, 1, 1, 0, 0, 0, strRemidTime, "", "");
-                if(imagePath1==null) {
+                final ChatHeader chatHeader = new ChatHeader(0, sdf.format(System.currentTimeMillis()), strTaskName, loginUser.getEmpId(), stringIdAdmin, strEmpId, strDesc, "", 0, 0, 0, strRemark, rgSelectType, reminderType, DateComp, 1, 1, groupId, remTypeValue, 0, strRemidTime, "", "");
+                if (imagePath1 == null) {
                     Log.e("Successfully", "------------------");
                     //final ChatHeader chatHeader = new ChatHeader(0, sdf.format(System.currentTimeMillis()), strTaskName, loginUser.getEmpId(), stringIdAdmin, strEmpId, strDesc, "", 0, 0, 0, strRemark, rgSelectType, reminderType, DateComp, 1, 1, 0, 0, 0, strRemidTime, "", "");
 
@@ -739,10 +795,10 @@ int yyyy, mm, dd;
                     });
                     AlertDialog dialog = builder.create();
                     dialog.show();
-                }else{
+                } else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
                     builder.setTitle("Confirmation");
-                    builder.setMessage("Do you want visitor gate pass ?");
+                    builder.setMessage("Do you want to create new task?");
                     builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -764,7 +820,7 @@ int yyyy, mm, dd;
                                 File imgFile1 = new File(imagePath1);
                                 int pos = imgFile1.getName().lastIndexOf(".");
                                 String ext = imgFile1.getName().substring(pos + 1);
-                                photo1 = sdf.format(Calendar.getInstance().getTimeInMillis()) + "_p1." + ext;
+                                photo1 = Calendar.getInstance().getTimeInMillis() + "_ChatHead." + ext;
                                 fileNameArray.add(photo1);
                             }
 
@@ -787,7 +843,7 @@ int yyyy, mm, dd;
     }
 
     private void sendImage(ArrayList<String> filePath, ArrayList<String> fileName, final ChatHeader chatHeader) {
-        Log.e("PARAMETER : ", "   FILE PATH : " + filePath + "            FILE NAME : " + fileName  +"           CHAT HEADER      "+chatHeader);
+        Log.e("PARAMETER : ", "   FILE PATH : " + filePath + "            FILE NAME : " + fileName + "           CHAT HEADER      " + chatHeader);
 
         final CommonDialog commonDialog = new CommonDialog(getContext(), "Loading", "Please Wait...");
         commonDialog.show();
@@ -804,7 +860,7 @@ int yyyy, mm, dd;
         }
 
         // RequestBody imgName = RequestBody.create(MediaType.parse("text/plain"), "photo1");
-        RequestBody imgType = RequestBody.create(MediaType.parse("text/plain"), "1");
+        RequestBody imgType = RequestBody.create(MediaType.parse("text/plain"), "chat");
 
         Call<JSONObject> call = Constants.myInterface.imageUpload(uploadImagesParts, fileName, imgType);
         call.enqueue(new Callback<JSONObject>() {
@@ -819,6 +875,7 @@ int yyyy, mm, dd;
                 commonDialog.dismiss();
 
             }
+
             @Override
             public void onFailure(Call<JSONObject> call, Throwable t) {
                 Log.e("Error : ", "--" + t.getMessage());
@@ -831,10 +888,51 @@ int yyyy, mm, dd;
 
     private void showCameraDialog(String type) {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+
+            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
+            builder.setTitle("Choose");
+            builder.setPositiveButton("Gallery", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent pictureActionIntent = null;
+                    pictureActionIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(pictureActionIntent, 101);
+                }
+            });
+            builder.setNegativeButton("Camera", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            f = new File(folder + File.separator, "Camera.jpg");
+
+                            String authorities = BuildConfig.APPLICATION_ID + ".provider";
+                            Uri imageUri = FileProvider.getUriForFile(getActivity(), authorities, f);
+
+                            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            startActivityForResult(intent, 102);
+
+                        } else {
+                            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            f = new File(folder + File.separator, "Camera.jpg");
+                            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            startActivityForResult(intent, 102);
+
+                        }
+                    } catch (Exception e) {
+                        ////Log.e("select camera : ", " Exception : " + e.getMessage());
+                    }
+                }
+            });
+            builder.show();
+
+           /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 if (type.equalsIgnoreCase("Photo1")) {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    f = new File(folder + File.separator, "" + Calendar.getInstance().getTimeInMillis()+ "_p1.jpg");
+                    f = new File(folder + File.separator, "" + Calendar.getInstance().getTimeInMillis() + "_p1.jpg");
                     String authorities = BuildConfig.APPLICATION_ID + ".provider";
                     Uri imageUri = FileProvider.getUriForFile(getContext(), authorities, f);
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
@@ -846,20 +944,20 @@ int yyyy, mm, dd;
 
                 if (type.equalsIgnoreCase("Photo1")) {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    f = new File(folder + File.separator, "" + Calendar.getInstance().getTimeInMillis()+ "_p1.jpg");
+                    f = new File(folder + File.separator, "" + Calendar.getInstance().getTimeInMillis() + "_p1.jpg");
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     startActivityForResult(intent, 102);
                 }
 
-            }
+            }*/
         } catch (Exception e) {
-            ////Log.e("select camera : ", " Exception : " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     private void saveTask(ChatHeader chatHeader) {
-        Log.e("PARAMETER","---------------------------------------ADD TASK--------------------------"+chatHeader);
+        Log.e("PARAMETER", "---------------------------------------ADD TASK--------------------------" + chatHeader);
 
         if (Constants.isOnline(getContext())) {
             final CommonDialog commonDialog = new CommonDialog(getContext(), "Loading", "Please Wait...");
@@ -954,7 +1052,7 @@ int yyyy, mm, dd;
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         RecyclerView rvCustomerList = dialog.findViewById(R.id.rvCustomerList);
         EditText edSearch = dialog.findViewById(R.id.edSearch);
-        Button btnSubmit=dialog.findViewById(R.id.btnSubmit);
+        Button btnSubmit = dialog.findViewById(R.id.btnSubmit);
 
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
@@ -971,37 +1069,23 @@ int yyyy, mm, dd;
                             if (assignStaticTaskAdminEmpList.get(i).isChecked()) {
                                 assignedArray.add(assignStaticTaskAdminEmpList.get(i));
                                 assignedEmpIdArray.add(assignStaticTaskAdminEmpList.get(i).getEmpId());
-                                assignedEmpNameArray.add(assignStaticTaskAdminEmpList.get(i).getEmpFname()+" " +assignStaticTaskAdminEmpList.get(i).getEmpMname()+" " +assignStaticTaskAdminEmpList.get(i).getEmpSname());
+                                assignedEmpNameArray.add(assignStaticTaskAdminEmpList.get(i).getEmpFname() + " " + assignStaticTaskAdminEmpList.get(i).getEmpMname() + " " + assignStaticTaskAdminEmpList.get(i).getEmpSname());
 
                             }
                         }
                     }
-                    Log.e("ASSIGN EMP", "---------------------------------" + assignedArray);
-                    Log.e("ASSIGN EMP SIZE", "---------------------------------" + assignedArray.size());
-                    Log.e("ASSIGN EMP ID", "---------------------------------" + assignedEmpIdArray);
-                    Log.e("ASSIGN EMP Name", "---------------------------------" + assignedEmpNameArray);
 
-                    String empIds=assignedEmpIdArray.toString().trim();
-                    Log.e("ASSIGN EMP ID","---------------------------------"+empIds);
+                    String empIds = assignedEmpIdArray.toString().trim();
 
-                    String a1 = ""+empIds.substring(1, empIds.length()-1).replace("][", ",")+"";
-                    stringIdAdmin = a1.replaceAll("\\s","");
+                    String a1 = "" + empIds.substring(1, empIds.length() - 1).replace("][", ",") + "";
+                    stringIdAdmin = a1.replaceAll("\\s", "");
 
-                    Log.e("ASSIGN EMP ID STRING","---------------------------------"+stringIdAdmin);
-                    Log.e("ASSIGN EMP ID STRING1","---------------------------------"+a1);
+                    String empName = assignedEmpNameArray.toString().trim();
 
-                    String empName=assignedEmpNameArray.toString().trim();
-                    Log.e("ASSIGN EMP NAME","---------------------------------"+empName);
+                    stringNameAdmin = "" + empName.substring(1, empName.length() - 1).replace("][", ",") + "";
 
-                    stringNameAdmin = ""+empName.substring(1, empName.length()-1).replace("][", ",")+"";
-
-                    // stringName = a.replaceAll("\\s","");
-
-                    Log.e("ASSIGN EMP NAME STRING","---------------------------------"+stringNameAdmin);
-                    //Log.e("ASSIGN EMP NAME STRING1","---------------------------------"+a);
-
-                    tvEmpAdmin.setText(""+stringNameAdmin);
-                    tvEmpIdAdmin.setText(""+stringIdAdmin);
+                    tvEmpAdmin.setText("" + stringNameAdmin);
+                    tvEmpIdAdmin.setText("" + stringIdAdmin);
                 }
             }
         });
@@ -1055,13 +1139,11 @@ int yyyy, mm, dd;
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         RecyclerView rvCustomerList = dialog.findViewById(R.id.rvCustomerList);
         EditText edSearch = dialog.findViewById(R.id.edSearch);
-        Button btnSubmit=dialog.findViewById(R.id.btnSubmit);
+        Button btnSubmit = dialog.findViewById(R.id.btnSubmit);
 
-        if(selectedText.equalsIgnoreCase("Indivsual"))
-        {
+        if (selectedText.equalsIgnoreCase("Indivsual")) {
             btnSubmit.setVisibility(View.GONE);
-        }else if(selectedText.equalsIgnoreCase("Group"))
-        {
+        } else if (selectedText.equalsIgnoreCase("Group")) {
             btnSubmit.setVisibility(View.VISIBLE);
         }
 
@@ -1117,7 +1199,7 @@ int yyyy, mm, dd;
             }
         });
 
-        empAdapter = new EmployeeListDialogAdapter(empList, getContext(),selectedText);
+        empAdapter = new EmployeeListDialogAdapter(empList, getContext(), selectedText);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         rvCustomerList.setLayoutManager(mLayoutManager);
         rvCustomerList.setItemAnimator(new DefaultItemAnimator());
@@ -1157,7 +1239,7 @@ int yyyy, mm, dd;
                     if (assignStaticTaskEmpList.get(i).isChecked()) {
                         assignedArray.add(assignStaticTaskEmpList.get(i));
                         assignedEmpIdArray.add(assignStaticTaskEmpList.get(i).getEmpId());
-                        assignedEmpNameArray.add(assignStaticTaskEmpList.get(i).getEmpFname()+" " +assignStaticTaskEmpList.get(i).getEmpMname()+" " +assignStaticTaskEmpList.get(i).getEmpSname());
+                        assignedEmpNameArray.add(assignStaticTaskEmpList.get(i).getEmpFname() + " " + assignStaticTaskEmpList.get(i).getEmpMname() + " " + assignStaticTaskEmpList.get(i).getEmpSname());
 
                     }
                 }
@@ -1167,27 +1249,27 @@ int yyyy, mm, dd;
             Log.e("ASSIGN EMP ID", "---------------------------------" + assignedEmpIdArray);
             Log.e("ASSIGN EMP Name", "---------------------------------" + assignedEmpNameArray);
 
-            String empIds=assignedEmpIdArray.toString().trim();
-            Log.e("ASSIGN EMP ID","---------------------------------"+empIds);
+            String empIds = assignedEmpIdArray.toString().trim();
+            Log.e("ASSIGN EMP ID", "---------------------------------" + empIds);
 
-            String a1 = ""+empIds.substring(1, empIds.length()-1).replace("][", ",")+"";
-            stringId = a1.replaceAll("\\s","");
+            String a1 = "" + empIds.substring(1, empIds.length() - 1).replace("][", ",") + "";
+            stringId = a1.replaceAll("\\s", "");
 
-            Log.e("ASSIGN EMP ID STRING","---------------------------------"+stringId);
-            Log.e("ASSIGN EMP ID STRING1","---------------------------------"+a1);
+            Log.e("ASSIGN EMP ID STRING", "---------------------------------" + stringId);
+            Log.e("ASSIGN EMP ID STRING1", "---------------------------------" + a1);
 
-            String empName=assignedEmpNameArray.toString().trim();
-            Log.e("ASSIGN EMP NAME","---------------------------------"+empName);
+            String empName = assignedEmpNameArray.toString().trim();
+            Log.e("ASSIGN EMP NAME", "---------------------------------" + empName);
 
-            stringName = ""+empName.substring(1, empName.length()-1).replace("][", ",")+"";
+            stringName = "" + empName.substring(1, empName.length() - 1).replace("][", ",") + "";
 
             // stringName = a.replaceAll("\\s","");
 
-            Log.e("ASSIGN EMP NAME STRING","---------------------------------"+stringName);
+            Log.e("ASSIGN EMP NAME STRING", "---------------------------------" + stringName);
             //Log.e("ASSIGN EMP NAME STRING1","---------------------------------"+a);
 
-            tvEmp.setText(""+stringName);
-            tvEmpId.setText(""+stringId);
+            tvEmp.setText("" + stringName);
+            tvEmpId.setText("" + stringId);
 
         }
     }
@@ -1255,6 +1337,146 @@ int yyyy, mm, dd;
     }
 
 
+
+    private void showDateDialog(ArrayList<DatewiseModel> dateList) {
+        dateDialog = new Dialog(getContext(), android.R.style.Theme_Light_NoTitleBar);
+        LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = li.inflate(R.layout.custom_dialog_fullscreen_search_button, null, false);
+        dateDialog.setContentView(v);
+        dateDialog.setCancelable(true);
+        dateDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        RecyclerView recyclerView = dateDialog.findViewById(R.id.rvCustomerList);
+        EditText edSearch = dateDialog.findViewById(R.id.edSearch);
+        edSearch.setVisibility(View.GONE);
+        Button btnSubmit = dateDialog.findViewById(R.id.btnSubmit);
+
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dateDialog.dismiss();
+
+
+                try {
+
+                    String str="";
+                    for (int i=0;i<staticDateList.size();i++){
+                        if (staticDateList.get(i).isChecked()){
+                            str=str+","+staticDateList.get(i).getValue();
+                        }
+                    }
+
+                    edDatewise.setText(""+str.substring(1));
+
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+
+
+
+        final DateListAdapter adapter = new DateListAdapter(dateList, getContext(), selectedText);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adapter);
+
+        dateDialog.show();
+    }
+
+
+    public class DateListAdapter extends RecyclerView.Adapter<DateListAdapter.MyViewHolder> {
+
+        private ArrayList<DatewiseModel> dateStr;
+        private Context context;
+        private String selectedText;
+
+        public DateListAdapter(ArrayList<DatewiseModel> dateStr, Context context, String selectedText) {
+            this.dateStr = dateStr;
+            this.context = context;
+            this.selectedText = selectedText;
+        }
+
+        public class MyViewHolder extends RecyclerView.ViewHolder {
+            public TextView tvName, tvAddress;
+            public CheckBox checkBox;
+            public LinearLayout linearLayout;
+
+            public MyViewHolder(View view) {
+                super(view);
+                tvName = view.findViewById(R.id.tvName);
+                tvAddress = view.findViewById(R.id.tvAddress);
+                checkBox = view.findViewById(R.id.checkBox);
+                linearLayout = view.findViewById(R.id.linearLayout);
+            }
+        }
+
+
+        @NonNull
+        @Override
+        public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+            View itemView = LayoutInflater.from(viewGroup.getContext())
+                    .inflate(R.layout.adapter_employee_dialog_group_list, viewGroup, false);
+            return new MyViewHolder(itemView);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull final MyViewHolder myViewHolder, int i) {
+            final DatewiseModel date = dateStr.get(i);
+            final int pos = i;
+            myViewHolder.tvName.setText(date.getValue());
+
+                myViewHolder.checkBox.setVisibility(View.VISIBLE);
+
+            myViewHolder.checkBox.setChecked(dateStr.get(i).isChecked());
+
+
+            myViewHolder.checkBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CheckBox cb = (CheckBox) v;
+
+                    staticDateList.get(pos).setChecked(cb.isChecked());
+
+                }
+            });
+
+           /* myViewHolder.linearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    try {
+
+                        String str="";
+                        for (int i=0;i<dateStr.size();i++){
+                            if (dateStr.get(i).isChecked()){
+                                str=str+","+dateStr.get(i).getValue();
+                            }
+                        }
+
+                        edDatewise.setText(""+str.substring(1));
+
+
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
+                }
+            });*/
+        }
+
+
+        @Override
+        public int getItemCount() {
+            return dateStr.size();
+        }
+
+    }
+
+
     public class DepartmentListDialogAdapter extends RecyclerView.Adapter<DepartmentListDialogAdapter.MyViewHolder> {
 
         private ArrayList<GroupList> custList;
@@ -1304,23 +1526,23 @@ int yyyy, mm, dd;
 //                        customerDataIntent.putExtra("id", model.getEmpDeptId());
 //                        LocalBroadcastManager.getInstance(context).sendBroadcast(customerDataIntent);
                     dialog.dismiss();
-                    tvDept.setText(""+model.getGroupName());
-                    tvDeptId.setText(""+model.getGroupId());
-                    tvEmp.setText(""+model.getExVar2());
-                    tvEmpId.setText(""+model.getUserIds());
+                    tvDept.setText("" + model.getGroupName());
+                    tvDeptId.setText("" + model.getGroupId());
+                    tvEmp.setText("" + model.getExVar2());
+                    tvEmpId.setText("" + model.getUserIds());
+                    tvGroupId.setText(""+model.getGroupId());
 
 
 //                    deptId= Integer.parseInt(tvDeptId.getText().toString());
 //                    Log.e("Department id","--------------------------------------------"+deptId);
                     final ArrayList<Integer> deptList = new ArrayList<>();
                     deptList.add(model.getExInt1());
-                    getAllEmp(deptList,model.getUserIds());
+                    getAllEmp(deptList, model.getUserIds());
 
-                   // getEmployeeName();
+                    // getEmployeeName();
                 }
             });
         }
-
 
 
         @Override
@@ -1341,7 +1563,7 @@ int yyyy, mm, dd;
         private Context context;
         private String selectedText;
 
-        public EmployeeListDialogAdapter(ArrayList<Employee> empList, Context context,String selectedText) {
+        public EmployeeListDialogAdapter(ArrayList<Employee> empList, Context context, String selectedText) {
             this.empList = empList;
             this.context = context;
             this.selectedText = selectedText;
@@ -1375,15 +1597,13 @@ int yyyy, mm, dd;
         public void onBindViewHolder(@NonNull final MyViewHolder myViewHolder, int i) {
             final Employee model = empList.get(i);
             final int pos = i;
-            myViewHolder.tvName.setText(model.getEmpFname()+" "+model.getEmpMname()+" "+model.getEmpSname());
+            myViewHolder.tvName.setText(model.getEmpFname() + " " + model.getEmpMname() + " " + model.getEmpSname());
             //holder.tvAddress.setText(model.getCustAddress());
 
-            Log.e("Adapter","---------------------------selected text----------------------------"+selectedText);
-            if(selectedText.equalsIgnoreCase("Indivsual"))
-            {
+            Log.e("Adapter", "---------------------------selected text----------------------------" + selectedText);
+            if (selectedText.equalsIgnoreCase("Indivsual")) {
                 myViewHolder.checkBox.setVisibility(View.GONE);
-            }else if(selectedText.equalsIgnoreCase("Group"))
-            {
+            } else if (selectedText.equalsIgnoreCase("Group")) {
                 myViewHolder.checkBox.setVisibility(View.VISIBLE);
             }
 
@@ -1412,13 +1632,12 @@ int yyyy, mm, dd;
 //                        customerDataIntent.putExtra("id", model.getEmpDeptId());
 //                        LocalBroadcastManager.getInstance(context).sendBroadcast(customerDataIntent);
                     dialog.dismiss();
-                    tvEmp.setText(""+model.getEmpFname()+" "+model.getEmpMname()+" "+model.getEmpSname());
-                    tvEmpId.setText(""+model.getEmpId());
+                    tvEmp.setText("" + model.getEmpFname() + " " + model.getEmpMname() + " " + model.getEmpSname());
+                    tvEmpId.setText("" + model.getEmpId());
 
                 }
             });
         }
-
 
 
         @Override
@@ -1471,7 +1690,7 @@ int yyyy, mm, dd;
         public void onBindViewHolder(@NonNull final MyViewHolder myViewHolder, int i) {
             final Employee model = empList.get(i);
             final int pos = i;
-            myViewHolder.tvName.setText(model.getEmpFname()+" "+model.getEmpMname()+" "+model.getEmpSname());
+            myViewHolder.tvName.setText(model.getEmpFname() + " " + model.getEmpMname() + " " + model.getEmpSname());
             //holder.tvAddress.setText(model.getCustAddress());
 
 
@@ -1508,7 +1727,6 @@ int yyyy, mm, dd;
         }
 
 
-
         @Override
         public int getItemCount() {
             return empList.size();
@@ -1522,7 +1740,7 @@ int yyyy, mm, dd;
     }
 
     private void getAllEmp(ArrayList<Integer> deptId, final String userIds) {
-        Log.e("PARAMETER","             DEPT ID       "+deptId+"                     USER ID     "+userIds);
+        Log.e("PARAMETER", "             DEPT ID       " + deptId + "                     USER ID     " + userIds);
         if (Constants.isOnline(getActivity())) {
             final CommonDialog commonDialog = new CommonDialog(getActivity(), "Loading", "Please Wait...");
             commonDialog.show();
@@ -1538,10 +1756,10 @@ int yyyy, mm, dd;
 //                            empNameList.clear();
 //                            empIdList.clear();
                             empList.clear();
-                            empList=response.body();
+                            empList = response.body();
 
                             assignStaticTaskEmpList.clear();
-                            assignStaticTaskEmpList=empList;
+                            assignStaticTaskEmpList = empList;
 
 //                            String strEmpId="";
 //                            if (model != null) {
@@ -1567,8 +1785,6 @@ int yyyy, mm, dd;
                                     }
                                 }
                             }
-
-
 
 
 //                            empNameList.add("");

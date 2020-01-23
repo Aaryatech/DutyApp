@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -24,7 +23,6 @@ import android.widget.Toast;
 import com.ats.dutyapp.R;
 import com.ats.dutyapp.activity.HomeActivity;
 import com.ats.dutyapp.constant.Constants;
-import com.ats.dutyapp.fragment.DashboardFragment;
 import com.ats.dutyapp.model.ChatMemo;
 import com.ats.dutyapp.model.ChatTask;
 import com.ats.dutyapp.model.GroupEmp;
@@ -44,11 +42,11 @@ public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapte
 
     private ArrayList<GroupEmp> empList;
     private Context context;
-    public  static Login loginUser;
-    public  static ChatTask chatTask;
+    public Login loginUser;
+    public ChatTask chatTask;
 
 
-    public EmployeeListAdapter(ArrayList<GroupEmp> empList, Context context,ChatTask chatTask,Login loginUser) {
+    public EmployeeListAdapter(ArrayList<GroupEmp> empList, Context context, ChatTask chatTask, Login loginUser) {
         this.empList = empList;
         this.context = context;
         this.chatTask = chatTask;
@@ -65,25 +63,36 @@ public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapte
 
     @Override
     public void onBindViewHolder(@NonNull EmployeeListAdapter.MyViewHolder myViewHolder, int i) {
-        final GroupEmp model=empList.get(i);
+        final GroupEmp model = empList.get(i);
 
         myViewHolder.tvEmpName.setText(model.getName());
 
-        if(model.getUserType()==1) {
-            myViewHolder.tvEmpDesig.setText("Created User");
+        if (model.getUserType() == 1) {
+            myViewHolder.tvEmpDesig.setVisibility(View.VISIBLE);
+            myViewHolder.tvEmpDesig.setText("Super Admin");
             myViewHolder.tvMemo.setVisibility(View.GONE);
-        }else  if(model.getUserType()==2) {
+        } else if (model.getUserType() == 2) {
+            myViewHolder.tvEmpDesig.setVisibility(View.VISIBLE);
             myViewHolder.tvEmpDesig.setText("Admin");
-            myViewHolder.tvMemo.setVisibility(View.VISIBLE);
-        }else  if(model.getUserType()==3) {
-            myViewHolder.tvMemo.setVisibility(View.VISIBLE);
-        }
+            myViewHolder.tvMemo.setVisibility(View.GONE);
+        } else if (model.getUserType() == 3) {
 
+            myViewHolder.tvEmpDesig.setVisibility(View.GONE);
+
+            if (chatTask.getPrivilege() != 3) {
+
+                if (loginUser.getEmpId() != model.getEmpId()) {
+                    myViewHolder.tvMemo.setVisibility(View.VISIBLE);
+                } else {
+                    myViewHolder.tvMemo.setVisibility(View.GONE);
+                }
+            }
+        }
 
         try {
             String imageUri = String.valueOf(model.getPhoto());
-            Log.e("Image Path","---------------------"+ Constants.IMAGE_URL+imageUri);
-            Picasso.with(context).load(Constants.IMAGE_URL+imageUri).placeholder(context.getResources().getDrawable(R.drawable.profile)).into(myViewHolder.ivPhoto);
+            Log.e("Image Path", "---------------------" + Constants.IMAGE_URL + imageUri);
+            Picasso.with(context).load(Constants.IMAGE_URL + imageUri).placeholder(context.getResources().getDrawable(R.drawable.profile)).into(myViewHolder.ivPhoto);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -92,7 +101,7 @@ public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapte
         myViewHolder.tvMemo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AddMemoDialog(context,chatTask,model).show();
+                new AddMemoDialog(context, chatTask, model).show();
             }
         });
 
@@ -105,27 +114,28 @@ public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapte
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         private CircleImageView ivPhoto;
-        private TextView tvEmpName,tvEmpDesig,tvEmpCount,tvMemo;
+        private TextView tvEmpName, tvEmpDesig, tvEmpCount, tvMemo;
         private CardView cardView;
+
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivPhoto=itemView.findViewById(R.id.ivEmployee);
-            tvEmpName=itemView.findViewById(R.id.tvEmpName);
-            tvEmpDesig=itemView.findViewById(R.id.tvEmpDesig);
-            tvEmpCount=itemView.findViewById(R.id.tvEmpCount);
-            tvMemo=itemView.findViewById(R.id.tvMemo);
-            cardView=itemView.findViewById(R.id.cardView);
+            ivPhoto = itemView.findViewById(R.id.ivEmployee);
+            tvEmpName = itemView.findViewById(R.id.tvEmpName);
+            tvEmpDesig = itemView.findViewById(R.id.tvEmpDesig);
+            tvEmpCount = itemView.findViewById(R.id.tvEmpCount);
+            tvMemo = itemView.findViewById(R.id.tvMemo);
+            cardView = itemView.findViewById(R.id.cardView);
         }
     }
 
     private class AddMemoDialog extends Dialog {
         public Button btnCancel, btnSubmit;
-        public TextView tvTaskName,tvTaskDesc;
+        public TextView tvTaskName, tvTaskDesc;
         public EditText edRemark;
         ChatTask chatTask;
         GroupEmp employee;
 
-        public AddMemoDialog(Context context,ChatTask chatTask,GroupEmp employee) {
+        public AddMemoDialog(Context context, ChatTask chatTask, GroupEmp employee) {
             super(context);
             this.chatTask = chatTask;
             this.employee = employee;
@@ -149,21 +159,20 @@ public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapte
             wlp.height = WindowManager.LayoutParams.WRAP_CONTENT;
             window.setAttributes(wlp);
 
-            tvTaskName=(TextView)findViewById(R.id.tvTaskName);
-            tvTaskDesc=(TextView)findViewById(R.id.tvTaskDesc);
+            tvTaskName = (TextView) findViewById(R.id.tvTaskName);
+            tvTaskDesc = (TextView) findViewById(R.id.tvTaskDesc);
 
             try {
                 tvTaskName.setText("" + chatTask.getHeaderName());
                 tvTaskDesc.setText("" + chatTask.getTaskDesc());
-            }catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            edRemark=(EditText)findViewById(R.id.edRemark);
+            edRemark = findViewById(R.id.edRemark);
 
-            btnCancel = (Button) findViewById(R.id.btnCancel);
-            btnSubmit = (Button) findViewById(R.id.btnSubmit);
+            btnCancel = findViewById(R.id.btnCancel);
+            btnSubmit = findViewById(R.id.btnSubmit);
 
             btnCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -176,9 +185,9 @@ public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapte
                 @Override
                 public void onClick(View v) {
                     String strRmark;
-                    boolean isValidRemark=false;
+                    boolean isValidRemark = false;
 
-                    strRmark=edRemark.getText().toString();
+                    strRmark = edRemark.getText().toString();
 
                     if (strRmark.isEmpty()) {
                         edRemark.setError("required");
@@ -187,21 +196,18 @@ public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapte
                         isValidRemark = true;
                     }
 
-                    if(isValidRemark)
-                    {
+                    if (isValidRemark) {
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                       final ChatMemo chatMemo=new ChatMemo(0,employee.getEmpId(),chatTask.getHeaderId(),loginUser.getEmpId(),strRmark,sdf.format(System.currentTimeMillis()),0,1,0,0,0,"","","");
+                        final ChatMemo chatMemo = new ChatMemo(0, employee.getEmpId(), chatTask.getHeaderId(), loginUser.getEmpId(), strRmark, sdf.format(System.currentTimeMillis()), 0, 1, 0, 0, 0, "", "", "");
                         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogTheme);
                         builder.setTitle("Confirmation");
-                        builder.setMessage("Do you want to save memo ?");
+                        builder.setMessage("Do you want to generate memo?");
                         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
                                 saveMemo(chatMemo);
                                 dismiss();
-                                Log.e("Save memo", "-------------------------------SAVE----------------------------------" + chatMemo);
-
                             }
                         });
                         builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
@@ -222,7 +228,7 @@ public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapte
     }
 
     private void saveMemo(ChatMemo chatMemo) {
-        Log.e("PARAMETER","---------------------------------------MEMO LIST--------------------------"+chatMemo);
+        Log.e("PARAMETER", "---------------------------------------MEMO LIST--------------------------" + chatMemo);
 
         if (Constants.isOnline(context)) {
             final CommonDialog commonDialog = new CommonDialog(context, "Loading", "Please Wait...");
@@ -236,11 +242,7 @@ public class EmployeeListAdapter extends RecyclerView.Adapter<EmployeeListAdapte
                         if (response.body() != null) {
 
                             Log.e("SAVE MEMO LIST : ", " ------------------------------SAVE MEMO LIST------------------------- " + response.body());
-                            HomeActivity activity = (HomeActivity) context;
-                            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show();
-                            FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
-                            ft.replace(R.id.content_frame, new DashboardFragment(), "MainFragment");
-                            ft.commit();
+                            Toast.makeText(context, "Memo generated successfully", Toast.LENGTH_SHORT).show();
 
                             commonDialog.dismiss();
 

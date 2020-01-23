@@ -4,14 +4,19 @@ import com.ats.dutyapp.model.ActionHeaderClose;
 import com.ats.dutyapp.model.AssignChecklist;
 import com.ats.dutyapp.model.AssignDetail;
 import com.ats.dutyapp.model.AssignDuty;
+import com.ats.dutyapp.model.ChatDetail;
+import com.ats.dutyapp.model.ChatDetailIdListByReadStatus;
+import com.ats.dutyapp.model.ChatDisplay;
 import com.ats.dutyapp.model.ChatGroup;
 import com.ats.dutyapp.model.ChatHeader;
 import com.ats.dutyapp.model.ChatMemo;
 import com.ats.dutyapp.model.ChatTask;
 import com.ats.dutyapp.model.ChecklistActionHeader;
 import com.ats.dutyapp.model.Detail;
+import com.ats.dutyapp.model.EmpChatReadModel;
 import com.ats.dutyapp.model.GroupEmp;
 import com.ats.dutyapp.model.GroupList;
+import com.ats.dutyapp.model.MemoGenerated;
 import com.ats.dutyapp.model.SaveAssigneChecklist;
 import com.ats.dutyapp.model.ChecklistHeader;
 import com.ats.dutyapp.model.Department;
@@ -30,6 +35,7 @@ import com.ats.dutyapp.model.Sync;
 
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import okhttp3.MultipartBody;
@@ -50,7 +56,10 @@ public interface InterfaceAPI {
     @POST("master/login")
     Call<Login> doLogin(@Query("dscNumber") String dscNumber);
 
-    @POST("master/updateToken")
+   /* @POST("master/updateToken")
+    Call<Info> updateUserToken(@Query("empId") int empId, @Query("token") String token);*/
+
+    @POST("master/updateChatToken")
     Call<Info> updateUserToken(@Query("empId") int empId, @Query("token") String token);
 
     @POST("duty/master/getTaskDoneHeaderByEmpAndFromToDate")
@@ -101,6 +110,9 @@ public interface InterfaceAPI {
 
     @GET("master/allEmployeesByDesg")
     Call<ArrayList<Emp>> allEmployees();
+
+    @GET("master/allEmployeesByDesg")
+    Call<ArrayList<Employee>> getAllEmployees();
 
     @POST("checklist/saveChecklistHeaderAndDetail")
     Call<ChecklistHeader> saveChecklistHeaderAndDetail(@Body ChecklistHeader checklistHeader);
@@ -168,10 +180,64 @@ public interface InterfaceAPI {
     @POST("chat/saveChatHeader")
     Call<ChatHeader> saveChatHeader(@Body ChatHeader chatHeader);
 
+    @POST("chat/editChatHeader")
+    Call<ChatHeader> editChatHeader(@Body ChatHeader chatHeader);
+
     @POST("chat/saveChatMemo")
     Call<ChatMemo> saveChatMemo(@Body ChatMemo chatMemo);
 
     @POST("chat/getChatEmpListByHeader")
     Call<ArrayList<GroupEmp>> getChatEmpListByHeader(@Query("headerId") int headerId);
+
+    @POST("chat/saveChatDetail")
+    Call<ChatDetail> saveChatDetail(@Body ChatDetail chatDetail);
+
+    @POST("chat/saveChatDetailWithoutNotify")
+    Call<ArrayList<ChatDetail>> saveChatDetailList(@Body ArrayList<ChatDetail> chatDetailList);
+
+    @POST("chat/getAllChatByLastSyncAndUserId")
+    Call<ArrayList<ChatDisplay>> getAllChatByLastSyncAndUserId(@Query("lastSyncId") int lastSyncId,@Query("userId") int userId);
+
+    @POST("chat/getAllChatHeaderDisplayByUser")
+    Call<ArrayList<ChatTask>> getAllChatHeaderDisplayByUser(@Query("userId") int userId);
+
+    @POST("chat/updateChatHeaderCloseRequest")
+    Call<Info> updateChatCloseRequest(@Query("headerId") int headerId,@Query("status") int status,@Query("empId") int empId);
+
+    @POST("chat/updateChatHeaderClose")
+    Call<Info> updateChatHeaderClose(@Query("headerId") int headerId,@Query("status") int status,@Query("empId") int empId, @Query("remark") String remark);
+
+    @POST("chat/getMemoByDateAndEmpId")
+    Call<ArrayList<MemoGenerated>> getMemoByDateAndEmpId(@Query("fromDate") String fromDate, @Query("toDate") String toDate, @Query("empId") int empId);
+
+    @POST("chat/getAllClosedChatHeaderDisplay")
+    Call<ArrayList<ChatTask>> getAllClosedChatHeaderDisplay(@Query("fromDate") String fromDate, @Query("toDate") String toDate);
+
+    @POST("chat/getAllChatDetailByHeader")
+    Call<ArrayList<ChatDetail>> getAllChatDetailByHeader(@Query("headerId") int headerId);
+
+    @POST("chat/getMemoByEmpId")
+    Call<ArrayList<MemoGenerated>> getMemoByEmpId(@Query("empId") int empId);
+
+    @POST("chat/getAllChatHeaderDisplayByUserAndGroup")
+    Call<ArrayList<ChatTask>> getAllChatHeaderDisplayByUserAndGroup(@Query("userId") int userId,@Query("groupId") int groupId);
+
+    @POST("chat/getAllChatGroupDisplayByUser")
+    Call<ArrayList<GroupList>> getAllChatGroupDisplayByUser(@Query("userId") int userId);
+
+    @POST("chat/getAllChatGroupDisplayMasterByUser")
+    Call<ArrayList<GroupList>> getAllChatGroupDisplayMasterByUser(@Query("userId") int userId);
+
+    @POST("chat/saveUserIdChatRead")
+    Call<Info> saveUserIdChatReadToServer(@Body ArrayList<ChatDetail> chatDetailList,@Query("userId") int userId);
+
+    @POST("chat/getChatDetailIdsByReadStatus")
+    Call<ArrayList<ChatDetailIdListByReadStatus>> getChatDetailIdsByReadStatus(@Query("readStatus") int readStatus);
+
+    @POST("chat/getChatDetailIdsRead")
+    Call<ArrayList<ChatDetailIdListByReadStatus>> getChatDetailIdsRead(@Body ArrayList<Integer> detailIds);
+
+    @POST("chat/getEmpChatRead")
+    Call<ArrayList<EmpChatReadModel>> getEmpChatRead(@Query("detailId") int detailId);
 
 }
